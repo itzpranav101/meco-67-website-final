@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#f7f3ee" />
-  <!-- Meco is explicitly light-themed -->
+
   <meta name="color-scheme" content="light" />
   <meta name="description" content="Meco is an adaptive cognitive-support system for dementia. It learns what a person can still do, notices when they need help, and gives the smallest cue that lets them succeed on their own." />
   <title>Meco | Adaptive Cognitive Support for Dementia</title>
@@ -14,7 +14,7 @@
   <link rel="manifest" href="/manifest.json" />
   <link rel="icon" href="/meco-icon.svg" />
   <link rel="stylesheet" href="/styles.css" />
-  <!-- Sets the saved theme before the page paints. -->
+
   <script>
     try {
       var t = localStorage.getItem('meco-theme');
@@ -27,7 +27,6 @@
   <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
   <div id="toast-region" class="toast-region" aria-live="polite"></div>
 
-  <!-- Shared theme popover -->
   <div id="theme-popover" class="theme-popover hidden" role="dialog" aria-label="Choose a theme">
     <p class="theme-popover-title">Choose a theme</p>
     <p class="theme-popover-sub">Changes color, contrast and mood everywhere: this site, sign-in, and both consoles. Two are built for low vision or light sensitivity.</p>
@@ -77,7 +76,6 @@
     </div>
     </div>
 
-    <!-- ============ HOME ============ -->
     <div class="landing-page" data-landing-page="home">
       <section class="hero-shell" id="top">
         <div class="hero-copy reveal">
@@ -331,7 +329,7 @@
             <li>This site</li><li>Sign-in</li><li>Caregiver console</li><li>Patient mode</li>
             <li class="yes">High Contrast, for low vision</li><li class="yes">Warm Sepia, for light sensitivity</li>
           </ul>
-        <!-- A continuously auto-scrolling marquee -->
+
         <div class="theme-grid-preview">
           <div class="theme-marquee-track">
             <div class="theme-marquee-set">
@@ -416,7 +414,6 @@
       </div>
     </div>
 
-    <!-- ============ RECOGNIZE ============ -->
     <div class="landing-page hidden" data-landing-page="recognize">
       <header class="chapter-header recognize-chapter reveal">
         <div class="chapter-header-copy">
@@ -615,7 +612,6 @@
       </div>
     </div>
 
-    <!-- ============ PRODUCT ============ -->
     <div class="landing-page hidden" data-landing-page="product">
       <header class="chapter-header product-chapter reveal">
         <div class="chapter-header-copy">
@@ -650,7 +646,7 @@
       </nav></div>
       <div class="deckle-divider" aria-hidden="true"></div>
       <div class="chapter-body">
-        <!-- HOW IT WORKS, interactive orbit -->
+
         <section id="how-it-works" class="chapter-section how-it-works-section">
           <div class="chapter-intro reveal-up">
             <p class="section-kicker centered">HOW IT WORKS</p>
@@ -701,7 +697,6 @@
             <button type="button" class="orbit-resume" data-orbit-resume hidden>▸ Resume the orbit</button>
           </div>
 
-          <!-- Mobile/narrow fallback -->
           <ol class="orbit-mobile-list" data-orbit-mobile-list aria-label="Five steps of how Meco works"></ol>
         </section>
 
@@ -832,7 +827,6 @@
       </div>
     </div>
 
-    <!-- ============ COMPANION ============ -->
     <div class="landing-page hidden" data-landing-page="companion">
       <header class="chapter-header companion-chapter reveal">
         <div class="chapter-header-copy">
@@ -1025,7 +1019,6 @@
       </div>
     </div>
 
-    <!-- ============ CAREGIVER ============ -->
     <div class="landing-page hidden" data-landing-page="caregiver">
       <header class="chapter-header caregiver-chapter reveal">
         <div class="chapter-header-copy">
@@ -1192,7 +1185,6 @@
       </div>
     </div>
 
-    <!-- ============ PRIVACY ============ -->
     <div class="landing-page hidden" data-landing-page="privacy">
       <header class="chapter-header privacy-chapter reveal">
         <div class="chapter-header-copy">
@@ -1346,7 +1338,6 @@
       </div>
     </div>
 
-    <!-- ============ PRICING ============ -->
     <div class="landing-page hidden" data-landing-page="pricing">
       <header class="chapter-header pricing-chapter reveal">
         <div class="chapter-header-copy">
@@ -1473,7 +1464,6 @@
       </div>
     </div>
 
-    <!-- ============ CLINICIANS ============ -->
     <div class="landing-page hidden" data-landing-page="clinicians">
       <header class="chapter-header clinicians-chapter reveal">
         <div class="chapter-header-copy">
@@ -1637,7 +1627,6 @@
       </div>
     </div>
 
-    <!-- ============ PRIVACY POLICY ============ -->
     <div class="landing-page hidden" data-landing-page="impact">
       <header class="chapter-header reveal">
         <div class="chapter-header-copy">
@@ -1819,7 +1808,6 @@
       </div>
     </div>
 
-    <!-- ============ TERMS OF SERVICE ============ -->
     <div class="landing-page hidden" data-landing-page="terms">
       <div class="legal-page">
         <div class="legal-head reveal">
@@ -1877,7 +1865,6 @@
       </div>
     </div>
 
-    <!-- ============ COOKIE POLICY ============ -->
     <div class="landing-page hidden" data-landing-page="cookies">
       <div class="legal-page">
         <div class="legal-head reveal">

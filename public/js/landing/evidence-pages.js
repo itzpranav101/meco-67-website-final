@@ -1,5 +1,3 @@
-/* Fills /impact and /science, plus the homepage evidence strip. */
-
 import { $, escapeHtml } from '../utils.js';
 import {
   Statistic, StatisticBreakdown, EvidenceCard, AllCitations, MECO_WILL_MEASURE,
@@ -37,8 +35,6 @@ export function renderEvidencePages() {
       </div>`;
   }
 
-  // Problem → response. The pairing is the argument: here is a measured
-  // burden, here is the specific thing Meco does about it.
   const pairs = $('[data-evidence="problem-response"]');
   if (pairs) {
     pairs.innerHTML = [
@@ -81,8 +77,6 @@ export function renderEvidencePages() {
   const refs = $('[data-evidence="citations"]');
   if (refs) refs.innerHTML = AllCitations();
 
-  // Homepage evidence strip: the same registry entries as /impact, so the
-  // homepage can never quote a different figure than the detail page.
   const homeStrip = $('[data-evidence="home-strip"]');
   if (homeStrip) {
     homeStrip.innerHTML = `

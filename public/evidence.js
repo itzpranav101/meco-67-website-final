@@ -1,5 +1,3 @@
-/* Meco, Evidence & Source Registry */
-
 export const SOURCES = {
   who2025: {
     id: 'who2025',
@@ -39,7 +37,6 @@ export const SOURCES = {
   },
 };
 
-/* The statistics themselves. */
 export const STATISTICS = {
   sgToday: {
     id: 'sgToday',
@@ -144,7 +141,6 @@ export const STATISTICS = {
   },
 };
 
-/* What Meco will measure once it is actually tested. */
 export const MECO_WILL_MEASURE = [
   { metric: 'Independent task completion', detail: 'Share of routine steps finished at assistance level 0 or 1.' },
   { metric: 'Assistance level required', detail: 'Median level on the ladder per task, tracked over weeks.' },
@@ -156,15 +152,12 @@ export const MECO_WILL_MEASURE = [
   { metric: 'Caregiver coordination time', detail: 'Time spent handing over between caregivers, before and after a shared handoff.' },
 ];
 
-/* Render helpers: the `<Statistic/>` */
-
 const esc = (value = '') =>
   String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const sourceLabel = (source, asOf) =>
   `${esc(source.organisation)}${asOf ? `, ${esc(asOf)}` : ''}`;
 
-/* A single headline number with its source attached. */
 export function Statistic(id, { size = 'large' } = {}) {
   const stat = STATISTICS[id];
   if (!stat) return '';
@@ -179,7 +172,6 @@ export function Statistic(id, { size = 'large' } = {}) {
     </figure>`;
 }
 
-/** A statistic broken into its components, e.g. the 217 care hours. */
 export function StatisticBreakdown(id) {
   const stat = STATISTICS[id];
   if (!stat?.breakdown) return '';
@@ -197,7 +189,6 @@ export function StatisticBreakdown(id) {
     </div>`;
 }
 
-/** A problem→response pairing: the evidence, then what Meco does about it. */
 export function EvidenceCard({ statId, heading, body }) {
   const stat = STATISTICS[statId];
   if (!stat) return '';
@@ -216,7 +207,6 @@ export function EvidenceCard({ statId, heading, body }) {
     </article>`;
 }
 
-/** A full academic-style citation, for /science and the references page. */
 export function Citation(sourceId) {
   const source = SOURCES[sourceId];
   if (!source) return '';
@@ -228,7 +218,6 @@ export function Citation(sourceId) {
     </li>`;
 }
 
-/** Every source, for the references page. */
 export function AllCitations() {
   return `<ul class="citation-list">${Object.keys(SOURCES).map(Citation).join('')}</ul>`;
 }

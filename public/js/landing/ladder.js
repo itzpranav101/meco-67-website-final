@@ -1,5 +1,3 @@
-/* The Assistance Ladder shown on the homepage. */
-
 import { $, escapeHtml } from '../utils.js';
 
 export const LADDER_RUNGS = [
@@ -11,8 +9,6 @@ export const LADDER_RUNGS = [
   { level: 5, name: 'Full guidance', short: 'Step by step', example: 'Step 1 of 4: Fill the kettle. Meco waits, then shows step 2.', why: 'Complete instructions, one step at a time, at the person\'s pace.' },
   { level: 6, name: 'Human assistance', short: 'A person', example: 'Meco offers to call Meena, or alerts the caregiver on duty.', why: 'Sometimes the right answer is a person. Meco says so rather than looping.' },
 ];
-
-/* The homepage simulation. */
 
 export function initAssistanceLadder() {
   const root = $('[data-ladder]');
@@ -49,7 +45,7 @@ export function initAssistanceLadder() {
     const btn = event.target.closest('.ladder-rung');
     if (btn) show(Number(btn.dataset.rung));
   });
-  // Arrow-key support so the ladder is operable without a mouse.
+
   rungsEl.addEventListener('keydown', (event) => {
     if (!['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
     event.preventDefault();

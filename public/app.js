@@ -1,5 +1,3 @@
-/* Caregiver console + patient mode. */
-
 import { $, $$, sleep, escapeHtml, formatDate, formatDuration, turnsLabel } from './js/utils.js';
 import { state, defaultState, setState, resetState } from './js/state.js';
 import {
@@ -21,7 +19,6 @@ import { initAssistanceLadder } from './js/landing/ladder.js';
 import { initAssistanceSimulation } from './js/landing/simulation.js';
 import { renderEvidencePages } from './js/landing/evidence-pages.js';
 
-// Counts up from 0 to target rather than just printing the number
 function animateCountUp(el, target, duration = 700) {
   if (!el) return;
   const goal = Number(target) || 0;
@@ -44,8 +41,6 @@ const conversationLanguages = [
   { code: 'hi', label: 'Hindi' },
 ];
 
-// Ordered gently from easier to harder feelings: the order itself is what
-// gives the mood picker a spectrum instead of a random grid of emoji.
 const journalMoods = [
   { key: 'happy', glyph: '◉', label: 'Happy' },
   { key: 'calm', glyph: '◎', label: 'Calm' },
@@ -85,7 +80,6 @@ function observeReveals() {
   $$('.reveal, .reveal-left, .reveal-right, .reveal-up, .reveal-scale, .stagger-group, .draw-in').forEach((element) => observer.observe(element));
 }
 
-// Scroll chrome: nav elevation
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let scrollChromeTicking = false;
 function updateScrollChrome() {
@@ -101,7 +95,6 @@ function updateScrollChrome() {
   scrollChromeTicking = false;
 }
 
-// Depth via speed, not opacity
 function applyHeroParallax(scrollY) {
   const heroShell = $('.hero-shell');
   if (!heroShell || scrollY > heroShell.offsetHeight + 200) return;
@@ -115,7 +108,6 @@ function applyHeroParallax(scrollY) {
   });
 }
 
-// Each chapter page's pill tab row
 let chapterTabsObserver = null;
 function initChapterTabs(root = document) {
   chapterTabsObserver?.disconnect();
@@ -148,12 +140,10 @@ function initChapterTabs(root = document) {
     if (visible) setActive(visible.target.id);
   }, { rootMargin: '-45% 0px -50% 0px' });
   sections.forEach(({ section }) => chapterTabsObserver.observe(section));
-  // Fonts/layout may not have settled the instant this runs
+
   requestAnimationFrame(() => setActive(sections[0]?.section.id));
 }
 
-// ---------- theme system ----------
-// The saved theme is already applied before this runs
 function currentTheme() {
   return document.documentElement.getAttribute('data-theme') || 'classic';
 }
@@ -166,7 +156,7 @@ function applyTheme(name) {
 }
 
 function wireThemeSystem() {
-  applyTheme(currentTheme()); // syncs .active rings to whatever the head script already applied
+  applyTheme(currentTheme());
   const popover = $('#theme-popover');
   const openers = [$('#theme-toggle-nav'), $('#theme-toggle-app'), $('#theme-toggle-footer')].filter(Boolean);
   const openPopover = (anchor) => {
@@ -235,12 +225,12 @@ async function initClerk() {
         resetState();
         currentPage = 'overview';
       }
-      // Bug: this used to only run when location.pathname !== '/app'
+
       if (user && !$('#auth-modal').classList.contains('hidden')) {
         closeAuthModal();
         if (location.pathname !== '/app') history.pushState({}, '', '/app');
       }
-      // Clerk emits this on routine session-token refreshes too.
+
       const alreadyShowingApp = appLoaded && location.pathname === '/app' && !$('#app-view').classList.contains('hidden');
       if (!userChanged && alreadyShowingApp) return;
       await renderRoute();
@@ -256,7 +246,7 @@ function openAuthModal(mode = 'sign-in') {
   const mount = $('#clerk-auth-mount');
   modal.classList.remove('hidden');
   $('#auth-loading').classList.remove('hidden');
-  // Unmount through Clerk
+
   try { clerk?.unmountSignIn?.(mount); } catch {}
   try { clerk?.unmountSignUp?.(mount); } catch {}
   if (mount.childElementCount) mount.innerHTML = '';
@@ -281,7 +271,7 @@ function openAuthModal(mode = 'sign-in') {
 function closeAuthModal() {
   $('#auth-modal').classList.add('hidden');
   const mount = $('#clerk-auth-mount');
-  // Clerk's own unmount removes the DOM it mounted
+
   try { clerk?.unmountSignIn?.(mount); } catch {}
   try { clerk?.unmountSignUp?.(mount); } catch {}
 }
@@ -322,7 +312,6 @@ async function loadFaceModels() {
   }
 }
 
-// The marketing site is a handful of real
 const LANDING_PAGES = ['home', 'recognize', 'product', 'companion', 'caregiver', 'privacy', 'pricing', 'clinicians', 'science', 'impact', 'privacy-policy', 'terms', 'cookies'];
 const landingPageTitles = {
   home: 'Meco | Adaptive Cognitive Support for Dementia',
@@ -366,7 +355,7 @@ function showLanding(page = 'home') {
   $$('[data-landing-nav]').forEach((link) => link.classList.toggle('active', link.dataset.landingNav === page));
   document.title = landingPageTitles[page] || landingPageTitles.home;
   window.scrollTo(0, 0);
-  // ScrollTo(0,0) is a no-op
+
   updateScrollChrome();
   observeReveals();
   initChapterTabs();
@@ -385,14 +374,13 @@ async function showApp() {
       mount.innerHTML = '';
       clerk.mountUserButton(mount, { afterSignOutUrl: '/' });
     }
-    // Sidebar cascades in once
+
     $('.sidebar-nav-scroll')?.classList.add('sidebar-ready');
   }
   updatePatientEntryButton();
   renderAppPage(currentPage);
 }
 
-// The three "Open patient mode" entry points
 function openPatientCameraMode() {
   companionSession = null;
   journalDraft = null;
@@ -410,7 +398,6 @@ function navigateApp(page) {
   if (page === 'visits' || page === 'reminders') pullFromCalendar();
 }
 
-// Jumps straight to one visit's detail view from another page (Timeline, Recall, ...).
 function openSessionDetail(id) {
   cleanupMedia();
   sessionsView = { mode: 'detail', id };
@@ -420,7 +407,6 @@ function openSessionDetail(id) {
   renderAppPage('sessions');
 }
 
-// The sidebar's patient-mode entry doubles as the way back out
 function updatePatientEntryButton() {
   const button = $('.patient-entry');
   if (!button) return;
@@ -433,7 +419,7 @@ function updatePatientEntryButton() {
 function renderAppPage(page) {
   const content = $('#app-content');
   if (!content) return;
-  // Only the Patient-mode camera/tabs view locks the page to one screen height with no scroll
+
   content.classList.remove('app-content-fixed');
   if (page === 'people') renderPeople(content);
   else if (page === 'memory') renderMemory(content);
@@ -484,8 +470,7 @@ function visitsCardMarkup(limit = 4) {
 }
 
 function reminderRowMarkup(reminder) {
-  // A reminder sharing a date with a scheduled visit is worth surfacing,
-  // but only on hover, so the row itself stays uncluttered.
+
   const linkedVisit = state.visits.find((visit) => visit.date === reminder.date);
   const linkedMarkup = linkedVisit
     ? `<div class="reminder-linked-visit"><small>Same day as ${escapeHtml(linkedVisit.visitorName ? `${linkedVisit.visitorName}'s` : 'a')} visit</small></div>`
@@ -503,7 +488,6 @@ function reminderRowMarkup(reminder) {
   </div>`;
 }
 
-// Context-aware reminders (Phase 2 assist layer).
 function contextConditionBadgeMarkup(conditions) {
   const place = conditions.nearPlaceId ? (state.places || []).find((p) => p.id === conditions.nearPlaceId) : null;
   const parts = [];
@@ -525,8 +509,6 @@ function remindersCardMarkup(limit = 4) {
   </article>`;
 }
 
-// Wires the add/edit/delete/toggle controls shared by the Overview preview
-// cards and the full Visits/Reminders pages, since they render the same rows.
 function wireVisitsAndReminders() {
   $('#add-visit')?.addEventListener('click', () => openVisitModal());
   $('#see-visits')?.addEventListener('click', () => navigateApp('visits'));
@@ -713,7 +695,6 @@ function renderReminders(content) {
   wireVisitsAndReminders();
 }
 
-// Flagging a chat only helped if a caregiver actually sees it
 function unacknowledgedFlaggedChats() {
   return (state.companionChats || []).filter((chat) => chat.analysis?.flagged && !chat.analysis?.acknowledged);
 }
@@ -736,8 +717,6 @@ function wireFlaggedChatBanner(content) {
   });
 }
 
-// ---- Pre-visit briefings (Phase 2 assist layer) ----
-// A short, source-grounded reminder of what to expect before each of today's visits
 function todaysBriefings() {
   const graph = buildMemoryGraph();
   return sortedVisits()
@@ -799,8 +778,6 @@ function triggerFlaggedChatAlert(chat) {
   else if (Notification.permission !== 'denied') Notification.requestPermission().then((permission) => { if (permission === 'granted') fire(); });
 }
 
-// ---- Demo mode: a realistic, clearly-labelled sample care circle ----
-// Every record this creates gets a "sample_" id prefix
 function buildSampleData() {
   const now = Date.now();
   const day = 86400000;
@@ -901,8 +878,7 @@ async function injectSampleData() {
   try {
     await persistState(false);
   } catch {
-    // Local state already reflects the sample data even if the sync failed,
-    // it'll retry on the next save, same as any other change.
+
   }
   toast('Sample data loaded. Meco now shows a full care circle to demo. Recording a real visit adds right on top of it.', 'success');
   renderAppPage(currentPage);
@@ -921,13 +897,12 @@ async function clearSampleData() {
   try {
     await persistState(false);
   } catch {
-    // Same as above, local state is already clean; the next save retries.
+
   }
   toast('Sample data cleared. Meco is back to a clean state.', 'success');
   renderAppPage(currentPage);
 }
 
-// A deliberately low-key utility
 function demoCodeStripMarkup() {
   return `<div class="demo-code-strip">
     <label for="demo-code-input">Enter code</label>
@@ -1007,10 +982,8 @@ function renderOverview(content) {
   wireVisitsAndReminders();
 }
 
-// A speaker label that names nobody in particular.
 const genericSpeaker = (name) => /^(visitor|unrecognized visitor|other speaker|caregiver|speaker\s*\w*|listening…?)$/i.test(String(name || '').trim());
 
-// Who actually spoke in a visit, most talkative first, excluding the patient.
 function sessionSpeakers(session) {
   const counts = new Map();
   (session.transcript || []).forEach((line) => {
@@ -1025,7 +998,6 @@ function sessionSpeakers(session) {
     .filter((name) => name.toLowerCase() !== patientName);
 }
 
-// The visit is filed under the person Meco recognized.
 function inferSessionVisitor() {
   if (patientContext?.visitor) {
     const visitor = patientContext.visitor;
@@ -1068,8 +1040,7 @@ async function recordVisitorVoice(id) {
   const sentence = voicePromptSentence();
   if (!confirm(`${visitor.name} will be recorded for 12 seconds. Ask them to read this sentence aloud:\n\n"${sentence}"\n\nStart the voice sample now?`)) return;
   button.disabled = true;
-  // The sentence stays visible in the row for the whole recording, so the person
-  // can keep reading it instead of remembering it from the prompt.
+
   const rowCopy = button.closest('.person-row')?.querySelector('.row-copy small');
   try {
     const result = await enrollVoiceSample({ name: visitor.name, personId: visitor.id }, (secondsLeft) => {
@@ -1108,11 +1079,8 @@ function renderPeople(content) {
   });
 }
 
-// Name, relationship and memory cue can all be corrected after enrollment; the
-// enrolled face descriptors and voiceprint are left untouched.
 let editingPersonId = null;
 
-// Accepts youtube.com/watch?v=
 function youtubeIdFromUrl(url) {
   if (!url) return null;
   try {
@@ -1123,7 +1091,7 @@ function youtubeIdFromUrl(url) {
       const embedMatch = parsed.pathname.match(/\/embed\/([\w-]+)/);
       if (embedMatch) return embedMatch[1];
     }
-  } catch { /* not a URL at all, treated as no link */ }
+  } catch {  }
   return null;
 }
 
@@ -1190,11 +1158,8 @@ function renderMemory(content) {
   $$('[data-edit-memory]').forEach((button) => button.onclick = () => openPersonEditor(button.dataset.editMemory));
 }
 
-// The server normalizes memoryCues/caregiverInsights to arrays before a real AI report is
 const asList = (value) => Array.isArray(value) ? value : (value == null || value === '') ? [] : [String(value)];
 
-// ---- Suggested reminders, extracted locally from a transcript ----
-// Runs entirely client-side, no AI key required: a keyword pass, not a language model.
 const REMINDER_TIME_SIGNAL = /\b(today|tomorrow|tonight|this (morning|afternoon|evening|weekend)|next (week|month|monday|tuesday|wednesday|thursday|friday|saturday|sunday)|on (monday|tuesday|wednesday|thursday|friday|saturday|sunday)|\d{1,2}(:\d{2})?\s?(am|pm)\b|\d{1,2}(st|nd|rd|th)?\s(of\s)?(january|february|march|april|may|june|july|august|september|october|november|december))/i;
 const REMINDER_ACTION_SIGNAL = /\b(remember to|don'?t forget|remind (me|her|him|them)|appointment|check[- ]?up|call|bring|pick up|drop off|birthday|come (over|by)|see the (doctor|dentist|gp)|visit(ing)?)\b/i;
 
@@ -1245,7 +1210,6 @@ function summaryMarkup(summary) {
   return `<div class="summary-panel"><div style="display:flex;align-items:center;gap:18px"><div class="score-ring" style="--score:${Number(summary.engagementScore || 0)}"><strong>${Number(summary.engagementScore || 0)}</strong></div><div><h3 style="margin:0">${escapeHtml(summary.emotionalTone || 'Visit report')}</h3><small>Observational engagement score · ${escapeHtml(summary.provider || 'AI')}</small></div></div><div class="summary-box"><h4>Summary</h4><p>${escapeHtml(summary.summary || '')}</p></div><div class="summary-box"><h4>Useful memory cues</h4><p>${escapeHtml(asList(summary.memoryCues).join(' · ') || 'None highlighted')}</p></div><div class="summary-box"><h4>Caregiver insights</h4><p>${escapeHtml(asList(summary.caregiverInsights).join(' · ') || '')}</p></div><div class="summary-box"><h4>Next prompt</h4><p>${escapeHtml(summary.followUpPrompt || '')}</p></div><small>${escapeHtml(summary.safetyNote || 'This report supports caregiver review and is not medical advice.')}</small></div>`;
 }
 
-// A visit keeps the name the caregiver gave it, falling back to who was recognized.
 const sessionTitle = (session) => session?.title?.trim() || session?.visitorName || 'Unrecognized visitor';
 
 function renameSession(id) {
@@ -1300,8 +1264,6 @@ function renderSessionDetail(content, session) {
   if (session.summary?.summary) renderRelatedMemoriesForSession(session, content.querySelector('#related-memories-slot'));
 }
 
-// ---- Conversation continuity ----
-// After a visit summary exists
 async function renderRelatedMemoriesForSession(session, slot) {
   if (!slot || !(state.memories || []).length) return;
   try {
@@ -1331,12 +1293,10 @@ async function renderRelatedMemoriesForSession(session, slot) {
     });
     slot.querySelector('[data-dismiss-related]').onclick = () => { slot.innerHTML = ''; };
   } catch {
-    // Silent, see comment above.
+
   }
 }
 
-// ---- "Save as memory": the AI-backed sibling of the local, no-AI reminder
-// suggestions above: same accept/dismiss pattern, never auto-saves. ----
 async function extractMemoriesFromSession(session, slot) {
   slot.innerHTML = `<div class="empty-state"><p>Looking for memories worth keeping from this visit…</p></div>`;
   try {
@@ -1401,7 +1361,6 @@ function wireMemoryCandidates(slot, session) {
   });
 }
 
-// Opens a standalone, self-contained document in a new tab and prints it
 function printSessionReport(id) {
   const session = state.sessions.find((item) => item.id === id);
   if (!session) return;
@@ -1438,8 +1397,6 @@ function printSessionReport(id) {
   setTimeout(() => win.print(), 300);
 }
 
-// ---------- insights ----------
-// Everything here is derived from state.sessions
 function weeklyVisitCounts(weeks = 8) {
   const now = new Date();
   const startOfWeek = (d) => { const x = new Date(d); const day = x.getDay(); x.setDate(x.getDate() - day); x.setHours(0, 0, 0, 0); return x; };
@@ -1479,8 +1436,6 @@ function topVisitedPeople(limit = 5) {
   return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit).map(([name, count]) => ({ name, count, pct: Math.round((count / max) * 100) }));
 }
 
-// ---------- cognitive insights (Phase 6) ----------
-// Built entirely from cognitiveAttempts[]/retrievalAttempts[] already logged by Stimulation
 function weeklyAverageBuckets(records, weeks, valueFn) {
   const now = new Date();
   const startOfWeek = (d) => { const x = new Date(d); const day = x.getDay(); x.setDate(x.getDate() - day); x.setHours(0, 0, 0, 0); return x; };
@@ -1514,7 +1469,6 @@ function cognitiveActivityAccuracy() {
   })).sort((a, b) => b.count - a.count);
 }
 
-// The "Cue Effectiveness Model"
 const CUE_LEVEL_LABEL = { 5: 'Full answer shown', 4: 'Context sentence', 3: 'Person photo/name', 2: 'Partial word', 1: 'Category hint', 0: 'Independent recall' };
 function cueEffectivenessTally() {
   const byLevel = new Map();
@@ -1621,8 +1575,6 @@ function exportCognitiveInsightsSummary() {
   setTimeout(() => win.print(), 300);
 }
 
-// ---- Memory Graph: a query-time join, not a stored edge list ----
-// People/Conversations/Events/Places/Memories are connected here by walking their existing
 function buildMemoryGraph() {
   const byId = (arr) => new Map((arr || []).map((item) => [item.id, item]));
   const visitorsById = byId(state.visitors);
@@ -1647,7 +1599,6 @@ function buildMemoryGraph() {
   return { memories, memoriesForPerson, sessionsForPerson, memoriesForPlace, visitorsById, placesById, sessionsById };
 }
 
-// A short, source-attributed line answering "why do I know this person"
 function whyKnowThisPerson(visitor) {
   const graph = buildMemoryGraph();
   const sessions = graph.sessionsForPerson(visitor.id);
@@ -1658,8 +1609,6 @@ function whyKnowThisPerson(visitor) {
   return parts.join(' ');
 }
 
-// ---- Generic content tabs ----
-// The same "one tab bar
 function contentTabsMarkup(tabs, activeKey) {
   return `<div class="content-tabs" role="tablist">${tabs.map((t) => `<button type="button" class="content-tab-btn${t.key === activeKey ? ' active' : ''}" data-content-tab="${t.key}" role="tab" aria-selected="${t.key === activeKey}">${t.label}</button>`).join('')}</div>`;
 }
@@ -1670,8 +1619,6 @@ function wireContentTabs(content, onSwitch) {
   });
 }
 
-// A small confidence badge reused everywhere the Memory Graph shows an
-// AI-touched or family-provided field, never rendered as plain fact.
 function confidenceBadgeMarkup(confidence) {
   const meta = {
     fact: { label: 'Fact', cls: 'confidence-fact' },
@@ -1684,7 +1631,7 @@ function confidenceBadgeMarkup(confidence) {
 
 let memoryGraphActiveTab = 'timeline';
 let memoryDetailId = null;
-// Holds the last batch of "Save as memory" candidates returned by the server
+
 let memoryCandidatesCache = [];
 
 function renderMemoryGraphPage(content) {
@@ -1706,7 +1653,6 @@ function renderMemoryGraphPage(content) {
   else renderTimelinePanel(panel);
 }
 
-// ---- Timeline: sessions + memories + journal entries + visits, merged ----
 function timelineEntries() {
   const graph = buildMemoryGraph();
   const entries = [];
@@ -1742,7 +1688,6 @@ function renderTimelinePanel(panel) {
   });
 }
 
-// ---- Memory Capsule detail (edit) ----
 function openMemoryDetail(id) {
   const memory = (state.memories || []).find((m) => m.id === id);
   if (!memory) return;
@@ -1802,7 +1747,6 @@ function renderMemoryDetail(panel, memory) {
   };
 }
 
-// ---- Recall: natural-language search over the Memory Graph ----
 function recallMemoryDigest() {
   const graph = buildMemoryGraph();
   return graph.memories.map((m) => ({
@@ -1868,7 +1812,6 @@ function renderRecallPanel(panel) {
   input.addEventListener('keydown', (event) => { if (event.key === 'Enter') run(); });
 }
 
-// Activities: Stimulation / Reminiscence / Practice
 let activitiesActiveTab = 'stimulation';
 
 function renderActivitiesPage(content) {
@@ -1883,9 +1826,6 @@ function renderActivitiesPage(content) {
   else renderStimulationPanel(panel);
 }
 
-// Adaptive Spaced Retrieval + Errorless Cueing
-
-// A pure function, independently testable
 function nextReview(item, success) {
   let easeFactor = Number(item.easeFactor) || 2.0;
   let intervalDays = Number(item.intervalDays) || 1;
@@ -1902,7 +1842,6 @@ function nextReview(item, success) {
   return { ...item, easeFactor, intervalDays, cueLevel, dueAt: new Date(Date.now() + intervalDays * 86400000).toISOString() };
 }
 
-// First + last letter of each word kept
 function maskAnswer(answer) {
   return String(answer || '').split(' ').map((word) => {
     if (word.length <= 2) return word;
@@ -2043,8 +1982,6 @@ async function answerPractice(panel, given) {
   setTimeout(() => renderPracticePanel(panel), 1800);
 }
 
-// Cognitive Stimulation Mode
-
 const STIMULATION_WORD_BANK = [
   { word: 'Happy', category: 'a feeling', decoys: ['Chair', 'Rain', 'Green'] },
   { word: 'Apple', category: 'a fruit', decoys: ['Hammer', 'Cloud', 'Guitar'] },
@@ -2125,7 +2062,6 @@ function buildStimulationExercise(activityType, level) {
     return { prompt: `Which word is ${bank.category}?`, kind: 'multiple-choice', options, correctAnswer: bank.word, hint: `${bank.word}, ${bank.category}.` };
   }
 
-  // numbers
   if (level <= 2) {
     const a = 1 + Math.floor(Math.random() * 5), b = 1 + Math.floor(Math.random() * 4);
     return { prompt: `What is ${a} + ${b}?`, kind: 'number', correctAnswer: String(a + b), hint: `Count up from ${a}, ${b} more times.` };
@@ -2177,7 +2113,7 @@ async function answerStimulation(panel, given) {
   const correct = normalize(given) === normalize(ex.correctAnswer) || (ex.kind === 'number' && Number(given) === Number(ex.correctAnswer));
   const attempt = { id: crypto.randomUUID(), activityType: ex.activityType, at: new Date().toISOString(), correct, latencyMs: Date.now() - ex.startedAt, hintsUsed: stimulationHintShown };
   state.cognitiveAttempts = [attempt, ...(state.cognitiveAttempts || [])].slice(0, 500);
-  // Adjust difficulty exactly once
+
   const recent = state.cognitiveAttempts.slice(0, 3);
   const level = Number(state.settings.stimulationLevel) || 2;
   if (recent.length === 3 && recent.every((a) => a.correct && !a.hintsUsed)) state.settings.stimulationLevel = Math.min(5, level + 1);
@@ -2195,7 +2131,6 @@ function renderStimulationPanel(panel) {
   nextStimulationExercise(panel);
 }
 
-// Reminiscence Mode (Phase 4)
 let reminiscenceCollectionId = null;
 let reminiscenceIndex = 0;
 
@@ -2254,7 +2189,6 @@ function wireReminiscenceCard(panel, items) {
   });
 }
 
-// A lightweight curation surface
 function renderReminiscenceManager(panel) {
   const collections = state.reminiscenceCollections || [];
   const graph = buildMemoryGraph();
@@ -2296,8 +2230,7 @@ function renderReminiscenceManager(panel) {
       const set = new Set(collection.memoryIds || []);
       if (set.has(memoryId)) set.delete(memoryId); else set.add(memoryId);
       collection.memoryIds = [...set];
-      // Toggle in place rather than re-rendering the whole manager, which
-      // would collapse this very editor closed on every click.
+
       chip.classList.toggle('selected');
       const row = manager.querySelector(`[data-collection-id="${CSS.escape(collection.id)}"] .object-row-copy small`);
       if (row) row.textContent = `${collection.memoryIds.length} memories`;
@@ -2363,7 +2296,6 @@ function renderInsights(content) {
   content.querySelector('#export-cognitive-insights')?.addEventListener('click', exportCognitiveInsightsSummary);
 }
 
-// A one-tap "how are you feeling" from Patient mode
 function moodCheckInTrendMarkup() {
   const entries = (state.moodCheckIns || []).slice(0, 14);
   if (!entries.length) return `<div class="empty-state"><p>Nothing logged yet, check-ins tapped in Patient mode will appear here.</p></div>`;
@@ -2373,8 +2305,6 @@ function moodCheckInTrendMarkup() {
   }).join('')}</div>`;
 }
 
-// ---------- care notes ----------
-// A shared caregiver-facing log, deliberately separate from the patient's own Journal.
 function careNoteRow(note) {
   return `<div class="care-note-row${note.pinned ? ' pinned' : ''}" data-note-id="${escapeHtml(note.id)}">
     <div class="care-note-row-body">
@@ -2469,8 +2399,6 @@ function companionOverviewCardMarkup() {
   </article>`;
 }
 
-// Chronological, only chats that have actually been reviewed: an
-// unreviewed chat has no wellbeingScore to plot.
 function companionWellbeingSeries() {
   return (state.companionChats || [])
     .filter((chat) => chat.analysis && typeof chat.analysis.wellbeingScore === 'number')
@@ -2478,7 +2406,6 @@ function companionWellbeingSeries() {
     .sort((a, b) => new Date(a.startedAt) - new Date(b.startedAt));
 }
 
-// A single-series line chart (magnitude over time: the textbook line-chart job).
 function companionTrendChartMarkup() {
   const series = companionWellbeingSeries();
   if (series.length < 2) return '';
@@ -2560,8 +2487,7 @@ function renderCompanion(content) {
     const chat = chats.find((item) => item.id === companionView.id);
     if (!chat) { companionView = { mode: 'list', id: null }; }
     else {
-      // Opening the conversation is what counts as reviewing it, no
-      // separate "mark as read" click to skip past.
+
       if (chat.analysis?.flagged && !chat.analysis.acknowledged) { chat.analysis.acknowledged = true; queueSave(); }
       content.innerHTML = `${pageHead('Companion', "Conversations between your Meco member and their AI companion.")}${companionDetailMarkup(chat)}`;
       $('#back-to-companion').onclick = () => { companionView = { mode: 'list', id: null }; renderCompanion(content); };
@@ -2583,7 +2509,7 @@ function renderCompanion(content) {
   wireCompanionTrendChart(content);
   wireFlaggedChatBanner(content);
   $('#start-companion-chat').onclick = () => {
-    // Setting the session before navigating means renderPatient's own companionSession guard
+
     journalDraft = null;
     companionSession = { id: `chat_${Date.now()}`, startedAt: new Date().toISOString(), messages: [], busy: false };
     navigateApp('patient');
@@ -2633,8 +2559,6 @@ function wireSessionActions(content) {
   });
 }
 
-// Plain-text export: one line per turn, prefixed with the speaker's name and the
-// timestamp shown in the app.
 function transcriptToText(session) {
   const header = [
     `Meco visit transcript`,
@@ -2665,8 +2589,6 @@ function downloadTranscript(session) {
   toast('Transcript downloaded.', 'success');
 }
 
-// Reports can be created (or recreated) from a saved visit, not only during the
-// recording session.
 async function generateSessionSummary(id) {
   const session = state.sessions.find((item) => item.id === id);
   const button = $(`[data-report-session="${CSS.escape(id)}"]`);
@@ -2736,7 +2658,6 @@ async function connectGoogleCalendar() {
   }
 }
 
-// Closes any open custom-select when the user clicks elsewhere.
 let customSelectGlobalListenerAttached = false;
 function ensureCustomSelectGlobalListener() {
   if (customSelectGlobalListenerAttached) return;
@@ -2746,7 +2667,6 @@ function ensureCustomSelectGlobalListener() {
   });
 }
 
-// Replaces a native <select>'s visual chrome with a dropdown styled to match the rest of Meco
 function enhanceSelect(select) {
   ensureCustomSelectGlobalListener();
   const wrap = document.createElement('div');
@@ -2818,8 +2738,6 @@ function enhanceSelectsIn(container) {
   container.querySelectorAll('select').forEach(enhanceSelect);
 }
 
-// Toggles a <select>'s disabled state and keeps its custom-select wrapper
-// (built by enhanceSelect) visually and functionally in sync.
 function setSelectDisabled(selector, disabled) {
   const select = $(selector);
   if (!select) return;
@@ -2906,11 +2824,8 @@ function renderSettings(content) {
   wireDataPrivacyCard(content);
 }
 
-// ---- Family contributions (Phase 3) ----
-// Deliberately a separate
 const CONTRIBUTION_TYPE_LABEL = { photo: 'Photo', story: 'Story', event: 'Upcoming event', correction: 'Correction', voice: 'Voice message' };
-// UI-only cache of the signed link, never persisted as account state
-// (the server derives it fresh from ownerId + the stored salt each time).
+
 let familyLinkCache = '';
 
 function familyContributionsCardMarkup() {
@@ -2957,7 +2872,6 @@ function wireFamilyContributionsCard(content) {
   content.querySelectorAll('[data-reject-contribution]').forEach((button) => button.onclick = () => rejectContribution(button.dataset.rejectContribution));
 }
 
-// The signed link itself is cheap to recompute server-side but there's no reason to force a
 async function generateFamilyLink(regenerate) {
   try {
     const result = await apiFetch('/api/family/link', {
@@ -2981,7 +2895,7 @@ async function approveContribution(id) {
   const contribution = (state.familyContributions || []).find((c) => c.id === id);
   if (!contribution) return;
   if (contribution.type === 'correction') {
-    // Never auto-patches a field: a guessed field match is worse than no automation at all.
+
     state.careNotes = [{
       id: `note_${Date.now()}`,
       text: `Correction from ${contribution.contributorName} (family)${contribution.contributorRelation ? `, ${contribution.contributorRelation}` : ''}: ${contribution.title}${contribution.text ? `, ${contribution.text}` : ''}`,
@@ -3019,8 +2933,6 @@ async function rejectContribution(id) {
   renderSettings($('#app-content'));
 }
 
-// ---- Places (spatial memory foundation) ----
-// A place is nothing more than a name + note until a memory or object gets linked to it.
 function placesCardMarkup() {
   const graph = buildMemoryGraph();
   const places = state.places || [];
@@ -3082,8 +2994,6 @@ async function deletePlace(id) {
   renderSettings($('#app-content'));
 }
 
-// ---- Object memory (Phase 2 assist layer) ----
-// A "last observed" log for commonly-misplaced things
 function objectMemoryCardMarkup() {
   const objects = state.objects || [];
   return `<article class="app-card section-card" style="margin-top:18px">
@@ -3107,7 +3017,6 @@ function objectRowMarkup(object) {
   </div>`;
 }
 
-// A compact Overview teaser
 function objectMemoryOverviewCardMarkup() {
   const objects = state.objects || [];
   if (!objects.length) return '';
@@ -3154,8 +3063,6 @@ async function deleteObjectMemory(id) {
   renderAppPage(currentPage);
 }
 
-// ---- Data & privacy: granular deletion ----
-// The Privacy Policy promises "any enrolled record ...
 const DATA_PRIVACY_CATEGORIES = [
   { key: 'visitors', label: 'Trusted people', desc: 'Removes every enrolled face/voice, their memory cues and Familiar Sounds. Visit reports already saved keep the visitor’s name as plain text.', countOf: (s) => (s.visitors || []).length },
   { key: 'sessions', label: 'Visit transcripts & reports', desc: 'Removes every recorded transcript, AI summary and engagement score. Enrolled people and scheduled visits remain.', countOf: (s) => (s.sessions || []).length },
@@ -3211,8 +3118,6 @@ function speakText(text) {
   speechSynthesis.speak(utterance);
 }
 
-// ---------- voiceprints and live conversation ----------
-// Meco streams the visit audio to its own server while it is being recorded.
 const liveTranscriptionAvailable = () => Boolean(config.features?.liveTranscription);
 const voiceIdAvailable = () => Boolean(config.features?.voiceId);
 const translationAvailable = () => Boolean(config.features?.translation);
@@ -3280,12 +3185,10 @@ async function blobToBase64(blob) {
   return btoa(binary);
 }
 
-// Records a fixed-length mic sample and returns it as base64 WAV for enrollment.
 async function recordVoiceSample(durationMs, onProgress) {
   const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true }, video: false });
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  // Chrome starts an AudioContext suspended when the user gesture has already
-  // been consumed by getUserMedia; without this the tap never receives audio.
+
   if (audioCtx.state !== 'running') await audioCtx.resume().catch(() => {});
   const source = audioCtx.createMediaStreamSource(stream);
   const processor = audioCtx.createScriptProcessor(2048, 1, 1);
@@ -3368,7 +3271,7 @@ function liveSpeakerName(clusterKey) {
 const TURN_MERGE_GAP_MS = 3000;
 
 function pushLiveTurn({ speaker, displaySpeaker, text, start, end, confidence }) {
-  // Speech arrives in short bursts.
+
   const last = liveContext.turns[liveContext.turns.length - 1];
   if (last && last.speaker === speaker && (start - (last.end || last.start || 0)) < TURN_MERGE_GAP_MS) {
     last.text = `${last.text} ${text}`.replace(/\s+/g, ' ').trim();
@@ -3414,8 +3317,7 @@ async function translateTurn(turn) {
 function renderLiveTranscript() {
   const scroll = $('#transcript-scroll');
   if (!scroll || !liveContext) return;
-  // Once the visit is being wrapped up the panel belongs to the progress view;
-  // late results must not paint over it.
+
   if (liveContext.stopping) return;
   const badge = $('#transcript-badge');
   if (badge) badge.textContent = liveContext.turns.length ? `${turnsLabel(liveContext.turns.length)} · live` : 'Listening';
@@ -3425,7 +3327,6 @@ function renderLiveTranscript() {
   scroll.scrollTop = scroll.scrollHeight;
 }
 
-// Deepgram's own per-word speaker clustering, used when no voiceprint matches.
 function turnsFromClustering(alternative, transcript, startMs) {
   const words = alternative.words || [];
   if (!words.length) return [{ key: 'cluster-0', text: transcript, start: startMs, end: startMs }];
@@ -3476,8 +3377,6 @@ async function handleLiveResult(data) {
     confidence: alternative.confidence,
   }));
 
-  // A single-voice segment can be checked against the enrolled voiceprints; the
-  // label is corrected in place once the local server answers.
   if (voiceprints.length && clusters.length === 1 && segment.length > liveContext.sampleRate * 0.4) {
     const match = await identifyVoice(segment, liveContext.sampleRate);
     if (match && liveContext?.active) {
@@ -3493,7 +3392,6 @@ async function handleLiveResult(data) {
   }
 }
 
-// The browser opens the speech socket itself
 async function openSpeechSocket(sampleRate) {
   const speechLanguage = state.settings.conversationLanguage || 'en';
   const language = speechLanguage === 'en' ? 'en-US' : speechLanguage;
@@ -3587,8 +3485,7 @@ async function startLiveConversation(stream) {
       liveContext.audioSent += input.length;
     }
     if (voiceprints.length) liveContext.pendingChunks.push(new Float32Array(input));
-    // Surfaced so a silent or muted microphone is obvious instead of looking
-    // like the transcription itself is broken.
+
     let peak = 0;
     for (let i = 0; i < input.length; i += 1) { const value = Math.abs(input[i]); if (value > peak) peak = value; }
     if (peak > 0.01) liveContext.heardAudio = true;
@@ -3626,8 +3523,6 @@ function stopLiveConversation() {
   return turns;
 }
 
-// Stops sending audio but keeps the socket open briefly so the last utterance,
-// and its voiceprint match, still lands in the transcript.
 async function finishLiveConversation() {
   if (!liveContext) return [];
   const session = liveContext;
@@ -3670,7 +3565,6 @@ function wireConversationLanguageRow() {
   }
 }
 
-// A quiet reality-orientation strip
 function patientOrientationMarkup() {
   const now = new Date();
   const dayLabel = now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
@@ -3679,7 +3573,7 @@ function patientOrientationMarkup() {
   const name = state.settings.patientName && state.settings.patientName !== 'Meco Member' ? `, ${state.settings.patientName}` : '';
   const next = sortedVisits().find((visit) => !dateParts(visit.date).isPast);
   const nextParts = next ? dateParts(next.date) : null;
-  // "today"/"tomorrow" read fine bare in a sentence
+
   const nextWhen = nextParts ? (nextParts.isToday ? 'today' : nextParts.tag === 'Tomorrow' ? 'tomorrow' : `on ${nextParts.tag}`) : '';
   const nextLabel = next
     ? `${escapeHtml(next.visitorName || 'A visit')} ${escapeHtml(nextWhen)}${next.time ? ` at ${escapeHtml(next.time)}` : ''}`
@@ -3694,7 +3588,6 @@ function patientOrientationMarkup() {
   </div>`;
 }
 
-// A relative-time label short enough for a one-line "last checked in" note
 function timeAgoShort(iso) {
   const diffMs = Date.now() - new Date(iso).getTime();
   const minutes = Math.round(diffMs / 60000);
@@ -3705,7 +3598,6 @@ function timeAgoShort(iso) {
   return `${Math.round(hours / 24)}d ago`;
 }
 
-// A one-tap mood log, separate from the full Journal
 function patientTodaysVisitorsNote() {
   const todays = sortedVisits().filter((v) => dateParts(v.date).isToday);
   if (todays.length <= 1) return '';
@@ -3797,7 +3689,7 @@ async function logMoodCheckIn(moodKey, container) {
     sad: "I'm sorry you're feeling sad. You're not alone.",
   };
   speakText(responses[moodKey] || 'Thanks for letting me know.');
-  try { await persistState(false); } catch { /* local state already reflects it; next save retries */ }
+  try { await persistState(false); } catch {  }
 }
 
 function wireMoodCheckIn(container) {
@@ -3806,9 +3698,7 @@ function wireMoodCheckIn(container) {
   });
 }
 
-// ---- Calming background sound (Patient mode) ----
-// Three lyric-free ambient beds
-let calmingAudio = null; // { ctx, master, kind }
+let calmingAudio = null;
 
 const CALMING_SOUNDS = [
   { id: 'off', label: 'Off', chip: 'Off' },
@@ -3871,8 +3761,7 @@ function startCalmingSound(kind, volume = 0.5) {
     noise.connect(filter);
     filter.connect(master);
     if (kind === 'ocean') {
-      // A slow LFO breathes the cutoff up and down: the noise "surges"
-      // like a wave arriving and pulling back, instead of a flat hiss.
+
       const lfo = ctx.createOscillator();
       lfo.frequency.value = 0.09;
       const lfoGain = ctx.createGain();
@@ -3883,8 +3772,7 @@ function startCalmingSound(kind, volume = 0.5) {
     }
     noise.start();
   } else if (kind === 'pad') {
-    // A held, hushed triad two octaves down (C, E, G), each voice with its
-    // own slow tremolo so the chord breathes instead of sitting static.
+
     [130.81, 164.81, 196.0].forEach((freq, i) => {
       const osc = ctx.createOscillator();
       osc.type = 'sine';
@@ -3904,8 +3792,7 @@ function startCalmingSound(kind, volume = 0.5) {
       tremolo.start();
     });
   } else if (kind === 'forest') {
-    // Bright, band-filtered noise with a slow amplitude sway, wind moving
-    // through leaves rather than the flatter hiss used for rain/ocean.
+
     const noise = ctx.createBufferSource();
     noise.buffer = makeNoiseBuffer(ctx, 4);
     noise.loop = true;
@@ -3927,8 +3814,7 @@ function startCalmingSound(kind, volume = 0.5) {
     lfo.start();
     noise.start();
   } else if (kind === 'hum') {
-    // A single steady low tone plus its octave, no filter or noise at all,
-    // closer to a quiet room's background hum than any kind of melody.
+
     [65.41, 130.81].forEach((freq, i) => {
       const osc = ctx.createOscillator();
       osc.type = 'sine';
@@ -3943,7 +3829,6 @@ function startCalmingSound(kind, volume = 0.5) {
   calmingAudio = { ctx, master, kind };
 }
 
-// Lives inside the quickbar's popover now
 function calmingSoundCardMarkup() {
   const activeKind = calmingAudio?.kind || 'off';
   const chips = CALMING_SOUNDS.map((sound) => `<button type="button" class="calming-chip${activeKind === sound.id ? ' active' : ''}" data-calm="${sound.id}">${sound.chip}</button>`).join('');
@@ -3971,7 +3856,7 @@ function wireCalmingSoundCard(content) {
 }
 
 let memoriesBrowseActive = false;
-// Independent mode: lets the patient open Stimulation/Reminiscence/ Practice themselves from
+
 let patientActivitiesActive = false;
 let patientActivitiesTab = 'stimulation';
 let patientActiveTab = 'camera';
@@ -3987,10 +3872,10 @@ function renderPatient(content) {
   if (journalDraft) { renderJournalComposer(content); return; }
   if (memoriesBrowseActive) { renderMemoriesBrowse(content); return; }
   if (patientActivitiesActive) { renderPatientActivities(content); return; }
-  // A visit that is already being recorded survives a redraw of this page
+
   const capturing = Boolean(liveContext) || patientContext?.recorder?.state === 'recording';
   if (!capturing) patientContext = { stream: null, audioStream: null, recorder: null, chunks: [], blob: null, visitor: null, transcript: [], summary: null, startedAt: null, matchStreak: {}, scanning: false, busy: false };
-  // This whole screen is one fixed-height view now
+
   content.classList.add('app-content-fixed');
   content.innerHTML = `${patientQuickBarMarkup()}
     <div class="patient-page${state.settings.elderMode ? ' elder-mode' : ''}">
@@ -4048,7 +3933,6 @@ function renderPatient(content) {
   }
 }
 
-// Logs the moment (state.sosEvents) so it survives a page change or a closed tab
 async function triggerPatientSOS() {
   state.sosEvents = [{ id: `sos_${Date.now()}`, createdAt: new Date().toISOString(), acknowledged: false }, ...(state.sosEvents || [])].slice(0, 50);
   const card = document.getElementById('matched-card');
@@ -4058,7 +3942,7 @@ async function triggerPatientSOS() {
   }
   speakText('Your caregiver will see this. You are safe.');
   toast('A caregiver alert was saved.', 'success');
-  try { await persistState(); } catch { /* the on-screen + spoken confirmation already reassured the patient; a save retry can happen quietly on the next change */ }
+  try { await persistState(); } catch {  }
 }
 
 function unacknowledgedSosEvents() {
@@ -4084,8 +3968,6 @@ function wireSosAlertBanner(content) {
   });
 }
 
-// ---------- browse memories ----------
-// Patient-initiated, not face-triggered
 function renderMemoriesBrowse(content) {
   const people = state.visitors || [];
   content.innerHTML = `${pageHead('Browse memories', 'Familiar faces and the stories that go with them.', '<button class="action-button" id="exit-memories">← Back</button>')}
@@ -4107,7 +3989,6 @@ function renderMemoriesBrowse(content) {
   $$('[data-play-song]').forEach((button) => button.addEventListener('click', () => {
     const wrap = button.closest('.memory-song');
     const videoId = button.dataset.playSong;
-    // Youtube-nocookie.com skips Google's ordinary tracking cookie for embeds
     wrap.innerHTML = `<iframe width="100%" height="200" src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?autoplay=1" title="Familiar song" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
   }));
   $$('[data-read-memory]').forEach((button) => button.addEventListener('click', () => {
@@ -4118,8 +3999,6 @@ function renderMemoriesBrowse(content) {
   }));
 }
 
-// ---- Independent mode: Activities reachable from inside Patient mode ----
-// Reuses the exact same renderStimulationPanel/renderReminiscencePanel/ renderPracticePanel
 function renderPatientActivities(content) {
   content.innerHTML = `${pageHead('Activities', 'Supportive exercises and reminiscence, not a treatment or diagnosis.', '<button class="action-button" id="exit-patient-activities">← Back</button>')}
     <div class="patient-page">
@@ -4135,8 +4014,6 @@ function renderPatientActivities(content) {
   content.querySelector('#exit-patient-activities').onclick = () => { patientActivitiesActive = false; renderPatient(content); };
 }
 
-// ---------- companion chat ----------
-// A calm, full-screen chat the patient can open on their own, for company between visits.
 function renderCompanionChat(content) {
   const micAvailable = Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
   content.innerHTML = `<div class="companion-chat-page${state.settings.elderMode ? ' elder-mode' : ''}">
@@ -4174,7 +4051,6 @@ function renderCompanionChat(content) {
   }
 }
 
-// Voice mode is a per-tab toggle
 let companionVoiceMode = false;
 
 function toggleCompanionVoiceMode() {
@@ -4192,7 +4068,6 @@ function toggleCompanionVoiceMode() {
   }
 }
 
-// Web Speech API: a browser built-in
 function startCompanionListening() {
   const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognitionCtor) return toast('Voice input is not supported in this browser.', 'error');
@@ -4218,7 +4093,6 @@ function startCompanionListening() {
   recognition.start();
 }
 
-// Reminiscence therapy
 function buildCompanionGreeting() {
   const name = state.settings.patientName && state.settings.patientName !== 'Meco Member' ? `, ${state.settings.patientName}` : '';
   const withMemory = (state.visitors || []).filter((v) => v.memory?.trim());
@@ -4243,7 +4117,6 @@ function renderCompanionMessages() {
   scroll.scrollTop = scroll.scrollHeight;
 }
 
-// A compact, plain-text digest of the member's full recorded history
 const companionHistoryShortDate = (value) => value ? new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value)) : '';
 const companionHistoryTruncate = (text, max) => {
   const clean = String(text || '').replace(/\s+/g, ' ').trim();
@@ -4265,8 +4138,6 @@ function buildCompanionHistoryDigest() {
       const who = s.visitorName || 'someone';
       const relationship = s.relationship ? ` (${s.relationship})` : '';
       const tone = s.summary?.emotionalTone ? `, mood: ${s.summary.emotionalTone}` : '';
-      // Not every visit has an AI report yet, fall back to a snippet of the
-      // actual transcript so a recorded conversation is still findable.
       const detail = s.summary?.summary
         ? companionHistoryTruncate(s.summary.summary, 180)
         : companionHistoryTruncate((s.transcript || []).map((line) => line.text).filter(Boolean).join(' '), 180);
@@ -4297,7 +4168,6 @@ function buildCompanionHistoryDigest() {
     sections.push(`Past conversations with you (Meco):\n${allChats.map((c) => `- ${companionHistoryShortDate(c.startedAt)}: ${c.analysis?.note ? companionHistoryTruncate(c.analysis.note, 180) : 'a casual chat'}`).join('\n')}`);
   }
 
-  // Newest items were built first within each section
   return sections.join('\n\n').slice(0, COMPANION_HISTORY_BUDGET);
 }
 
@@ -4354,13 +4224,11 @@ async function endCompanionChat() {
   if (chat.analysis?.flagged) triggerFlaggedChatAlert(chat);
   companionSession = null;
   navigateApp('companion');
-  refreshCompanionOverview(); // fires in the background, doesn't block the caregiver
+  refreshCompanionOverview();
 }
 
-// ---------- journal ----------
-// A calm, full-screen page the patient can open on their own to note how they're feeling and
 const JOURNAL_ALLOWED_TAGS = new Set(['P', 'DIV', 'BR', 'H2', 'H3', 'UL', 'OL', 'LI', 'BLOCKQUOTE', 'CODE', 'STRONG', 'B', 'EM', 'I', 'U', 'SPAN']);
-// These carry no meaningful visible text of their own
+
 const JOURNAL_DISCARD_TAGS = new Set(['SCRIPT', 'STYLE']);
 const JOURNAL_FONT_SIZES = ['14px', '16px', '20px', '26px'];
 
@@ -4387,13 +4255,10 @@ function sanitizeJournalHtml(html) {
     });
   };
   clean(template.content);
-  // Strip the zero-width space journalWrapSelection uses as a typing anchor
-  // for a collapsed-cursor toggle, it should never survive into storage.
+
   return template.innerHTML.replace(/\u200B/g, '');
 }
 
-// The nearest block-level ancestor of the current selection, or null if the
-// selection is directly in the editor root (e.g. a single unwrapped line).
 function journalCurrentBlock(editor) {
   const selection = window.getSelection();
   if (!selection.rangeCount) return null;
@@ -4408,7 +4273,6 @@ function journalToggleBlock(editor, tag) {
   document.execCommand('formatBlock', false, block?.tagName === tag ? 'p' : tag.toLowerCase());
 }
 
-// Align applies to exactly one block
 function journalSetAlign(editor, align) {
   let block = journalCurrentBlock(editor);
   if (!block) {
@@ -4418,7 +4282,6 @@ function journalSetAlign(editor, align) {
   if (block) block.style.textAlign = align;
 }
 
-// Wraps the current selection in a tag.
 function journalWrapSelection(tagName, styleAttr = '') {
   const selection = window.getSelection();
   if (!selection.rangeCount) return;
@@ -4463,7 +4326,6 @@ function journalToggleInlineCode() {
   }
 }
 
-// Small inline icons instead of bare letters where a letter would be ambiguous or collide
 const journalIcons = {
   bullet: '<svg viewBox="0 0 20 14" width="18" height="14" fill="currentColor"><circle cx="1.5" cy="1.5" r="1.5"/><rect x="6" y="0.4" width="14" height="2.2" rx="1.1"/><circle cx="1.5" cy="7" r="1.5"/><rect x="6" y="5.9" width="14" height="2.2" rx="1.1"/><circle cx="1.5" cy="12.5" r="1.5"/><rect x="6" y="11.4" width="14" height="2.2" rx="1.1"/></svg>',
   quote: '<svg viewBox="0 0 20 14" width="16" height="14" fill="currentColor"><path d="M2 8V4.6C2 2.1 3.9 0.5 6.2 0.5V2.4C4.8 2.4 4 3.2 4 4.5V5.1H6.2V8H2Z"/><path d="M10.8 8V4.6C10.8 2.1 12.7 0.5 15 0.5V2.4C13.6 2.4 12.8 3.2 12.8 4.5V5.1H15V8H10.8Z"/></svg>',
@@ -4525,7 +4387,7 @@ function runJournalCommand(cmd, editor) {
 function renderJournalComposer(content) {
   const hour = new Date().getHours();
   const timeOfDay = hour < 12 ? 'this morning' : hour < 18 ? 'this afternoon' : 'this evening';
-  // Each group is its own flex item
+
   const toolbarMarkup = journalToolbarGroups.map((group) => `<span class="toolbar-group">${group.map((item) => `<button type="button" data-cmd="${item.cmd}" aria-label="${item.label}" title="${item.label}">${item.symbol}</button>`).join('')}</span>`).join('');
   content.innerHTML = `<div class="journal-composer-page${state.settings.elderMode ? ' elder-mode' : ''}">
     <div class="journal-composer-head">
@@ -4548,8 +4410,7 @@ function renderJournalComposer(content) {
   });
   const editor = $('#journal-editor');
   $$('[data-cmd]', content).forEach((button) => {
-    // Prevent the button from stealing focus. That would collapse the
-    // editor's selection before the command has anything left to act on.
+
     button.addEventListener('mousedown', (event) => event.preventDefault());
     button.addEventListener('click', () => runJournalCommand(button.dataset.cmd, editor));
   });
@@ -4558,7 +4419,7 @@ function renderJournalComposer(content) {
     journalDraft.text = editor.innerText;
     updateJournalSaveState();
   });
-  // A pasted <img onerror=...> or similar would run its handler the instant the browser parses
+
   editor.addEventListener('paste', (event) => {
     event.preventDefault();
     const text = (event.clipboardData || window.clipboardData).getData('text/plain');
@@ -4579,7 +4440,7 @@ async function saveJournalEntry() {
     title: '',
     mood: journalDraft.mood,
     html: sanitizeJournalHtml(journalDraft.html).slice(0, 20000),
-    // Strips the zero-width space journalWrapSelection plants so a collapsed cursor still has
+
     text: journalDraft.text.replace(/\u200B/g, '').trim().slice(0, 4000),
     createdAt: new Date().toISOString(),
   };
@@ -4594,8 +4455,6 @@ const formatJournalDate = (value) => value ? new Intl.DateTimeFormat(undefined, 
 
 const journalMoodMeta = (key) => journalMoods.find((mood) => mood.key === key) || journalMoods.find((mood) => mood.key === 'okay');
 
-// A caregiver-given name, falling back to null so callers can decide their
-// own fallback (the mood label in the list, the diary date in detail).
 const journalEntryTitle = (entry) => entry?.title?.trim() || null;
 
 function journalEntryRowMarkup(entry) {
@@ -4627,7 +4486,6 @@ function journalDetailMarkup(entry) {
   </article>`;
 }
 
-// A chronological strip of mood dots
 function journalMoodTrendMarkup() {
   const chronological = (state.journalEntries || []).slice().sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
   if (chronological.length < 3) return '';
@@ -4663,7 +4521,7 @@ function renderJournal(content) {
       ${entries.length ? `<div class="session-list">${entries.map(journalEntryRowMarkup).join('')}</div>` : '<div class="empty-state"><div><h3>No entries yet</h3><p>Once your Meco member writes in their journal, entries will appear here.</p></div></div>'}
     </article>`;
   $('#start-journal-now').onclick = () => {
-    // Same trick as the companion chat button
+
     companionSession = null;
     journalDraft = { mood: null, text: '' };
     navigateApp('patient');
@@ -4694,8 +4552,6 @@ async function deleteJournalEntry(id) {
   renderJournal($('#app-content'));
 }
 
-// A caregiver-given name, falling back to a generic label: the date is
-// always shown separately, so the fallback doesn't need to repeat it.
 const companionChatTitle = (chat) => chat?.title?.trim() || 'Conversation';
 
 function renameCompanionChat(id) {
@@ -4708,7 +4564,6 @@ function renameCompanionChat(id) {
   renderCompanion($('#app-content'));
 }
 
-// Recomputes the overall wellbeing signal from every chat's own analysis
 async function refreshCompanionOverview() {
   const reviewed = (state.companionChats || []).filter((chat) => chat.analysis).slice(0, 30)
     .map((chat) => ({
@@ -4732,7 +4587,6 @@ async function refreshCompanionOverview() {
   }
 }
 
-// Everything that becomes possible once there is a transcript to work with.
 function enableTranscriptActions() {
   $('#generate-summary').disabled = false;
   $('#download-transcript').disabled = false;
@@ -4740,8 +4594,6 @@ function enableTranscriptActions() {
   $('#save-visit').disabled = false;
 }
 
-// Puts the freshly drawn patient page back in sync with the recording that is
-// already running.
 function restorePatientCaptureUi() {
   const video = $('#patient-video');
   if (patientContext.stream && video) {
@@ -4829,8 +4681,6 @@ function chooseRecorderMimeType() {
   return candidates.find((type) => window.MediaRecorder?.isTypeSupported?.(type)) || '';
 }
 
-// The visit recording is independent of the camera: it can start, run and stop
-// whether or not a face is on screen or the camera was ever opened.
 async function startPatientRecording() {
   if (!patientContext || patientContext.busy || patientContext.stopping) return;
   patientContext.stopping = false;
@@ -4892,7 +4742,6 @@ async function stopRecorder() {
   });
 }
 
-// Progress shown in the conversation panel while a visit is being wrapped up.
 function showVisitProgress(percent, heading, detail = '') {
   const scroll = $('#transcript-scroll');
   if (!scroll) return;
@@ -4906,14 +4755,12 @@ function showVisitProgress(percent, heading, detail = '') {
   existing.querySelector('.progress-fill').style.width = `${percent}%`;
 }
 
-// Groups the captured fragments into the turns each person actually spoke and
-// repairs obvious mis-hearings. Falls back to the raw turns if the pass fails.
 async function tidyTranscript(turns) {
   if (turns.length < 2) return turns;
   const badge = $('#transcript-badge');
   if (badge) badge.textContent = 'Tidying…';
   showVisitProgress(62, 'Formatting the conversation', 'Grouping fragments into full turns and repairing mis-hearings');
-  // Bounded, so a slow provider can never strand the visit in "Tidying…".
+
   const abort = new AbortController();
   const timer = setTimeout(() => abort.abort(), 60000);
   try {
@@ -4937,15 +4784,12 @@ async function tidyTranscript(turns) {
   }
 }
 
-// Releases the microphone so the browser stops showing the tab as recording.
-// The next recording re-acquires it.
 function releaseRecordingAudio() {
   if (!patientContext) return;
   patientContext.audioStream?.getTracks?.().forEach((track) => track.stop());
   patientContext.audioStream = null;
 }
 
-// Ends the capture without starting a transcription job.
 async function stopPatientRecording() {
   if (!patientContext || patientContext.stopping) return;
   patientContext.stopping = true;
@@ -4978,8 +4822,7 @@ async function stopPatientRecording() {
     $('#transcript-badge').textContent = 'Stopped';
     toast(`The recording could not be stopped cleanly: ${error.message}`, 'error');
   } finally {
-    // However the stop went, the capture is over: the mic is released and the
-    // controls are left in a usable state.
+
     stopLiveConversation();
     releaseRecordingAudio();
     if (patientContext) {
@@ -4988,14 +4831,12 @@ async function stopPatientRecording() {
       $('#start-recording').disabled = false;
       $('#stop-recording').disabled = true;
       $('#record-status').classList.add('hidden');
-      // Whatever was captured can still be saved.
+
       if (patientContext.transcript.length || patientContext.chunks?.length) $('#save-visit').disabled = false;
     }
   }
 }
 
-// Used when live transcription produced nothing: the recorded audio is sent to
-// AssemblyAI instead, so a visit is never lost.
 async function transcribeRecordedAudio() {
   const blob = await stopRecorder();
   releaseRecordingAudio();
@@ -5028,7 +4869,6 @@ async function transcribeRecordedAudio() {
   return patientContext.transcript;
 }
 
-// One button, the whole ending
 async function saveVisitNow() {
   if (!patientContext || patientContext.saving) return;
   patientContext.saving = true;
@@ -5114,8 +4954,7 @@ async function generatePatientSummary() {
 }
 
 async function savePatientSession() {
-  // Saving is never blocked by other work in progress: a recorded visit must
-  // always be storable.
+
   if (!patientContext?.transcript.length) throw new Error('There is no transcript to save.');
   const visitor = inferSessionVisitor();
   const session = {
@@ -5146,8 +4985,7 @@ async function openFaceModal() {
   $('#visitor-relationship').value = '';
   $('#visitor-memory').value = '';
   enrollContext = { stream: null, descriptors: {}, thumbnail: '', poseIndex: 0, detection: null, voiceSample: null };
-  // Consent resets every time the modal opens, it's specific to whoever
-  // ends up in front of the camera this time, not a one-time app setting.
+
   $('#enroll-consent-check').checked = false;
   $('.face-camera-side').classList.remove('consent-granted');
   $('#start-enroll-camera').disabled = true;
@@ -5309,7 +5147,6 @@ async function saveVisitor() {
   }
 }
 
-// Js/calendar.js pulls from Google on a timer and can rewrite visits and reminders while the
 function wireRerenderRequests() {
   window.addEventListener(RERENDER_EVENT, () => {
     if (['visits', 'reminders', 'overview'].includes(currentPage)) renderAppPage(currentPage);
@@ -5317,12 +5154,12 @@ function wireRerenderRequests() {
 }
 
 function wireGlobalEvents() {
-  // In local-demo mode there's no Clerk key configured at all
+
   $$('[data-auth]').forEach((button) => button.addEventListener('click', () => {
     if (config.features.localDemo) { history.pushState({}, '', '/app'); renderRoute(); return; }
     openAuthModal(button.dataset.auth);
   }));
-  // The hamburger sheet that replaces .nav-links below 1100px.
+
   const burger = $('#nav-burger-toggle');
   const sheet = $('#nav-mobile-sheet');
   if (burger && sheet) {
@@ -5362,7 +5199,7 @@ function wireGlobalEvents() {
   $('#save-reminder').addEventListener('click', saveReminderModal);
   $('#delete-reminder-modal').addEventListener('click', () => editingReminderId && deleteReminder(editingReminderId));
   $('#reminder-text').addEventListener('keydown', (event) => { if (event.key === 'Enter') { event.preventDefault(); saveReminderModal(); } });
-  // .patient-entry is wired separately below
+
   $$('.side-nav:not(.patient-entry)').forEach((button) => button.addEventListener('click', () => navigateApp(button.dataset.page)));
   $('.patient-entry').addEventListener('click', (event) => {
     if (event.currentTarget.dataset.page === 'patient') openPatientCameraMode();
@@ -5381,7 +5218,7 @@ function wireGlobalEvents() {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') { closeAuthModal(); closeFaceModal(); closePersonEditor(); closeVisitModal(); closeReminderModal(); }
   });
-  // One rAF-throttled scroll handler covers three things instead of three separate listeners
+
   window.addEventListener('scroll', () => {
     if (scrollChromeTicking) return;
     scrollChromeTicking = true;
@@ -5389,7 +5226,7 @@ function wireGlobalEvents() {
   }, { passive: true });
   window.addEventListener('resize', updateScrollChrome, { passive: true });
   updateScrollChrome();
-  // Hero scenery drifts a few pixels toward the cursor for a light parallax feel.
+
   $('.hero-shell')?.addEventListener('mousemove', (event) => {
     const art = $('.hero-art');
     if (!art) return;
@@ -5400,7 +5237,6 @@ function wireGlobalEvents() {
   });
   $('.hero-shell')?.addEventListener('mouseleave', () => { const art = $('.hero-art'); if (art) art.style.transform = ''; });
 
-  // Style-picker chips (voice tone
   $$('.style-picker').forEach((picker) => {
     picker.addEventListener('click', (event) => {
       const chip = event.target.closest('.style-chip');
@@ -5414,7 +5250,6 @@ function wireGlobalEvents() {
   });
 }
 
-// Tilt-on-hover for cards
 function initTiltCards() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!window.matchMedia('(pointer: fine)').matches) return;
@@ -5435,8 +5270,6 @@ function initTiltCards() {
   });
 }
 
-// A soft light that trails the cursor while on the marketing site, purely
-// atmospheric, hidden the moment the caregiver signs into the workspace.
 function initCursorGlow() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if (!window.matchMedia('(pointer: fine)').matches) return;
@@ -5461,8 +5294,6 @@ function initCursorGlow() {
   document.addEventListener('mouseleave', () => glow.classList.remove('active'));
 }
 
-// Magnetic pull on the primary CTA pills
-/* Keeps the hero illustration clear of the hero copy. */
 async function boot() {
   observeReveals();
   wireGlobalEvents();

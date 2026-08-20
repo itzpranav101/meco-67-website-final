@@ -1,12 +1,10 @@
 :root {
   color-scheme: light;
 
-  /* Vertical rhythm */
   --space-block: clamp(26px, 3vw, 40px);
   --space-band:  clamp(34px, 4vw, 54px);
   --space-page:  clamp(40px, 5vw, 64px);
 
-  /* Type scale */
   --fs-display: clamp(38px, 5.2vw, 64px);
   --fs-h1:      clamp(32px, 4.2vw, 50px);
   --fs-h2:      clamp(27px, 3.2vw, 38px);
@@ -15,14 +13,10 @@
   --fs-body:    17px;
   --fs-small:   15px;
 
-  /* Display faces were set as low as .95, which lets descenders on one
-     line touch ascenders on the next. 1.06 still reads as tight. */
   --lh-display: 1.06;
   --lh-heading: 1.12;
   --lh-body:    1.62;
 
-  /* Line length. Body copy was running 93-107 characters; 60-75 is the
-     readable band, and this site is for people with ageing eyes. */
   --measure: 54ch;
   --measure-wide: 62ch;
   --paper: #f8f4ef;
@@ -53,7 +47,6 @@
   --shadow-premium: var(--shadow-ambient), var(--shadow-deep), var(--shadow-atmosphere);
   --shadow-premium-hover: var(--shadow-ambient), 0 20px 34px rgba(20,16,8,.12), 0 55px 95px -20px rgba(20,16,8,.3);
 
-  /* Theme identity layer */
   --accent: #5d80e6;
   --accent-ink: #ffffff;
   --accent-soft: rgba(93,128,230,.13);
@@ -63,13 +56,12 @@
   --surface-2: #f7f4ef;
   --sidebar-bg: #ece8e1;
   --app-bg: #f4f0ea;
-  /* A theme is more than a palette swap */
+
   --radius-hero: 32px;
   --radius-card: 26px;
   --bg-texture: radial-gradient(rgba(10,9,8,.045) 1.2px, transparent 1.2px);
   --bg-texture-size: 26px 26px;
 
-  /* Glass system */
   --glass-blur: 16px;
   --glass-blur-strong: 28px;
   --glass-saturate: 180%;
@@ -89,11 +81,8 @@
     inset 0 0 30px 12px color-mix(in srgb, white 30%, transparent);
 }
 
-/* Meco Classic: the default: warm paper, near-black ink, a soft periwinkle
-   accent. Every other theme is a deliberate departure from this one. */
 [data-theme="classic"] { }
 
-/* Midnight Calm: a real dark mode */
 [data-theme="midnight"] {
   color-scheme: dark;
   --paper: #14161c; --ink: #ece9e2; --muted: #a8a49c; --white: #1c1f27;
@@ -108,7 +97,6 @@
   --bg-texture: radial-gradient(rgba(236,233,226,.05) 1.2px, transparent 1.2px);
 }
 
-/* Sage Garden, soft botanical greens, a warm coral accent for contrast. */
 [data-theme="sage"] {
   --paper: #f2f5ee; --ink: #1e2a1c; --muted: #5c6b56; --white: #fdfef9;
   --accent: #e0794f; --accent-ink: #fff; --accent-soft: rgba(224,121,79,.14);
@@ -119,8 +107,6 @@
   --bg-texture: radial-gradient(rgba(38,56,32,.05) 1.4px, transparent 1.4px);
 }
 
-/* Golden Hour, warm apricot paper, deep umber ink, an amber accent. Named
-   for the light, not a season, meant to feel unhurried. */
 [data-theme="golden"] {
   --paper: #fbf2e4; --ink: #3a2812; --muted: #8a6f4c; --white: #fffaf0;
   --accent: #d98a2b; --accent-ink: #2a1c0a; --accent-soft: rgba(217,138,43,.16);
@@ -132,7 +118,6 @@
   --bg-texture: radial-gradient(rgba(58,40,18,.05) 1.2px, transparent 1.2px);
 }
 
-/* Ocean Mist, pale blue-grey paper, ink-navy text, a clear teal accent. */
 [data-theme="ocean"] {
   --paper: #eef3f4; --ink: #10222b; --muted: #4f6a73; --white: #fbfeff;
   --accent: #1f8f8a; --accent-ink: #fff; --accent-soft: rgba(31,143,138,.14);
@@ -144,8 +129,6 @@
   --bg-texture-size: 100% 100%;
 }
 
-/* Lavender Fields: a softer, quieter palette; deep plum ink, dusty rose
-   accent. Was the most-requested "calming" option in early sketches. */
 [data-theme="lavender-fields"] {
   --paper: #f5f0f7; --ink: #2c1f36; --muted: #705f7d; --white: #fdfbfe;
   --accent: #b6567f; --accent-ink: #fff; --accent-soft: rgba(182,86,127,.14);
@@ -158,27 +141,25 @@
   --bg-texture-size: 30px 30px;
 }
 
-/* High Contrast: an accessibility theme first */
 [data-theme="contrast"] {
   --paper: #ffffff; --ink: #000000; --muted: #202020; --white: #ffffff;
   --accent: #0b4fd6; --accent-ink: #fff; --accent-soft: rgba(11,79,214,.16);
   --dark: #000000; --dark-ink: #ffffff;
   --surface: #ffffff; --surface-2: #f0f0f0; --sidebar-bg: #ececec; --app-bg: #ffffff;
   --line: rgba(0,0,0,.35);
-  /* Flat and sharp on purpose */
+
   --serif: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
   --radius-hero: 10px; --radius-card: 8px;
   --shadow: 0 0 0 2px #000;
   --soft-shadow: 0 0 0 1.5px #000;
   --bg-texture: none;
-  /* Glass is a legibility risk for a theme built for low vision */
+
   --glass-blur: 0px; --glass-blur-strong: 0px; --glass-saturate: 100%;
   --glass-bg: var(--surface); --glass-bg-strong: var(--surface);
   --glass-border: var(--line);
   --glass-shadow: var(--soft-shadow); --glass-shadow-strong: var(--shadow);
 }
 
-/* Warm Sepia: the other accessibility-minded theme */
 [data-theme="sepia"] {
   --paper: #f2e8d5; --ink: #3f2f1c; --muted: #7a6547; --white: #faf3e5;
   --accent: #a15a2e; --accent-ink: #fff; --accent-soft: rgba(161,90,46,.15);
@@ -191,7 +172,6 @@
   --bg-texture-size: 24px 24px;
 }
 
-/* Rose Quartz: a blush, gentle palette; maroon ink, a dusty-rose accent. */
 [data-theme="rose"] {
   --paper: #fbeef0; --ink: #3a1520; --muted: #8a5c66; --white: #fff8f9;
   --accent: #c3536f; --accent-ink: #fff; --accent-soft: rgba(195,83,111,.14);
@@ -206,7 +186,7 @@
 html, body { transition: background-color .4s var(--ease), color .4s var(--ease); }
 
 * { box-sizing: border-box; }
-/* Scroll-snap was tried here and pulled against normal scroll momentum enough to feel sticky */
+
 html { scroll-behavior: smooth; background: var(--paper); overflow-x: hidden; }
 body { margin: 0; background: var(--paper) var(--bg-texture) 0 0/var(--bg-texture-size); color: var(--ink); font-family: var(--sans); overflow-x: hidden; }
 button, input, textarea, select { font: inherit; }
@@ -215,21 +195,19 @@ a { color: inherit; text-decoration: none; }
 .hidden { display: none !important; }
 
 .landing-view { padding: 100px 14px 60px; }
-/* Hero-gap reserves the vertical space the copy block */
+
 .hero-shell { --hero-gap: clamp(300px, 240px + 5vw, 340px); position: relative; min-height: calc(var(--hero-gap) + 340px); max-width: 1580px; margin: 0 auto 56px; overflow: hidden; border-radius: var(--radius-hero); background: radial-gradient(circle at 48% 15%, rgba(255,255,255,.48), transparent 28%), linear-gradient(180deg, #91d9f2 0%, #aee3f3 calc(100% - 256px), #f7f2ec calc(100% - 252px)); box-shadow: var(--shadow); }
 .hero-shell::before { content: ""; position: absolute; inset: 0; opacity: .26; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.23'/%3E%3C/svg%3E"); mix-blend-mode: multiply; }
-/* Header glassmorphism */
-/* The whole nav unit */
-/* A thin reading-progress bar pinned to the very top edge of the viewport */
+
 .scroll-progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; z-index: 60; pointer-events: none; background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 55%, var(--ink) 45%)); box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 55%, transparent); }
 .nav-sticky-wrap { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 50; width: min(980px, calc(100% - 52px)); }
 .floating-nav {
-  /* Glass only earns its name while something is actually visible moving behind it */
+
   position: relative;
   width: 100%;
   margin: 0 auto;
   min-height: 58px;
-  /* A 3-column grid */
+
   display: grid;
   grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
   align-items: center;
@@ -265,7 +243,7 @@ a { color: inherit; text-decoration: none; }
   background: linear-gradient(180deg, color-mix(in srgb, white 80%, transparent), transparent 65%, color-mix(in srgb, white 25%, transparent));
   pointer-events: none;
 }
-/* A real wordmark */
+
 .wordmark { display: inline-flex; align-items: baseline; font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: .01em; font-size: 30px; line-height: 1; white-space: nowrap; color: var(--ink); }
 .wordmark span { display: inline-block; }
 .wordmark span:last-child { color: var(--accent); }
@@ -273,23 +251,22 @@ a { color: inherit; text-decoration: none; }
 .nav-links a { opacity: .82; transition: .2s ease; white-space: nowrap; }
 .nav-links a:hover { opacity: 1; transform: translateY(-1px); }
 .nav-actions { display: flex; align-items: center; gap: 8px; }
-/* Grid-column placement for the pill's 3 direct children */
+
 .floating-nav > .wordmark { justify-self: start; }
 .floating-nav > .nav-links { justify-self: center; }
 .floating-nav > .nav-actions { justify-self: end; }
 .link-button { appearance: none; border: 0; background: transparent; cursor: pointer; padding: 10px 12px; border-radius: 999px; font-weight: 600; transition: background .2s var(--ease), color .2s var(--ease), box-shadow .2s var(--ease); }
 .link-button:hover { background: rgba(0,0,0,.05); }
-/* "Log in" in the header reads stronger as a quiet outlined pill than as bare text sitting */
+
 .link-button.ghost-pill { padding: 10px 20px; border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent); color: var(--ink); }
 .link-button.ghost-pill:hover { background: color-mix(in srgb, var(--surface) 70%, transparent); border-color: color-mix(in srgb, var(--ink) 28%, transparent); box-shadow: 0 4px 12px color-mix(in srgb, var(--ink) 8%, transparent); }
 .pill-button, .soft-button, .mode-button, .mini-action { border: 0; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
 .pill-button { display: inline-flex; justify-content: center; align-items: center; min-height: 46px; padding: 0 24px; border-radius: 999px; font-weight: 650; }
 .pill-button:hover:not(:disabled), .soft-button:hover:not(:disabled), .mode-button:hover:not(:disabled) { transform: translateY(-2px); }
-/* .action-button:disabled already dims */
+
 .pill-button:disabled, .soft-button:disabled, .mode-button:disabled, .mini-action:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; transform: none; }
 .pill-button.dark { color: var(--dark-ink); background: var(--dark); box-shadow: 0 8px 16px rgba(0,0,0,.18); }
-/* A quiet light-sweep on the primary CTAs, plays once on hover, not on a
-   loop, so it reads as a response to the cursor rather than decoration. */
+
 .pill-button.dark, .pill-button.glass { position: relative; overflow: hidden; isolation: isolate; }
 .pill-button.dark::before, .pill-button.glass::before {
   content: ""; position: absolute; inset: 0 -20% 0 -60%; z-index: -1;
@@ -304,7 +281,6 @@ a { color: inherit; text-decoration: none; }
 .soft-button { min-height: 44px; padding: 0 22px; border-radius: 999px; background: white; box-shadow: 0 10px 24px rgba(0,0,0,.10); font-weight: 650; }
 .mode-button { min-height: 42px; padding: 0 18px; border-radius: 999px; background: var(--dark); color: var(--dark-ink); font-weight: 650; }
 
-/* Sized down from the original */
 .hero-copy { position: relative; z-index: 5; width: min(860px, 90%); margin: 34px auto 0; text-align: center; }
 .eyebrow, .section-kicker { margin: 0 0 14px; font-size: 13px; font-weight: 700; letter-spacing: .08em; }
 .hero-copy h1 { margin: 0; font-family: var(--serif); font-size: var(--fs-display); line-height: var(--lh-display); letter-spacing: -.035em; font-weight: 400; }
@@ -322,9 +298,9 @@ a { color: inherit; text-decoration: none; }
 .mock-side-label.active { background: white; color: black; font-weight: 700; }
 .mock-content { padding: 18px 20px; }
 .mock-heading-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.mock-heading-row small { display: block; font-size: 9px; color: #8a8884; margin-bottom: 4px; letter-spacing: .08em; }
+.mock-heading-row small { display: block; font-size: 11px; color: #8a8884; margin-bottom: 4px; letter-spacing: .08em; }
 .mock-heading-row strong { font-family: var(--serif); font-size: 23px; font-weight: 400; }
-.mock-status { font-size: 10px; color: #4f7a5f; background: #ebf7ef; padding: 6px 9px; border-radius: 999px; }
+.mock-status { font-size: 11px; color: #4f7a5f; background: #ebf7ef; padding: 6px 9px; border-radius: 999px; }
 .memory-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
 .memory-card { min-height: 128px; padding: 12px; border-radius: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); box-shadow: 0 8px 18px rgba(0,0,0,.07); backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)); }
 .memory-card b, .memory-card small { display: block; }
@@ -387,8 +363,7 @@ a { color: inherit; text-decoration: none; }
 .tile-brand { font-weight: 800; font-size: 15px; letter-spacing: -.01em; }
 .tile-icon { font-size: 17px; line-height: 1; }
 .tile-label { font-size: 11px; font-weight: 700; letter-spacing: .02em; opacity: .85; }
-/* Wordmark tiles name the real services Meco integrates with, in a colour
-   evoking (not claiming to reproduce) each one's own brand identity. */
+
 .tile.assemblyai { background: #5b4dff; color: #fff; }
 .tile.deepgram { background: #10d888; color: #06251a; }
 .tile.clerk { background: linear-gradient(135deg,#6957ff,#b195ff); color: #fff; }
@@ -418,7 +393,6 @@ a { color: inherit; text-decoration: none; }
 .note-preview { margin-top: 75px; padding: 22px; border-radius: 14px; background: white; box-shadow: 0 8px 18px rgba(0,0,0,.08); }
 .note-preview p { color: #706e69; line-height: 1.45; }
 
-/* Caregiver's signature moment */
 .week-planner { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 8px; }
 .week-planner-day { min-height: 190px; padding: 16px 12px; border-radius: 18px; background: #fffaf0; border: 1px solid rgba(201,143,18,.16); display: flex; flex-direction: column; gap: 8px; transition: transform .25s var(--ease), box-shadow .25s var(--ease); }
 .week-planner-day:hover { transform: translateY(-4px); box-shadow: 0 14px 26px rgba(201,143,18,.16); }
@@ -471,7 +445,6 @@ a { color: inherit; text-decoration: none; }
 .editorial-copy h2 { font-family: var(--serif); font-size: var(--fs-h1); line-height: var(--lh-display); margin: 0 0 22px; font-weight: 400; }
 .editorial-copy > p { color: #696662; line-height: 1.6; font-size: 17px; }
 
-/* Compact fact components */
 .spec-list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 0; }
 .spec-list li {
   display: grid; grid-template-columns: minmax(88px, 30%) 1fr; gap: 14px;
@@ -545,7 +518,6 @@ a { color: inherit; text-decoration: none; }
 .footer-bottom-links a { font-size: 13px; color: var(--muted); transition: color .2s var(--ease); }
 .footer-bottom-links a:hover { color: var(--ink); }
 
-/* A soft focus-pull on top of the existing translate/scale */
 .reveal { opacity: 0; transform: translateY(30px) scale(.98); filter: blur(7px); transition: opacity .8s var(--ease), transform .8s var(--ease), filter .8s var(--ease); }
 .reveal.visible { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 .reveal-left { opacity: 0; transform: translateX(-46px); filter: blur(7px); transition: opacity .8s var(--ease), transform .8s var(--ease), filter .8s var(--ease); }
@@ -564,7 +536,6 @@ a { color: inherit; text-decoration: none; }
 .deep-grid > .reveal:nth-child(3),.teaser-grid > .reveal:nth-child(3) { transition-delay: .16s; }
 .deep-grid > .reveal:nth-child(4),.teaser-grid > .reveal:nth-child(4) { transition-delay: .24s; }
 
-/* Global interaction polish */
 button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: inherit; }
 .pill-button, .soft-button, .mode-button, .action-button, .link-button, .icon-button, .mini-action {
   transition: transform .4s var(--ease-spring), box-shadow .25s var(--ease), background-color .2s var(--ease), border-color .2s var(--ease), opacity .2s var(--ease);
@@ -574,7 +545,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .action-button:hover:not(:disabled) { border-color: rgba(0,0,0,.24); transform: translateY(-1px); }
 .action-button.primary:hover:not(:disabled) { box-shadow: 0 10px 22px rgba(0,0,0,.24); }
 
-/* Floating / app nav gain a little weight, and shrink slightly, once the page scrolls */
 .floating-nav { transition: box-shadow .3s var(--ease), background-color .3s var(--ease), min-height .3s var(--ease), padding .3s var(--ease); }
 .floating-nav.scrolled {
   min-height: 50px;
@@ -591,12 +561,10 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .app-topbar { transition: box-shadow .25s var(--ease); }
 .app-topbar.scrolled { box-shadow: 0 8px 20px rgba(0,0,0,.07); }
 
-/* Underline slides in under the active nav tab instead of just appearing */
 .nav-links a[data-landing-nav] { position: relative; }
 .nav-links a[data-landing-nav]::after { content: ""; position: absolute; left: 2px; right: 2px; bottom: -9px; height: 3px; border-radius: 99px; background: var(--tab-color, #11100f); transform: scaleX(0); transition: transform .4s var(--ease-spring); transform-origin: center; }
 .nav-links a.active::after { transform: scaleX(1); }
 
-/* The hamburger + sheet that stand in for .nav-links once it disappears below 1100px */
 .nav-burger { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 38px; height: 38px; border: 0; background: transparent; cursor: pointer; padding: 0; flex-shrink: 0; }
 .nav-burger span { display: block; width: 20px; height: 2px; background: var(--ink); border-radius: 2px; transition: transform .3s var(--ease-spring), opacity .2s var(--ease); }
 .nav-burger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
@@ -618,12 +586,9 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .nav-burger { display: flex; }
 }
 
-/* A soft light that follows the cursor across the landing page, barely
-   there, just enough to make the surface feel responsive. Desktop only. */
 .cursor-glow { position: fixed; top: 0; left: 0; width: 520px; height: 520px; margin: -260px 0 0 -260px; border-radius: 50%; pointer-events: none; z-index: 3; opacity: 0; background: radial-gradient(circle, rgba(255,255,255,.65), transparent 70%); filter: blur(18px); mix-blend-mode: soft-light; transition: opacity .5s ease; will-change: transform; }
 .cursor-glow.active { opacity: .6; }
 
-/* Tilt-reactive cards */
 .deep-card, .teaser-card, .integration-card, .price-card, .memory-card, .care-tile, .organize-card, .metric-card {
   transition: transform .5s var(--ease-out), box-shadow .35s var(--ease);
   transform-style: preserve-3d;
@@ -632,7 +597,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   box-shadow: var(--shadow-premium-hover);
 }
 
-/* Hero ambient motion, slow and layered, never distracting */
 .cloud { animation: cloud-drift 24s ease-in-out infinite; }
 .cloud-two { animation-duration: 29s; animation-delay: -8s; }
 @keyframes cloud-drift { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(22px, -10px); } }
@@ -647,7 +611,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .yellow-slope { animation: bob-tilt 12s ease-in-out infinite; animation-delay: -6s; }
 @keyframes bob-tilt { 0%, 100% { transform: rotate(-2deg) translateY(0); } 50% { transform: rotate(-2deg) translateY(-9px); } }
 
-/* Whole scene drifts a few pixels toward the cursor for a light parallax feel */
 .hero-art { transition: transform .35s var(--ease); will-change: transform; }
 .hero-art::before {
   content: ""; position: absolute; z-index: 0; inset: -80px 10% 40% 10%; pointer-events: none;
@@ -656,7 +619,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 }
 @keyframes sun-glow { 0%, 100% { opacity: .35; transform: scale(1); } 50% { opacity: .6; transform: scale(1.06); } }
 
-/* Landing card hover lift */
 .memory-card, .integration-card, .care-tile, .tile, .price-card, .recognition-card {
   transition: transform .3s var(--ease), box-shadow .3s var(--ease);
 }
@@ -669,9 +631,8 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .organize-card:hover { transform: translateY(-7px); box-shadow: 0 32px 64px rgba(0,0,0,.2); }
 .organize-card:hover .organize-mock { transform: translateY(-4px) rotate(.4deg); }
 
-/* App dashboard: page transition, sidebar, cards, form controls */
 @keyframes page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-/* Every page render now cascades in: the top-level blocks under */
+
 .app-content.page-enter > * { opacity: 0; animation: page-in .5s var(--ease) both; }
 .app-content.page-enter > *:nth-child(1) { animation-delay: 0s; }
 .app-content.page-enter > *:nth-child(2) { animation-delay: .06s; }
@@ -684,12 +645,11 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .app-content.page-enter .app-grid > *:nth-child(4) { animation-delay: .23s; }
 .app-content.page-enter .app-grid > *:nth-child(5) { animation-delay: .28s; }
 .app-content.page-enter .app-grid > *:nth-child(n+6) { animation-delay: .32s; }
-/* Patient mode's fixed-height, no-scroll layout is meant to feel calm and
-   settled, not busy with cascading motion every tab switch, opt it out. */
+
 .app-content-fixed.page-enter > * { animation: none; opacity: 1; }
 .side-nav { transition: background-color .2s var(--ease), color .2s var(--ease), transform .15s var(--ease); }
 .side-nav:hover { transform: translateX(2px); }
-/* The sidebar nav cascades in once */
+
 .sidebar-nav-scroll > * { opacity: 0; transform: translateX(-10px); }
 .sidebar-nav-scroll.sidebar-ready > * { animation: side-nav-in .45s var(--ease) both; }
 .sidebar-nav-scroll.sidebar-ready > *:nth-child(1) { animation-delay: .02s; }
@@ -708,7 +668,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .reminder-check input { transition: transform .15s var(--ease); }
 .reminder-check input:active { transform: scale(1.2); }
 
-/* Modals restart their entrance animation every time .hidden is removed */
 .modal-backdrop:not(.hidden) { animation: modal-backdrop-in .22s var(--ease); }
 .modal-backdrop:not(.hidden) > * { animation: modal-card-in .3s var(--ease); }
 @keyframes modal-backdrop-in { from { opacity: 0; } }
@@ -717,7 +676,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .toast.leaving { animation: toast-out .25s var(--ease) forwards; }
 @keyframes toast-out { to { opacity: 0; transform: translateY(8px) scale(.95); } }
 
-/* App */
 .app-view { min-height: 100vh; background: var(--app-bg); color: var(--ink); }
 .app-topbar { position: sticky; top: 0; z-index: 30; height: 74px; display: grid; grid-template-columns: 220px 1fr 220px; align-items: center; padding: 0 22px; background: color-mix(in srgb, var(--surface) 88%, transparent); border-bottom: 1px solid var(--line); backdrop-filter: blur(14px); }
 .app-wordmark { border:0; background:transparent; cursor:pointer; width:max-content; }
@@ -737,25 +695,25 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(var(--glass-saturate));
   box-shadow: 1px 0 0 color-mix(in srgb, white 40%, transparent), 8px 0 24px rgba(24,75,92,.05);
 }
-/* The nav list is the one part of the sidebar that grows with the feature set */
+
 .sidebar-nav-scroll { flex:1 1 auto; min-height:0; overflow-y:auto; display:flex; flex-direction:column; }
 .side-nav { display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px; border:0; border-radius:13px; background:transparent; cursor:pointer; text-align:left; color:var(--muted); font-weight:600; flex-shrink:0; }
 .side-nav:hover { background:color-mix(in srgb, var(--surface) 65%, transparent); }
 .side-nav.active { background:var(--surface); color:var(--ink); box-shadow:0 8px 18px rgba(0,0,0,.06); }
 .side-nav span:not(.patient-entry-label) { width:22px; text-align:center; font-size:18px; }
-/* Groups the growing nav list into scannable clusters instead of one long flat list */
-.side-nav-group { margin:16px 0 4px; padding:0 14px; font-size:10px; font-weight:700; letter-spacing:.09em; color:#8c8780; flex-shrink:0; }
+
+.side-nav-group { margin:16px 0 4px; padding:0 14px; font-size:11px; font-weight:700; letter-spacing:.09em; color:#8c8780; flex-shrink:0; }
 .side-nav-group:first-of-type { margin-top:10px; }
 .side-nav-gap { height:14px; flex-shrink:0; }
 .care-note { flex-shrink:0; padding:17px; margin:12px 0 12px; border-radius:16px; background:#ffe37e; box-shadow:0 8px 16px rgba(105,77,13,.1); }
-.care-note small { font-size:10px; letter-spacing:.08em; font-weight:700; }
+.care-note small { font-size:11px; letter-spacing:.08em; font-weight:700; }
 .care-note p { margin:9px 0 0; font-family:var(--serif); font-size:18px; line-height:1.15; }
-/* This button also carries data-page="patient" */
+
 .patient-entry, .patient-entry.active { background:var(--dark); color:var(--dark-ink); gap:8px; }
 .patient-entry-label { white-space:nowrap; font-size:15px; }
 .patient-entry:hover, .patient-entry.active:hover { background:var(--dark); filter:brightness(1.25); color:var(--dark-ink); }
 .app-content { padding:34px; min-width:0; }
-/* Patient mode locks to exactly one screen, no page scroll. */
+
 #app-content.app-content-fixed {
   height: calc(100vh - 74px);
   height: calc(100dvh - 74px);
@@ -768,7 +726,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .page-head h1 { margin:0; font-family:var(--serif); font-size:58px; line-height:.95; font-weight:400; }
 .page-head p { margin:10px 0 0; color:#726e68; }
 .app-grid { display:grid; grid-template-columns:repeat(12,1fr); gap:18px; }
-/* A deliberately quiet utility strip */
+
 .demo-code-strip { display:flex; align-items:center; justify-content:center; gap:9px; margin:46px 0 6px; padding:10px; opacity:.5; transition:opacity .2s var(--ease); }
 .demo-code-strip:focus-within, .demo-code-strip:hover { opacity:1; }
 .demo-code-strip label { font-size:11px; font-weight:600; letter-spacing:.04em; color:var(--muted); text-transform:uppercase; }
@@ -816,7 +774,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .badge.success { background:#d7f0d9; color:#2f6b3a; }
 .badge.error { background:#fbdcd8; color:#a13a2c; }
 
-/* ---------- Overview teaser tiles (Insights / Care Notes) ---------- */
 .teaser-tile { display:flex; align-items:center; gap:16px; cursor:pointer; transition:transform .2s var(--ease), box-shadow .2s var(--ease); }
 .teaser-tile:hover { transform:translateY(-3px); box-shadow:0 16px 30px rgba(44,34,23,.1); }
 .teaser-tile:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
@@ -827,7 +784,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .teaser-tile-go { margin-left:auto; flex-shrink:0; color:#a49f97; font-size:18px; transition:transform .2s var(--ease); }
 .teaser-tile:hover .teaser-tile-go { transform:translateX(4px); color:#11100f; }
 
-/* ---------- Insights ---------- */
 .insight-bars { display:grid; gap:12px; }
 .insight-bar-row { display:grid; grid-template-columns:110px 1fr 34px; align-items:center; gap:12px; }
 .insight-bar-label { font-size:13px; font-weight:650; color:#4c4842; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -840,7 +796,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .mood-trend-chip:hover { transform:translateY(-2px); }
 .mood-trend-chip small { font-size:10.5px; font-weight:600; color:var(--muted); }
 
-/* ---------- Care Notes ---------- */
 .care-notes-list { display:grid; gap:10px; }
 .care-note-row { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; padding:14px 16px; border-radius:15px; background:#f7f4ef; transition:background .2s var(--ease); }
 .care-note-row:hover { background:#f0ece3; }
@@ -849,14 +804,12 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .care-note-row-body p { margin:0; font-size:14px; line-height:1.5; color:#2c2a27; }
 .care-note-row-body small { display:block; margin-top:6px; color:#85807a; font-size:12px; }
 
-/* The "I need help" button gets a slow */
 .quickbar-icon-btn.danger { animation:sos-breathe 3.2s ease-in-out infinite; }
 .quickbar-icon-btn.danger:hover { animation-play-state:paused; }
 @keyframes sos-breathe { 0%,100% { box-shadow:0 0 0 0 rgba(166,62,52,0); } 50% { box-shadow:0 0 0 6px rgba(166,62,52,.14); } }
 .elder-mode .quickbar-icon-btn { width:48px; height:48px; font-size:22px; }
 .elder-mode .patient-tabset-btn { min-height:52px; font-size:1.05em; }
 
-/* A one-tap mood log, separate from the full Journal, which asks for writing. */
 .mood-checkin-strip { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:14px 22px; margin-bottom:14px; border-radius:18px; background:var(--surface); border:1px solid var(--line); box-shadow:0 8px 18px rgba(0,0,0,.05); animation:patient-card-in .5s var(--ease) both; animation-delay:.02s; }
 .mood-checkin-head { display:flex; flex-direction:column; gap:2px; font-weight:650; }
 .mood-checkin-head small { font-weight:500; color:var(--muted); }
@@ -874,7 +827,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .mood-checkin-chip { height:40px; padding:0 10px; }
 }
 
-/* SOS confirmation replaces the "Ready when you are" card's content in place */
 .matched-card.sos-active { background:rgba(255,255,255,.95); border:2px solid #4ea768; }
 .matched-card.sos-active h3 { color:#2f6b3a; }
 .flagged-alert-banner.sos { background:#fff4e0; box-shadow:0 10px 24px rgba(201,143,18,.14); }
@@ -882,7 +834,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .flagged-alert-banner.sos .action-button { background:#8a5f10; }
 .flagged-alert-banner.sos .action-button:hover { background:#6e4b0c; }
 
-/* ---------- Browse memories ---------- */
 .memories-browse { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:18px; }
 .memory-browse-card { padding:28px 24px; border-radius:22px; background:#fff; box-shadow:var(--soft-shadow); text-align:center; }
 .memory-browse-portrait { width:84px; height:84px; margin:0 auto 16px; border-radius:50%; overflow:hidden; background:#ffd0c1; display:grid; place-items:center; font-size:32px; font-weight:700; font-family:var(--serif); }
@@ -893,7 +844,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .memories-browse.elder-mode .memory-browse-card p { font-size:1.2em; }
 .memories-browse.elder-mode .memory-browse-portrait { width:104px; height:104px; font-size:40px; }
 
-/* ---------- Companion chat ---------- */
 .companion-row { cursor:pointer; transition: background .2s var(--ease); }
 .companion-row:hover { background:#f0ece3; }
 .companion-row.flagged { background:#fbe9e6; }
@@ -903,7 +853,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .trend-chart-wrap { position:relative; }
 .trend-chart { width:100%; height:auto; overflow:visible; display:block; }
 .trend-grid { stroke:rgba(0,0,0,.08); stroke-width:1; }
-.trend-axis-label { font-size:10px; fill:#948f88; font-family:var(--sans); }
+.trend-axis-label { font-size:11px; fill:#948f88; font-family:var(--sans); }
 .trend-line { fill:none; stroke:#4f9d6e; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
 .trend-point { fill:#fff; stroke:#4f9d6e; stroke-width:2.5; cursor:pointer; transition:r .15s var(--ease); }
 .trend-point:hover, .trend-point:focus-visible { r:7; outline:none; }
@@ -911,8 +861,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .trend-tooltip b { font-weight:650; }
 .trend-tooltip span { color:#c9c4bc; }
 
-/* ---------- Elder-friendly display mode ---------- */
-/* Scoped to patient-facing containers only */
 .elder-mode { font-size:19px; }
 .elder-mode p, .elder-mode label, .elder-mode small { font-size:1em; }
 .elder-mode .action-button { min-height:56px; padding:0 26px; font-size:1.05em; }
@@ -975,7 +923,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .companion-bubble.ai { justify-self:start; background:#f0ece3; border-bottom-left-radius:6px; }
 .companion-bubble.patient { justify-self:end; background:#c2d0fb; border-bottom-right-radius:6px; margin-left:auto; }
 
-/* Companion's signature moment */
 .conversation-thread { max-width: 620px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; padding: 34px 30px; border-radius: 30px; background: linear-gradient(180deg,#fff8f5,#fff1ea); box-shadow: 0 22px 48px rgba(255,140,100,.16); }
 .conversation-thread .companion-bubble { display: block; width: fit-content; font-size: 15px; box-shadow: 0 6px 16px rgba(0,0,0,.05); }
 @media (max-width: 640px) { .conversation-thread { padding: 24px 18px; } .conversation-thread .companion-bubble { max-width: 88%; } }
@@ -1004,16 +951,12 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .companion-mic-btn.listening { background:#fbdcd8; border-color:transparent; color:#a13a2c; animation:companion-mic-pulse 1.2s ease-in-out infinite; }
 @keyframes companion-mic-pulse { 0%,100% { box-shadow:0 0 0 0 rgba(161,58,44,.35); } 50% { box-shadow:0 0 0 10px rgba(161,58,44,0); } }
 
-/* ---------- Journal ---------- */
-/* Mood colors read left-to-right on the picker as a gentle spectrum, easier
-   to harder: the color itself carries meaning, not just decoration. */
 .mood-happy { background:var(--yellow); }
 .mood-calm { background:var(--mint); }
 .mood-okay { background:var(--blue); }
 .mood-tired { background:var(--lavender); }
 .mood-anxious { background:var(--peach); }
 .mood-sad { background:var(--blue-soft); }
-
 
 .journal-row .row-copy small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
 .mood-avatar { font-size:20px; }
@@ -1048,8 +991,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .journal-detail-eyebrow { margin:0 0 8px; font-weight:650; color:#726e68; }
 .journal-detail-text { font-size:17px; line-height:1.75; margin-top:20px; color:#2c2a27; }
 
-/* Shared by the live editor and the read-only detail view, since both render
-   the same sanitized tag set. */
 .journal-editor strong,.journal-detail-text strong,.journal-editor b,.journal-detail-text b { font-weight:700; }
 .journal-editor em,.journal-detail-text em,.journal-editor i,.journal-detail-text i { font-style:italic; }
 .journal-editor u,.journal-detail-text u { text-decoration:underline; }
@@ -1167,7 +1108,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 
 .patient-page { flex:1; min-height:0; display:flex; flex-direction:column; position:relative; }
 
-/* ---- Quickbar: compact greeting + mood/calming popovers + memories/help ---- */
 .patient-quickbar { position:relative; flex-shrink:0; display:flex; align-items:center; gap:12px; padding:10px 14px; margin-bottom:12px; border-radius:18px; background:var(--surface); border:1px solid var(--line); box-shadow:0 8px 18px rgba(0,0,0,.05); }
 .quickbar-back { flex-shrink:0; width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:var(--surface-2); font-size:18px; cursor:pointer; display:grid; place-items:center; color:var(--ink); transition:transform .15s var(--ease-spring), background .2s var(--ease); }
 .quickbar-back:hover { transform:translateX(-2px); background:var(--accent-soft); }
@@ -1189,7 +1129,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .patient-popover .mood-checkin-options { flex-wrap:wrap; }
 .patient-popover .calming-popover-body .card-head { margin-bottom:12px; }
 
-/* ---- Tabbed Camera / Conversation / Report, one screen, one panel visible ---- */
 .patient-tabset { flex:1; min-height:0; display:flex; flex-direction:column; }
 .patient-tabset-bar { flex-shrink:0; display:flex; gap:8px; margin-bottom:10px; }
 .patient-tabset-btn { flex:1; padding:10px 10px; border-radius:12px; border:1px solid var(--line); background:var(--surface); font-weight:650; font-size:13.5px; cursor:pointer; transition:background .2s var(--ease), border-color .2s var(--ease), transform .15s var(--ease-spring); }
@@ -1236,7 +1175,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .patient-tabset-panel #live-summary p { margin:0 0 4px; font-size:14px; }
 .patient-tabset-panel .action-row { gap:8px; flex-shrink:0; }
 .patient-tabset-panel .action-row button { padding:9px 12px; font-size:13px; }
-/* Same soft focus-pull as every .reveal-family transition sitewide */
+
 @keyframes patient-card-in { from { opacity:0; transform:translateY(10px); filter:blur(5px); } to { opacity:1; transform:translateY(0); filter:blur(0); } }
 .calming-card { padding:16px 20px; }
 .calming-card-toggle { display:flex; align-items:center; justify-content:space-between; gap:18px; width:100%; border:0; background:none; padding:0; margin-bottom:18px; font:inherit; color:inherit; text-align:left; cursor:pointer; }
@@ -1301,7 +1240,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   background: linear-gradient(90deg, transparent, color-mix(in srgb, white 85%, var(--surface)), transparent);
   pointer-events: none;
 }
-/* Clerk's own sign-in widget is mounted with appearance.elements.card. */
+
 .auth-modal-card {
   width:min(520px,100%); min-height:590px; padding:30px;
   background: var(--paper);
@@ -1321,7 +1260,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .face-form-side label { display:grid; gap:7px; margin-bottom:15px; font-size:12px; font-weight:700; }
 .privacy-hint { color:#77726c; font-size:12px; line-height:1.5; }
 .face-camera-side { display:grid; gap:15px; }
-/* Enrollment captures real biometric data */
+
 .face-camera-side .camera-shell,
 .face-camera-side .pose-progress,
 .face-camera-side .camera-actions,
@@ -1351,7 +1290,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .toast.success { background:#265f3a; }
 @keyframes toast-in { from{opacity:0;transform:translateY(8px)} }
 
-/* ---------- Multi-page landing: chapter tabs, headers, teasers ---------- */
 .landing-page:not(.hidden) { animation: page-in .5s var(--ease); }
 
 .nav-links a.active { opacity: 1; font-weight: 700; }
@@ -1373,7 +1311,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .chapter-header-copy { position: relative; z-index: 1; }
 .chapter-header-art { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; min-height: 240px; }
 
-/* Ambient texture that fills the empty space around the header copy */
 .chapter-header::after {
   content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: .55;
   background-image: radial-gradient(rgba(10,9,8,.14) 1.4px, transparent 1.4px);
@@ -1394,7 +1331,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .pricing-chapter .header-blob { background: #fff; }
 .clinicians-chapter .header-blob { background: #e4f3f1; }
 
-/* Card + floating chip stack */
 .header-art-stack { position: relative; width: min(270px, 100%); }
 .header-art-card { position: relative; width: 100%; border-radius: 26px; background: rgba(255,255,255,.92); box-shadow: 0 25px 50px rgba(0,0,0,.18); overflow: hidden; }
 .header-art-topbar { display: flex; gap: 6px; padding: 14px 16px; border-bottom: 1px solid rgba(0,0,0,.06); }
@@ -1403,7 +1339,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .header-art-chip { position: absolute; z-index: 2; left: 50%; bottom: -18px; transform: translateX(-50%); padding: 9px 16px; border-radius: 999px; background: #11100f; color: #fff; font-size: 12px; font-weight: 700; white-space: nowrap; box-shadow: 0 10px 22px rgba(0,0,0,.28); animation: chip-rise 3.6s var(--ease) infinite; }
 @keyframes chip-rise { 0%, 14% { opacity: 0; transform: translate(-50%, 10px); } 24%, 82% { opacity: 1; transform: translate(-50%, 0); } 94%, 100% { opacity: 0; transform: translate(-50%, 10px); } }
 
-/* Recognize, face scan */
 .scan-art-body { position: relative; height: 220px; display: grid; place-items: center; overflow: hidden; background: linear-gradient(180deg,#f5f8ff,#eef2ff); }
 .scan-mesh { position: absolute; inset: 0; opacity: .5; background-image: linear-gradient(rgba(93,128,230,.16) 1px, transparent 1px), linear-gradient(90deg, rgba(93,128,230,.16) 1px, transparent 1px); background-size: 16px 16px; -webkit-mask-image: radial-gradient(circle at 50% 45%, black, transparent 68%); mask-image: radial-gradient(circle at 50% 45%, black, transparent 68%); }
 .scan-viewport { position: relative; width: 178px; height: 208px; }
@@ -1420,14 +1355,11 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .scan-sweep { position: absolute; left: 6%; right: 6%; height: 3px; border-radius: 3px; background: linear-gradient(90deg, transparent, #5d80e6, transparent); box-shadow: 0 0 16px rgba(93,128,230,.7); animation: sweep 2.6s ease-in-out infinite; }
 @keyframes sweep { 0%, 100% { top: 6%; opacity: 0; } 10% { opacity: 1; } 50% { top: 90%; opacity: 1; } 60% { opacity: 0; } }
 
-/* Hover the recognize card to see it "lock on": the ambient loop keeps
-   running for anyone just scrolling past, this is the reward for stopping. */
 .recognize-chapter .header-art-stack:hover .scan-sweep { box-shadow: 0 0 28px rgba(93,128,230,1); }
 .recognize-chapter .header-art-stack:hover .scan-corner { opacity: 1; border-color: #2f57c4; }
 .header-art-stack:hover .header-art-ring { animation-duration: 6s; }
 .recognize-chapter .header-art-stack:hover .header-art-chip { animation-play-state: paused; opacity: 1; transform: translateX(-50%) scale(1.06); box-shadow: 0 14px 28px rgba(0,0,0,.35), 0 0 0 5px rgba(93,128,230,.35); }
 
-/* Product, voice detection */
 .voice-art-body { position: relative; height: 220px; display: grid; place-items: center; gap: 18px; overflow: hidden; background: linear-gradient(180deg,#f2fbf4,#e9f8ec); }
 .voice-ripple { position: absolute; top: 50%; left: 50%; width: 150px; height: 150px; margin: -75px 0 0 -75px; border-radius: 50%; border: 2px solid rgba(63,156,94,.3); animation: lock-ping 2.6s ease-out infinite; }
 .voice-ripple.two { animation-delay: 1.3s; }
@@ -1445,7 +1377,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .voice-art-label { position: absolute; z-index: 1; left: 50%; bottom: 22px; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: #fff; box-shadow: 0 8px 16px rgba(0,0,0,.08); font-size: 12px; font-weight: 700; color: #2f6b45; white-space: nowrap; }
 .voice-art-label i { width: 7px; height: 7px; border-radius: 50%; background: #3f9c5e; animation: pulse 1.4s infinite; }
 
-/* Companion: a quiet chat */
 .chat-art-body { position: relative; height: 220px; padding: 18px 20px; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; overflow: hidden; background: linear-gradient(180deg,#fff4ef,#ffe8df); }
 .chat-art-body .companion-bubble { max-width: 78%; font-size: 13px; padding: 10px 14px; box-shadow: 0 6px 14px rgba(0,0,0,.05); }
 .chat-art-typing { align-self: flex-start; display: flex; gap: 4px; padding: 10px 14px; }
@@ -1453,7 +1384,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .chat-art-typing span:nth-child(2) { animation-delay: .15s; }
 .chat-art-typing span:nth-child(3) { animation-delay: .3s; }
 
-/* Caregiver, calendar */
 .cal-art-body { position: relative; height: 220px; padding: 18px 24px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; background: linear-gradient(180deg,#fffaf0,#fff4d9); }
 .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
 .cal-grid span { aspect-ratio: 1; border-radius: 6px; background: #f1ede4; transition: background .2s ease; }
@@ -1465,13 +1395,11 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 @keyframes cal-slide { 0%, 10% { opacity: 0; transform: translateY(8px); } 22%, 80% { opacity: 1; transform: translateY(0); } 94%, 100% { opacity: 0; transform: translateY(-8px); } }
 @keyframes cal-check { 0%, 55% { transform: translateY(-50%) scale(0); } 68% { transform: translateY(-50%) scale(1.2); } 76%, 80% { transform: translateY(-50%) scale(1); } 94%, 100% { transform: translateY(-50%) scale(0); } }
 
-/* Clinicians, plain feature list */
 .clin-art-body { position: relative; height: 220px; padding: 18px 22px; display: flex; flex-direction: column; justify-content: center; gap: 14px; overflow: hidden; background: linear-gradient(180deg,#eef8f6,#e2f2ef); }
 .clin-art-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 14px; background: #fff; box-shadow: 0 6px 14px rgba(0,0,0,.05); font-size: 13px; font-weight: 650; color: #1c1a17; }
 .clin-art-dot { width: 8px; height: 8px; border-radius: 50%; background: #2f6f6a; flex-shrink: 0; }
 .chapter-header.clinicians-chapter::after { background-image: radial-gradient(rgba(255,255,255,.35) 1.4px, transparent 1.4px); }
 
-/* Privacy, secure lock */
 .lock-art-body { position: relative; height: 220px; display: grid; place-items: center; overflow: hidden; background: linear-gradient(180deg,#16291f,#0e1c15); }
 .lock-ring { position: absolute; top: 50%; left: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; border: 2px solid rgba(140,222,168,.4); animation: lock-ping 2.8s ease-out infinite; }
 .lock-ring.ring-two { animation-delay: 1.4s; }
@@ -1481,7 +1409,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .lock-body { position: absolute; bottom: 0; left: 0; width: 68px; height: 40px; border-radius: 12px; background: #d8f2df; }
 .lock-body::after { content: ""; position: absolute; left: 50%; top: 12px; width: 8px; height: 8px; border-radius: 50%; background: #16291f; transform: translateX(-50%); }
 
-/* Pricing, free-to-start seal */
 .seal-art-body { position: relative; height: 220px; display: grid; place-items: center; overflow: hidden; background: linear-gradient(180deg,#eef3ff,#e2ebff); }
 .seal-spark { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #3457d5; opacity: .5; animation: spark-drift 5s ease-in-out infinite; }
 .seal-spark.s1 { top: 26%; left: 22%; animation-duration: 6s; }
@@ -1496,7 +1423,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .seal-badge small { display: block; font-size: 11px; letter-spacing: .04em; color: rgba(255,255,255,.65); }
 .seal-check { position: absolute; top: -6px; right: -6px; width: 40px; height: 40px; border-radius: 50%; background: #3f9c5e; color: #fff; display: grid; place-items: center; font-weight: 800; box-shadow: 0 8px 18px rgba(0,0,0,.22); animation: pop-in 2.6s var(--ease) infinite; }
 @keyframes pop-in { 0%, 70% { transform: scale(1); } 78% { transform: scale(1.22); } 88%, 100% { transform: scale(1); } }
-/* Gentler pastels */
+
 .chapter-header.recognize-chapter { background: linear-gradient(135deg, #c7d4fc, #c2cffc); }
 .chapter-header.product-chapter { background: linear-gradient(135deg, #a3ddba, #b0e0c1); }
 .chapter-header.companion-chapter { background: linear-gradient(135deg, #ffdccf, #ffcabf); }
@@ -1506,35 +1433,23 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .chapter-header.pricing-chapter { background: linear-gradient(135deg, #d3e0ff, #bdd0fb); }
 .chapter-header.clinicians-chapter { background: linear-gradient(135deg, #c0e2dd, #b0d9d3); }
 
-/* The container itself shouldn't always read as "the same rounded colour rectangle" either */
-
-/* Product & Pricing, no colour block at all: plain paper with a hairline
-   border, closer to a spec sheet or an editorial page than a hero card. */
 .chapter-header.product-chapter, .chapter-header.pricing-chapter { background: var(--paper); box-shadow: none; border: 1px solid rgba(10,9,8,.12); }
 .chapter-header.product-chapter::before, .chapter-header.pricing-chapter::before { display: none; }
 .chapter-header.product-chapter::after { opacity: .3; }
 .chapter-header.product-chapter .header-blob, .chapter-header.pricing-chapter .header-blob { opacity: .5; }
 
-/* Companion: an uneven */
 .chapter-header.companion-chapter { border-radius: calc(var(--radius-hero) * 2.2) calc(var(--radius-hero) * .35) calc(var(--radius-hero) * 2.2) calc(var(--radius-hero) * .35); }
 
-/* Caregiver, flat and sharp-cornered, a banner rather than a floating
-   card: no shadow, barely any rounding. */
 .chapter-header.caregiver-chapter { border-radius: calc(var(--radius-hero) * .2); box-shadow: none; }
 
-/* Privacy & Clinicians, sharp, document-like corners instead of the soft
-   rounded card used everywhere else. */
 .chapter-header.privacy-chapter, .chapter-header.clinicians-chapter { border-radius: calc(var(--radius-hero) * .25); }
 
-/* Seven pages, seven different shapes */
 @media (min-width: 1101px) {
-  /* Product, mirrored: art on the left, copy on the right. */
+
   .chapter-header.product-chapter { grid-template-columns: .85fr 1.15fr; }
   .chapter-header.product-chapter .chapter-header-copy { order: 2; }
   .chapter-header.product-chapter .chapter-header-art { order: 1; }
 
-  /* Companion, centered and stacked: headline on top, a wide art banner
-     underneath, like a persona introduction rather than a feature pitch. */
   .chapter-header.companion-chapter { grid-template-columns: 1fr; text-align: center; padding: 76px 56px 48px; }
   .chapter-header.companion-chapter .chapter-header-copy { max-width: 620px; margin: 0 auto; }
   .chapter-header.companion-chapter .chapter-header-copy h1 { max-width: none; }
@@ -1542,18 +1457,15 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .chapter-header.companion-chapter .pill-button { margin: 32px auto 0; }
   .chapter-header.companion-chapter .chapter-header-art { margin-top: 34px; min-height: 190px; width: 100%; }
 
-  /* Caregiver, top-anchored and asymmetric */
   .chapter-header.caregiver-chapter { grid-template-columns: 1.35fr .65fr; align-items: start; padding-top: 96px; }
   .chapter-header.caregiver-chapter .chapter-header-copy h1 { max-width: 720px; font-size: clamp(32px, 4vw, 56px); }
   .chapter-header.caregiver-chapter .chapter-header-art { margin-top: 46px; transform: scale(.92); }
 
-  /* Privacy, full-width copy with the art reduced to a faint watermark in the corner */
   .chapter-header.privacy-chapter { grid-template-columns: 1fr; padding: 88px 64px 64px; }
   .chapter-header.privacy-chapter .chapter-header-copy { max-width: 680px; }
   .chapter-header.privacy-chapter .chapter-header-copy h1 { max-width: none; }
   .chapter-header.privacy-chapter .chapter-header-art { position: absolute; right: 40px; bottom: 16px; width: 300px; min-height: 0; opacity: .5; pointer-events: none; z-index: 0; }
 
-  /* Pricing, centered editorial */
   .chapter-header.pricing-chapter { grid-template-columns: 1fr; text-align: center; padding: 90px 64px 60px; }
   .chapter-header.pricing-chapter .chapter-header-copy { max-width: 640px; margin: 0 auto; }
   .chapter-header.pricing-chapter .chapter-header-copy h1 { max-width: none; }
@@ -1561,7 +1473,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .chapter-header.pricing-chapter .pill-button { margin: 32px auto 0; }
   .chapter-header.pricing-chapter .chapter-header-art { position: absolute; top: 36px; right: 44px; width: 190px; min-height: 0; transform: scale(.78); z-index: 2; }
 
-  /* Clinicians: a letterhead split */
   .chapter-header.clinicians-chapter { grid-template-columns: 1fr .55fr; align-items: stretch; gap: 0; padding: 80px 0 60px; }
   .chapter-header.clinicians-chapter .chapter-header-copy { padding: 0 48px; border-right: 1px solid rgba(10,40,35,.16); display: flex; flex-direction: column; justify-content: center; }
   .chapter-header.clinicians-chapter .chapter-header-art { padding: 0 40px; }
@@ -1570,11 +1481,8 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 
 .deckle-divider { max-width: 1580px; height: 32px; margin: -1px auto 0; background: var(--paper); clip-path: polygon(0 0,3% 100%,7% 22%,11% 100%,15% 16%,19% 100%,23% 26%,27% 100%,31% 12%,35% 100%,39% 22%,43% 100%,47% 14%,51% 100%,55% 18%,59% 100%,63% 10%,67% 100%,71% 20%,75% 100%,79% 15%,83% 100%,87% 24%,91% 100%,95% 16%,100% 100%,100% 0); }
 
-/* Ambient colour behind the plain paper background, fills the wide gutters
-   either side of the centred content column with a slow, low-opacity drift. */
 .chapter-body { position: relative; max-width: 1320px; margin: 0 auto; padding: 10px 20px 0; }
 
-/* Single-direction vertical margins */
 .chapter-body > .chapter-section,
 .chapter-body > .feature-panel,
 .chapter-body > .promo-band,
@@ -1594,8 +1502,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .chapter-body > .how-it-works-section { margin-bottom: var(--space-band); }
 .chapter-body > :last-child { margin-bottom: 0; }
 
-/* Prose measure. Card and grid text needs it as much as running copy,
-   a one-column card on a wide viewport was rendering 107 characters. */
 .deep-card > p,
 .teaser-card > p,
 .integration-card > p,
@@ -1617,7 +1523,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 [data-landing-page="pricing"] .chapter-body { --body-blob-1: #bdd0fb; --body-blob-2: #d7d0ff; }
 [data-landing-page="clinicians"] .chapter-body { --body-blob-1: #8fc4be; --body-blob-2: #cdeae6; }
 
-/* ---------- Product Playground: a real, clickable dashboard sandbox ---------- */
 .playground-section { max-width: 1100px; margin: var(--space-band) auto; text-align: center; }
 .playground-window { width: 100%; max-width: 900px; margin: 46px auto 0; min-height: 560px; box-shadow: var(--shadow); transition: box-shadow .4s var(--ease), transform .4s var(--ease); }
 .playground-window:hover { box-shadow: var(--shadow-atmosphere), 0 30px 60px rgba(0,0,0,.18); }
@@ -1656,8 +1561,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .pg-accordion[data-reveal-panel] .pg-accordion-inner p { margin: 0; color: #5b5752; line-height: 1.5; }
 .pg-accordion[data-reveal-panel] .pg-accordion-inner ul { margin: 0; padding-left: 18px; color: #5b5752; line-height: 1.7; }
 
-/* ---- Hero actions ---------------------------------------------------- */
-/* Justify-content matters here */
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center; }
 .pill-button.ghost {
   background: transparent;
@@ -1670,7 +1573,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .pill-button.ghost:hover { background: var(--white); border-color: rgba(10,9,8,.24); }
 .hero-sub em { font-style: italic; color: var(--ink); }
 
-/* ---- Home evidence strip --------------------------------------------- */
 .home-evidence { max-width: 1100px; margin: 0 auto; padding: var(--space-page) 24px var(--space-block); text-align: center; }
 .evidence-more {
   display: inline-block;
@@ -1681,7 +1583,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   text-underline-offset: 4px;
 }
 
-/* The Assistance Ladder */
 .ladder-section {
   max-width: 1100px;
   margin: 0 auto;
@@ -1712,8 +1613,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   font: inherit;
   color: var(--ink);
   transition: transform .22s var(--ease), box-shadow .22s var(--ease), background .22s var(--ease);
-  /* Higher rungs sit progressively further right, so the stack reads as a
-     ladder climbing rather than a plain list of options. */
+
   margin-left: calc(var(--i) * 7px);
 }
 .ladder-rung:hover { transform: translateX(3px); box-shadow: var(--soft-shadow); }
@@ -1799,7 +1699,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .ladder-rung, .ladder-rung:hover, .ladder-rung.is-active { transition: none; transform: none; }
 }
 
-/* Evidence & statistics */
 .evidence-section {
   max-width: 1100px;
   margin: 0 auto;
@@ -1822,8 +1721,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .stat {
   flex: 1 1 220px;
   max-width: 320px;
-  /* Centres a standalone stat that isn't inside a .stat-row: the flex
-     rules above only govern it when it has siblings to share a row with. */
+
   margin: 0 auto;
   padding: 28px 22px;
   background: var(--white);
@@ -1927,8 +1825,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .evidence-callout p { font-size: 15px; line-height: 1.65; color: var(--muted); }
 .evidence-callout p + p { margin-top: 12px; }
 .evidence-callout strong { color: var(--ink); }
-/* The boundary statement is the most important text on the site and is
-   styled to be read, not skimmed past. */
+
 .boundary-callout {
   background: linear-gradient(170deg, rgba(255,214,190,.30), rgba(255,214,190,.05)), var(--white);
 }
@@ -1985,7 +1882,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .stat-breakdown-row { grid-template-columns: 1fr 70px 46px; gap: 10px; }
 }
 
-/* Homepage engine simulation */
 .sim-section {
   max-width: 1120px;
   margin: 0 auto;
@@ -2030,8 +1926,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   transition: background .35s var(--ease), transform .35s var(--ease);
 }
 .sim-seg.is-on { background: var(--blue-soft); }
-/* The current rung is emphasised so "how much help" is legible at a glance
-   rather than requiring the reader to count filled segments. */
+
 .sim-seg.is-current { background: #5d80e6; transform: scaleY(1.5); }
 
 .sim-reason {
@@ -2108,7 +2003,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .chapter-teasers::before, .chapter-teasers::after { content: ""; position: absolute; z-index: -1; border-radius: 50%; filter: blur(85px); pointer-events: none; animation: blob-float 24s ease-in-out infinite; }
 .chapter-teasers::before { top: -60px; left: -180px; width: 340px; height: 340px; opacity: .28; background: #c7d7ff; }
 .chapter-teasers::after { bottom: -80px; right: -190px; width: 380px; height: 380px; opacity: .22; background: #ffedad; animation-direction: reverse; animation-delay: -10s; }
-/* Legal documents */
+
 .legal-page { max-width: 720px; margin: 40px auto 90px; padding: 0 20px; }
 .legal-head { margin-bottom: 40px; padding-bottom: 32px; border-bottom: 1px solid var(--line); }
 .legal-head h1 { margin: 6px 0 0; font-family: var(--serif); font-size: clamp(34px, 4.4vw, 52px); font-weight: 400; letter-spacing: -.02em; }
@@ -2128,7 +2023,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 
 .chapter-section { margin: var(--space-block) 0; }
 
-/* Line length */
 .chapter-section > p,
 .chapter-section > .section-lead,
 .evidence-section > p,
@@ -2142,13 +2036,12 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .legal-body p {
   line-height: var(--lh-body);
 }
-/* Centred sections need the cap centred too, or the text hangs left. */
+
 .chapter-section[style*="text-align: center"] > p,
 .chapter-section.centered > p,
 .evidence-section.centered > p {
   margin-inline: auto;
 }
-
 
 .chapter-section:first-child { margin-top: 36px; }
 .chapter-intro { max-width: 680px; margin: 0 auto 32px; text-align: center; }
@@ -2163,35 +2056,23 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .deep-card h3 { margin: 0 0 12px; font-family: var(--serif); font-size: 25px; font-weight: 400; }
 .deep-card p { margin: 0; color: #5b5752; line-height: 1.6; font-size: 15px; }
 
-/* Page-scoped card & list skins */
-
-/* Recognize: a rounded accent badge and a left rail, echoing the face-scan
-   motif already used in its header. */
 [data-landing-page="recognize"] .deep-card { border-left: 4px solid #5d80e6; border-radius: 4px 22px 22px 4px; }
 [data-landing-page="recognize"] .deep-card .line-icon { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: rgba(93,128,230,.14); margin-bottom: 18px; }
 
-/* Product: an index-card feel: a faint oversized numeral, a hairline top
-   border instead of a drop shadow, no icon glyph. */
 [data-landing-page="product"] .deep-grid { counter-reset: product-card; }
 [data-landing-page="product"] .deep-card { counter-increment: product-card; position: relative; box-shadow: none; border-top: 3px solid #2f9d5e; border-radius: 6px; background: transparent; padding-top: 34px; }
 [data-landing-page="product"] .deep-card::before { content: counter(product-card, decimal-leading-zero); position: absolute; top: 12px; right: 18px; font-family: var(--serif); font-size: 40px; color: rgba(10,9,8,.08); line-height: 1; }
 [data-landing-page="product"] .deep-card .line-icon { display: none; }
 
-/* Companion, soft, rounded and warm: bigger radius, a peach wash, a round
-   avatar-style badge instead of a flat glyph. */
 [data-landing-page="companion"] .deep-card { border-radius: 30px; background: linear-gradient(165deg, #fff8f5, #fff1ea); box-shadow: 0 16px 34px rgba(255,140,100,.14); }
 [data-landing-page="companion"] .deep-card .line-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #ffe0d2; }
 
-/* Caregiver: a flatter utility-list feel: horizontal rows instead of
-   stacked cards, a bottom rule instead of a shadow, like a settings page. */
 [data-landing-page="caregiver"] .deep-grid { grid-template-columns: 1fr; gap: 0; }
 [data-landing-page="caregiver"] .deep-card { display: flex; align-items: flex-start; gap: 20px; border-radius: 0; box-shadow: none; border-bottom: 1px solid rgba(10,9,8,.1); padding: 22px 4px; background: transparent; }
 [data-landing-page="caregiver"] .deep-card:hover { transform: none; box-shadow: none; background: rgba(255,223,101,.12); }
 [data-landing-page="caregiver"] .deep-card .line-icon { margin-bottom: 0; flex-shrink: 0; }
 [data-landing-page="caregiver"] .deep-card h3 { margin-top: 2px; }
 
-/* Privacy, dark and secure, almost console-like: dark cards, a hairline
-   green-tinted border, sharp corners. */
 [data-landing-page="privacy"] .deep-card { background: #14201a; box-shadow: none; border: 1px solid rgba(140,222,168,.25); border-radius: 8px; }
 [data-landing-page="privacy"] .deep-card h3 { color: #eafaf0; }
 [data-landing-page="privacy"] .deep-card p { color: rgba(234,250,240,.68); }
@@ -2216,8 +2097,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .teaser-card.dark-tab { background: linear-gradient(160deg, color-mix(in srgb, #2a3d33 78%, transparent), color-mix(in srgb, #16291f 78%, transparent)); color: #fff; }
 .teaser-card.dark-tab p { color: rgba(255,255,255,.66); }
 
-/* 5 chapters now fit a wide row (was hardcoded to 4); auto-fit keeps every
-   card a sane minimum width and wraps gracefully instead of squeezing. */
 .teaser-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 
 .pricing-teaser { max-width: 1320px; margin: 0 auto 96px; padding: 46px 56px; border-radius: 26px; background: linear-gradient(120deg,#d3e0ff,#bdd0fb); display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; box-shadow: var(--soft-shadow); }
@@ -2225,9 +2104,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .pricing-teaser p { margin: 0; color: rgba(10,9,8,.65); }
 .chapter-section .privacy-banner { margin: 0; }
 
-/* REBRAND KIT: a small set of reusable pieces every chapter page draws on */
-
-/* Pill tab-switcher */
 .chapter-tabs { position: relative; z-index: 2; display: inline-flex; gap: 4px; margin: 30px auto 0; padding: 6px; width: max-content; max-width: calc(100% - 24px); border-radius: 999px; background: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.8); box-shadow: 0 10px 26px rgba(20,16,8,.1), inset 0 1px 0 white; backdrop-filter: blur(10px); }
 .chapter-tabs-row { display: flex; justify-content: center; }
 .chapter-tab-indicator { position: absolute; z-index: 0; top: 6px; left: 6px; height: calc(100% - 12px); border-radius: 999px; background: #fff; box-shadow: 0 6px 14px rgba(0,0,0,.1); transition: transform .45s var(--ease-spring), width .45s var(--ease-spring); pointer-events: none; opacity: 0; }
@@ -2238,8 +2114,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .chapter-tab-icon { font-size: 15px; display: inline-block; transition: transform .3s var(--ease-spring); }
 .chapter-tab.active .chapter-tab-icon { transform: scale(1.15) rotate(-4deg); }
 
-/* INTERACTIVE ORBIT, "How it works" (Product page). */
-/* Container (not viewport) query */
 .how-it-works-section { max-width: 1180px; margin: 0 auto var(--space-band); text-align: center; container-type: inline-size; container-name: how-it-works; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
@@ -2248,7 +2122,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   width: min(600px, 92vw);
   aspect-ratio: 1 / 1;
   margin: 56px auto 0;
-  /* Unnamed container */
+
   container-type: inline-size;
 }
 .orbit-glow {
@@ -2261,7 +2135,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .orbit-track-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .orbit-track { fill: none; stroke: var(--glass-border); stroke-width: 1.5; stroke-dasharray: 4 7; }
 
-/* The hub: a fixed, non-rotating glass medallion at dead center. */
 .orbit-hub {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
   width: 30%; aspect-ratio: 1 / 1; border-radius: 50%;
@@ -2276,7 +2149,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .orbit-hub-mark { font-family: var(--serif); font-style: italic; font-size: clamp(17px, 4.4cqi, 26px); color: var(--ink); line-height: 1; }
 .orbit-hub-label { font-size: clamp(9px, 1.6cqi, 11px); font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 
-/* The ring is the only element that actually spins */
 .orbit-ring { position: absolute; inset: 0; z-index: 3; }
 .orbit:not(.is-static) .orbit-ring { animation: orbit-spin 58s linear infinite; }
 .orbit.is-locked .orbit-ring,
@@ -2297,7 +2169,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .orbit-node:hover { box-shadow: var(--glass-shadow-strong); }
 .orbit-node:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .orbit-node.is-active { background: linear-gradient(135deg, #a3ddba, #b0e0c1); }
-/* This inner element cancels the parent .orbit-node's own static rotate */
+
 .orbit:not(.is-static) .orbit-node-inner { animation: orbit-spin-reverse 58s linear infinite; }
 .orbit.is-locked .orbit-node-inner,
 .orbit.is-dragging .orbit-node-inner,
@@ -2310,7 +2182,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .orbit-node-num { font-size: clamp(8px, 1.4cqi, 10px); font-weight: 700; color: var(--muted); }
 .orbit-node.is-active .orbit-node-num { color: #1c3a26; opacity: .7; }
 
-/* Shared detail panel */
 .orbit-panel-wrap { max-width: 560px; margin: 34px auto 0; text-align: center; }
 .orbit-panel { padding: 4px 12px; }
 .orbit-panel-step { display: inline-block; margin-bottom: 6px; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .05em; background: color-mix(in srgb, #a3ddba 35%, var(--surface)); color: #1c3a26; }
@@ -2318,17 +2189,15 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .orbit-panel-body { margin: 0; color: var(--muted); line-height: 1.6; font-size: 15.5px; transition: opacity .22s var(--ease), transform .22s var(--ease), filter .22s var(--ease); }
 .orbit-panel.is-swapping .orbit-panel-body,
 .orbit-panel.is-swapping .orbit-panel-title { animation: page-in .32s var(--ease) both; }
-/* A small hand-drawn flourish under the active step's title */
+
 .ink-underline { display: block; width: 100%; max-width: 160px; height: 10px; margin: 0 auto; overflow: visible; }
 .ink-underline path { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 168; stroke-dashoffset: 168; transition: stroke-dashoffset .5s var(--ease); }
 .orbit-panel.is-swapping .ink-underline path { stroke-dashoffset: 0; }
 
-/* An explicit `display` on an element also toggled by the `hidden` attribute silently wins */
 .orbit-resume { display: block; margin: 14px auto 0; padding: 8px 18px; border: 1px solid var(--glass-border); border-radius: 999px; background: var(--surface); font-size: 13px; font-weight: 650; color: var(--ink); cursor: pointer; transition: background .2s var(--ease), transform .2s var(--ease-spring); }
 .orbit-resume[hidden] { display: none; }
 .orbit-resume:hover { transform: translateY(-1px); }
 
-/* Mobile / narrow fallback */
 .orbit-mobile-list { display: none; list-style: none; margin: 40px auto 0; padding: 0; max-width: 560px; text-align: left; }
 @container how-it-works (max-width: 620px) {
   .orbit, .orbit-panel-wrap { display: none; }
@@ -2340,7 +2209,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .orbit-mobile-step p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
 .orbit-mobile-step-num { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; color: #1c3a26; margin-bottom: 2px; }
 
-/* 4-up mockup card row */
 .showcase-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 46px; }
 .showcase-card { display: flex; flex-direction: column; min-height: 250px; padding: 20px; border-radius: 20px; background: #fff; box-shadow: var(--soft-shadow); transition: transform .3s var(--ease), box-shadow .3s var(--ease); transform-style: preserve-3d; }
 .showcase-card:hover { transform: translateY(-6px); box-shadow: 0 24px 44px rgba(0,0,0,.16); }
@@ -2361,7 +2229,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .showcase-check.done { background: #11100f; border-color: #11100f; position: relative; }
 .showcase-check.done::after { content: "✓"; position: absolute; inset: 0; display: grid; place-items: center; color: #fff; font-size: 10px; }
 
-/* Staggered entrance */
 .stagger-group > * { opacity: 0; transform: translateY(22px); filter: blur(5px); transition: opacity .55s var(--ease), transform .55s var(--ease), filter .55s var(--ease); }
 .stagger-group.visible > * { opacity: 1; transform: translateY(0); filter: blur(0); }
 .stagger-group > *:nth-child(1) { transition-delay: 0s; }
@@ -2370,7 +2237,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .stagger-group > *:nth-child(4) { transition-delay: .24s; }
 .stagger-group > *:nth-child(5) { transition-delay: .32s; }
 
-/* Quote row, Craft-style compact testimonial */
 .quote-row { display: flex; align-items: center; gap: 28px; max-width: 900px; margin: var(--space-block) auto; flex-wrap: wrap; }
 .quote-row.reverse { flex-direction: row-reverse; }
 .quote-row-who { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
@@ -2383,13 +2249,12 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .quote-row-who b { font-size: 14px; font-weight: 650; white-space: nowrap; }
 .quote-row p { flex: 1; min-width: 240px; margin: 0; font-family: var(--serif); font-style: italic; font-size: 21px; line-height: 1.4; color: #2c2a27; }
 
-/* Full-bleed promo band */
 .promo-band { max-width: 1320px; margin: var(--space-band) auto; padding: clamp(30px, 3.4vw, 44px); border-radius: 28px; text-align: center; box-shadow: var(--shadow); position: relative; overflow: hidden; background-size: 160% 160%; animation: hero-shimmer 18s ease-in-out infinite; }
 .promo-band > * { position: relative; z-index: 1; }
 .promo-band::before { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: .5; background-image: radial-gradient(rgba(10,9,8,.09) 1.3px, transparent 1.3px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(circle at 50% 0%, black, transparent 70%); mask-image: radial-gradient(circle at 50% 0%, black, transparent 70%); }
 .promo-band.dark::before { background-image: radial-gradient(rgba(255,255,255,.12) 1.3px, transparent 1.3px); }
 .promo-kicker { margin: 0 0 16px; font-size: 13px; font-weight: 700; letter-spacing: .1em; opacity: .7; }
-/* A large faint numeral watermark */
+
 .step-band { position: relative; }
 .step-band .step-number { position: absolute; top: 14px; right: 30px; z-index: 0; font-family: var(--serif); font-size: clamp(70px, 9vw, 128px); font-weight: 400; line-height: 1; color: rgba(10,9,8,.07); pointer-events: none; }
 .promo-band.dark .step-number { color: rgba(255,255,255,.08); }
@@ -2402,17 +2267,15 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .promo-band.dark .promo-mock { background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.14); }
 .promo-mock i { width: 8px; height: 8px; border-radius: 50%; background: #4ea768; flex-shrink: 0; animation: pulse 1.6s infinite; }
 
-/* Style-picker teaser */
 .style-picker { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 26px 0; }
 .style-chip { position: relative; padding: 10px 18px; border-radius: 999px; border: 1.5px solid rgba(10,9,8,.14); background: #fff; font-weight: 650; font-size: 13px; cursor: pointer; overflow: hidden; transition: border-color .2s ease, transform .2s var(--ease-spring), background .2s ease, color .2s ease; }
 .style-chip:hover { transform: translateY(-2px); }
 .style-chip:active { transform: translateY(0) scale(.96); }
 .style-chip.selected { border-color: #11100f; background: #11100f; color: #fff; }
-/* A quick radial "pop" plays from the click point when a chip becomes selected */
+
 .style-chip.just-selected::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(circle, rgba(255,255,255,.5), transparent 60%); animation: chip-pop .5s var(--ease) forwards; }
 @keyframes chip-pop { from { opacity: 1; transform: scale(.4); } to { opacity: 0; transform: scale(1.6); } }
 
-/* Small inline trend chart used to give the Companion page's "wellbeing signal" claim */
 .mini-trend-wrap { max-width: 560px; margin: 34px auto 0; padding: 22px 26px; border-radius: 20px; background: #fff; box-shadow: var(--soft-shadow); }
 .mini-trend-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; font-size: 12px; color: #85807a; }
 .mini-trend-head b { font-family: var(--serif); font-size: 18px; font-weight: 400; color: #2c2a27; }
@@ -2428,9 +2291,9 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .quote-row-rule { display: none; }
   .nav-links { display:none; }
   .floating-nav { width:calc(100% - 30px); }
-  /* Below 1100px nav-links is hidden */
+
   .floating-nav { display: flex; justify-content: space-between; align-items: center; }
-  /* The hero mock window shrinks continuously with viewport width */
+
   .mock-app-grid { grid-template-columns:130px 1fr; }
   .mock-content { padding:22px 20px; }
   .memory-cards { grid-template-columns:1fr 1fr; }
@@ -2465,7 +2328,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .hero-copy { margin-top:50px; }
   .hero-copy h1 { font-size:38px; }
   .hero-sub { font-size:14px; }
-  /* Derive from --hero-gap like the desktop rule does. */
+
   .hero-art { inset: var(--hero-gap, 300px) 0 0; }
   .hero-window { width:92vw; height:250px; }
   .mock-app-grid { grid-template-columns:105px 1fr; }
@@ -2494,14 +2357,13 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .app-top-center { display:none; }
   .app-layout { grid-template-columns:1fr; }
 
-  /* Sidebar becomes a bottom tab bar. */
   .app-sidebar {
     position:fixed; z-index:40; bottom:0; top:auto; left:0; right:0; height:auto; width:100%;
     padding:4px 4px calc(4px + env(safe-area-inset-bottom, 0px));
     flex-direction:row; align-items:stretch; overflow:visible;
     border-top:1px solid rgba(0,0,0,.1); border-right:0;
   }
-  /* Same fix as desktop, on the other axis: the nav list scrolls */
+
   .sidebar-nav-scroll {
     flex-direction:row; overflow-x:auto; overflow-y:hidden;
     -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity;
@@ -2509,11 +2371,9 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .side-nav { flex-direction:column; justify-content:center; gap:2px; width:auto; min-width:62px; white-space:nowrap; padding:7px 8px 6px; font-size:10.5px; scroll-snap-align:start; }
   .side-nav span:not(.patient-entry-label) { display:block; font-size:18px; }
   .patient-entry-label { font-size:10.5px; }
-  /* The desktop sidebar's group labels/spacer are a vertical-list device,
-     in the horizontal tab-bar row they'd just show up as odd empty gaps. */
+
   .side-nav-group, .side-nav-gap { display:none; }
 
-  /* The caregiver reassurance note */
   :root { --meco-tabbar-h: 60px; }
   .care-note {
     display:flex; align-items:baseline; gap:6px; flex-wrap:wrap;
@@ -2525,9 +2385,8 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .care-note small { flex-shrink:0; }
   .care-note p { margin:0; font-size:12.5px; line-height:1.35; }
 
-  /* 34px care-note + 60px tab bar + safe-area + a little breathing room */
   .app-content { padding:22px 14px calc(34px + var(--meco-tabbar-h) + env(safe-area-inset-bottom, 0px) + 24px); }
-  /* Patient mode's own fixed-height rule */
+
   #app-content.app-content-fixed {
     height: calc(100vh - 74px - 34px - var(--meco-tabbar-h) - env(safe-area-inset-bottom, 0px));
     height: calc(100dvh - 74px - 34px - var(--meco-tabbar-h) - env(safe-area-inset-bottom, 0px));
@@ -2542,14 +2401,13 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .form-grid { grid-template-columns:1fr; }
   .face-modal-card { grid-template-columns:1fr; padding:24px; }
 
-  /* Trusted-person row: avatar+copy | (multi-button) action row. */
   .person-row { grid-template-columns:auto 1fr; row-gap:8px; }
   .person-row > .action-row { grid-column:1 / -1; }
 
   .matched-card h3 { font-size:22px; }
   .matched-card p { font-size:13px; }
   .patient-bottom { flex-direction:column; align-items:stretch; gap:10px; }
-  /* The 4 controls */
+
   .patient-controls { display:grid; grid-template-columns:1fr 1fr; gap:8px; justify-content:stretch; }
   .patient-controls button { width:100%; padding-left:6px; padding-right:6px; }
   .patient-quickbar { padding:8px 10px; gap:8px; }
@@ -2588,8 +2446,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .style-picker { gap:8px; }
 }
 
-/* Anyone who has asked their OS for reduced motion gets it, every
-   animation and transition on the site collapses to effectively instant. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;
@@ -2598,17 +2454,16 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
     scroll-behavior: auto !important;
   }
   .cursor-glow { display: none !important; }
-  /* An infinite CSS animation with duration forced to .01ms would flicker rather than stop */
+
   .theme-marquee-track { animation: none !important; width: auto; }
   .theme-marquee-set[aria-hidden="true"] { display: none; }
   .theme-grid-preview { overflow-x: auto; -webkit-mask-image: none; mask-image: none; scroll-snap-type: x proximity; }
   .theme-grid-preview .theme-swatch { scroll-snap-align: start; }
-  /* Same reasoning as the marquee above */
+
   .orbit-ring, .orbit-node-inner, .orbit-glow { animation: none !important; }
   .orbit-panel-body, .orbit-panel-title, .ink-underline path { transition: none !important; }
 }
 
-/* THEME SYSTEM: the toggle in both navs */
 .theme-toggle { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-size: 17px; cursor: pointer; display: grid; place-items: center; flex-shrink: 0; transition: transform .3s var(--ease-spring), background .2s ease; }
 .theme-toggle:hover { transform: rotate(-25deg); }
 .app-top-actions .theme-toggle { margin-right: 2px; }
@@ -2627,7 +2482,7 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .theme-swatch-name small { display: block; font-weight: 500; color: var(--muted); font-size: 10px; }
 
 .theme-showcase { max-width: 1180px; margin: var(--space-band) auto; text-align: center; }
-/* Auto-scrolling marquee */
+
 .theme-grid-preview {
   overflow: hidden;
   padding: 44px 4px 14px;
@@ -2647,7 +2502,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   .theme-grid-preview .theme-swatch { width: 108px; }
 }
 
-/* Printing the Clinicians chapter */
 @media print {
   body.printing-clinicians .no-print,
   body.printing-clinicians .landing-page.hidden,
@@ -2666,23 +2520,18 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
   body.printing-clinicians .showcase-card { box-shadow: none !important; border: 1px solid #ddd; break-inside: avoid; }
 }
 
-/* Memory Graph platform */
-
-/* Generic tabbed-panel component */
 .content-tabs { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
 .content-tab-btn { appearance:none; cursor:pointer; padding:10px 18px; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font-size:13.5px; font-weight:600; transition:background .2s var(--ease), color .2s var(--ease), transform .15s var(--ease); }
 .content-tab-btn:hover { background:#f0ece3; }
 .content-tab-btn:active { transform:scale(.96); }
 .content-tab-btn.active { background:var(--dark); color:var(--dark-ink); border-color:var(--dark); }
 
-/* Confidence / provenance badge */
 .confidence-badge { font-size:10.5px; letter-spacing:.02em; }
 .confidence-badge.confidence-fact { background:#d7f0d9; color:#2f6b3a; }
 .confidence-badge.confidence-family { background:#dbe6fb; color:#2c4f9e; }
 .confidence-badge.confidence-ai { background:#ffe9c2; color:#8a5a10; }
 .confidence-badge.confidence-unknown { background:#efe9e2; color:#7e7973; }
 
-/* Timeline (Memory > Timeline tab) */
 .timeline-list { display:grid; gap:10px; }
 .timeline-row { display:grid; grid-template-columns:auto 1fr auto; gap:15px; align-items:center; padding:14px; border-radius:15px; background:#f7f4ef; cursor:pointer; transition:background .2s var(--ease), transform .15s var(--ease); text-align:left; border:0; width:100%; font:inherit; color:inherit; }
 .timeline-row:hover { background:#f0ece3; }
@@ -2695,7 +2544,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .timeline-row-copy b { display:block; }
 .timeline-row-copy small { display:block; color:#7e7973; margin-top:4px; }
 
-/* Memory Capsule detail / edit view */
 .memory-detail-card { display:grid; gap:18px; }
 .memory-source-note { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding:12px 14px; border-radius:12px; background:#f7f4ef; font-size:13px; color:#605b54; }
 .memory-people-chips { display:flex; flex-wrap:wrap; gap:8px; }
@@ -2708,7 +2556,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .memory-voice-note b { font-size:13px; }
 .memory-voice-note audio { width:100%; }
 
-/* Recall Engine (Memory > Recall tab) */
 .recall-search-row { display:flex; gap:10px; margin-bottom:20px; }
 .recall-search-row input { flex:1; }
 .recall-result { display:grid; gap:16px; animation:patient-card-in .4s var(--ease) both; }
@@ -2721,16 +2568,11 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .recall-match-card small { color:#7e7973; }
 .recall-provider { font-size:11px; color:#a39d94; text-align:right; }
 
-/* Save-as-memory candidate cards (Visit Reports detail) reuse */
-
-/* "Why do I know this person?" toggle on the People page */
 .person-why-toggle { justify-self:flex-start; padding:4px 0; font-size:12.5px; color:#8a742f; text-decoration:underline; text-underline-offset:2px; }
 .person-why { margin-top:6px; padding:10px 12px; border-radius:10px; background:#fff8e6; border:1px solid rgba(201,143,18,.18); font-size:13px; line-height:1.5; color:#5c4d1f; animation:utterance-in .3s var(--ease) both; }
 
-/* Activities shell (Stimulation / Reminiscence / Practice) */
 .activities-disclaimer { margin:0 0 20px; padding:16px 18px; border-radius:16px; background:#fff4e0; border:1px solid rgba(201,143,18,.25); color:#6b5416; font-size:13px; line-height:1.55; }
 
-/* Phase 2, assist layer */
 .related-memories { margin:16px 0; padding:16px 18px; border-radius:16px; background:#eef2ff; border:1px solid rgba(44,79,158,.15); display:grid; gap:10px; animation:patient-card-in .4s var(--ease) both; }
 .related-memories-head { display:flex; align-items:center; gap:10px; }
 .related-memories-head b { flex-shrink:0; }
@@ -2741,7 +2583,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .related-memory-card b { display:block; margin-bottom:2px; }
 .related-memory-card small { color:#7e7973; }
 
-/* Object memory + Places (Settings sub-sections, share the same row look) */
 .object-list { display:grid; gap:10px; }
 .object-row { display:grid; grid-template-columns:auto 1fr auto; gap:15px; align-items:center; padding:14px; border-radius:15px; background:#f7f4ef; }
 .object-row-icon { width:42px; height:42px; border-radius:50%; display:grid; place-items:center; font-size:18px; background:#e9eee9; flex-shrink:0; }
@@ -2749,10 +2590,8 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .place-memories { display:grid; gap:8px; margin-top:10px; }
 .place-memories:empty { display:none; }
 
-/* Context-aware reminders: a caregiver-set note, not a location filter */
 .context-badge { background:#dbe6fb; color:#2c4f9e; }
 
-/* Phase 3, family contributions (share-token inbox) */
 .family-link-row { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
 .family-link-row input { flex:1; min-width:200px; border:1px solid var(--line); border-radius:13px; padding:12px 13px; background:#f7f4ef; color:#605b54; font-size:13px; }
 .family-contrib-list { display:grid; gap:14px; }
@@ -2761,7 +2600,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .family-contrib-photo { max-width:100%; max-height:220px; border-radius:12px; display:block; margin-bottom:10px; object-fit:cover; }
 .family-contrib-row audio { width:100%; margin-bottom:10px; }
 
-/* Phase 4, Cognitive Stimulation Mode + Reminiscence Mode */
 .stim-prompt { font-family:var(--serif); font-size:26px; font-weight:400; margin:4px 0 20px; line-height:1.3; }
 .stim-options { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:10px; }
 .stim-option { padding:16px 14px; border-radius:14px; border:1px solid var(--line); background:var(--surface); font-size:15px; font-weight:600; cursor:pointer; transition:background .2s var(--ease), transform .15s var(--ease); }
@@ -2783,7 +2621,6 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .reminiscence-card audio { width:100%; }
 .reminiscence-count { font-size:12px; color:#a39d94; align-self:center; }
 
-/* Phase 5, Adaptive Spaced Retrieval + Errorless Cueing */
 .cue-box { margin:0 0 18px; padding:14px 18px; border-radius:14px; font-size:15px; line-height:1.5; animation:patient-card-in .35s var(--ease) both; }
 .cue-full { background:#d7f0d9; color:#2f6b3a; font-size:18px; }
 .cue-context { background:#dbe6fb; color:#2c4f9e; }
@@ -2792,5 +2629,80 @@ button:focus-visible, a:focus-visible, .side-nav:focus-visible, .icon-button:foc
 .cue-partial { background:#fff4e0; color:#6b5416; font-size:22px; letter-spacing:.08em; font-weight:700; text-align:center; }
 .cue-soft { background:#fff4e0; color:#6b5416; }
 
-/* Activities reached from inside Patient mode */
 .patient-activities-scroll { flex:1; min-height:0; overflow-y:auto; padding-right:2px; }
+
+:root {
+  --focus: #3b6fe0;
+  --focus-ring: 0 0 0 3px var(--paper), 0 0 0 5.5px var(--focus);
+  --lift: 0 14px 34px rgba(52, 37, 18, .13), 0 2px 6px rgba(52, 37, 18, .07);
+}
+:root[data-theme="midnight"], :root[data-theme="contrast"] { --focus: #7fb0ff; }
+
+*:focus { outline: none; }
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible,
+[contenteditable]:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 10px;
+  position: relative;
+  z-index: 3;
+}
+.pill-button:focus-visible,
+.side-nav:focus-visible,
+.mood-checkin-chip:focus-visible,
+.quickbar-icon-btn:focus-visible,
+.chapter-tab:focus-visible,
+.tag-row li:focus-visible { border-radius: 999px; }
+.app-card:focus-visible,
+.deep-card:focus-visible,
+.teaser-card:focus-visible,
+.showcase-card:focus-visible { border-radius: var(--radius-card); }
+
+::selection { background: color-mix(in srgb, var(--accent, #3b6fe0) 22%, transparent); color: inherit; }
+
+* { scrollbar-width: thin; scrollbar-color: rgba(10, 9, 8, .22) transparent; }
+::-webkit-scrollbar { width: 11px; height: 11px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(10, 9, 8, .2);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(10, 9, 8, .34); background-clip: content-box; }
+:root[data-theme="midnight"] * { scrollbar-color: rgba(255, 255, 255, .26) transparent; }
+:root[data-theme="midnight"] ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, .24); background-clip: content-box; }
+
+.deep-card, .teaser-card, .showcase-card, .price-card, .integration-card, .care-tile {
+  transition: transform .32s var(--ease), box-shadow .32s var(--ease), border-color .32s var(--ease);
+}
+.deep-card:hover, .teaser-card:hover, .showcase-card:hover, .price-card:hover, .integration-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--lift);
+}
+
+button:disabled, .pill-button:disabled, input:disabled, select:disabled, textarea:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  filter: saturate(.6);
+}
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+img, svg, video { max-width: 100%; }
+:where(input, select, textarea) { font: inherit; color: inherit; }

@@ -1,5 +1,3 @@
-/* The interactive orbit on /product */
-
 import { $, $$, escapeHtml } from '../utils.js';
 
 export const ORBIT_STEPS = [
@@ -20,7 +18,6 @@ export function initOrbit() {
   const mobileList = $('[data-orbit-mobile-list]');
   if (!ring || !nodes.length || !panel) return;
 
-  // Mobile fallback is plain
   if (mobileList) {
     mobileList.innerHTML = ORBIT_STEPS.map((step, i) => `
       <li class="orbit-mobile-step">
@@ -49,7 +46,7 @@ export function initOrbit() {
     $('[data-orbit-panel-step]', panel).textContent = `Step 0${index + 1} / 05`;
     $('[data-orbit-panel-title]', panel).textContent = step.title;
     $('[data-orbit-panel-body]', panel).textContent = step.body;
-    // Restart the CSS entrance transition
+
     panel.classList.remove('is-swapping');
     void panel.offsetWidth;
     panel.classList.add('is-swapping');
@@ -68,7 +65,6 @@ export function initOrbit() {
     resumeBtn.hidden = true;
   });
 
-  // WAI-ARIA APG "Tabs" pattern
   ring.addEventListener('keydown', (event) => {
     const count = nodes.length;
     let next = null;
@@ -83,7 +79,6 @@ export function initOrbit() {
     nodes[next].focus();
   });
 
-  // Below the ~620px container-query breakpoint
   const section = $('#how-it-works');
   const heading = $('#orbit-heading');
   if (section && heading) {
@@ -104,7 +99,6 @@ export function initOrbit() {
   setActiveStep(0);
 }
 
-// The "try it yourself" sandbox on the home page
 const PLAYGROUND_PEOPLE = {
   sarah: { name: 'Sarah', relationship: 'Daughter', note: 'Sunday garden walks and looking through the blue photo album. Recognized warmly on 3 recent visits.' },
   james: { name: 'James', relationship: 'Brother', note: 'Old school stories and Saturday football. Always brings a laugh into the room.' },
@@ -160,6 +154,3 @@ export function initPlayground() {
     });
   });
 }
-
-/* Fills the /science and /impact pages from the evidence registry. */
-/* The Assistance Ladder */

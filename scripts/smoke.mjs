@@ -7,8 +7,7 @@ import os from 'node:os';
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const port = 3197;
 const base = `http://127.0.0.1:${port}`;
-// Never touch the developer's real store. This used to write to and then
-// delete data/meco-state.json, which is the file a running app uses.
+
 const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'meco-smoke-'));
 const child = spawn(process.execPath, ['--env-file=.env', 'server.mjs'], {
   cwd: root,

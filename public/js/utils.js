@@ -1,11 +1,8 @@
-/* Shared DOM and formatting helpers. */
-
 export const $ = (selector, root = document) => root.querySelector(selector);
 export const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
 export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/* Escapes the five characters that can break out of HTML text or an attribute. */
 export const escapeHtml = (value = '') =>
   String(value).replace(/[&<>'"]/g, (char) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;',

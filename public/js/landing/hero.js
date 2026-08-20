@@ -1,5 +1,3 @@
-/* Hero behaviours on the marketing pages. */
-
 import { $, $$ } from '../utils.js';
 
 export function initHeroGap() {
@@ -12,19 +10,17 @@ export function initHeroGap() {
     const shellTop = shell.getBoundingClientRect().top;
     const copyBottom = copy.getBoundingClientRect().bottom;
     const needed = Math.round(copyBottom - shellTop + BREATHING_ROOM);
-    // Never shrink below the CSS default, that value also positions the
-    // illustration's own composition, not just the clearance.
+
     shell.style.setProperty('--hero-gap', `max(${needed}px, var(--hero-gap-base))`);
   };
 
-  // Snapshot the authored clamp() once, before we start overriding it.
   const base = getComputedStyle(shell).getPropertyValue('--hero-gap').trim();
   shell.style.setProperty('--hero-gap-base', base);
 
   apply();
   if ('ResizeObserver' in window) new ResizeObserver(apply).observe(copy);
   window.addEventListener('resize', apply);
-  // Late webfont swap changes the headline's height after first paint.
+
   document.fonts?.ready?.then(apply);
 }
 

@@ -1,5 +1,3 @@
-/* Session plumbing shared by every caregiver-console screen */
-
 import { $, escapeHtml } from './utils.js';
 import { state, defaultState, setState, resetState } from './state.js';
 
@@ -35,7 +33,6 @@ export async function getToken() {
   throw new Error('Please sign in again.');
 }
 
-/* Every call to our own API goes through here */
 export async function apiFetch(url, options = {}) {
   const token = await getToken();
   const headers = new Headers(options.headers || {});
@@ -55,8 +52,7 @@ function describeBackend(name) {
 export async function loadState() {
   try {
     const result = await apiFetch('/api/state');
-    // Spread defaults underneath so an account saved before a newer array was
-    // added still comes back with that array present rather than undefined.
+
     setState({
       ...defaultState(),
       ...(result.state || {}),
@@ -66,8 +62,7 @@ export async function loadState() {
     setChip('backend-chip', ...describeBackend(backendName));
   } catch (error) {
     console.error(error);
-    // Clear rather than keep stale data, one account's information must never
-    // be left on screen underneath another account's session.
+
     resetState();
     backendName = 'unavailable';
     setChip('backend-chip', 'Data unavailable', 'error');
@@ -97,8 +92,6 @@ export async function persistState(showToast = false) {
   }
 }
 
-/* Screens mutate `state` directly and call this. Debounced so a burst of edits
-   (typing in a note, toggling several reminders) is one request, not twenty. */
 export function queueSave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => persistState().catch(() => {}), 500);
@@ -120,7 +113,6 @@ export function dateParts(dateStr) {
   };
 }
 
-/* Screens that need a full repaint after changing data out of band */
 export const RERENDER_EVENT = 'meco:rerender';
 export function requestRerender() {
   window.dispatchEvent(new CustomEvent(RERENDER_EVENT));

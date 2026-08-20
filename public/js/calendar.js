@@ -1,10 +1,7 @@
-/* Two-way Google Calendar sync for scheduled visits and reminders */
-
 import { $, $$, escapeHtml } from './utils.js';
 import { state } from './state.js';
 import { clerk, apiFetch, toast, persistState, todayISO, requestRerender } from './core.js';
 
-// Local calendar date (not UTC) so "today" matches the caregiver's clock.
 export function calendarSyncEnabled() {
   return Boolean(state.settings.googleCalendarSync)
     && Boolean(clerk?.user?.externalAccounts?.some((account) => account.provider === 'google' && String(account.approvedScopes || '').includes('calendar')));
@@ -12,7 +9,6 @@ export function calendarSyncEnabled() {
 
 export const syncedBadge = (record) => (record.googleEventId ? '<span class="badge synced-badge">Synced</span>' : '');
 
-// Only a "weekly on these days
 export const REPEAT_DAY_ORDER = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 const REPEAT_DAY_LABELS = { MO: 'Mon', TU: 'Tue', WE: 'Wed', TH: 'Thu', FR: 'Fri', SA: 'Sat', SU: 'Sun' };
 const defaultRepeat = () => ({ freq: 'none', days: [] });
@@ -24,7 +20,6 @@ export function repeatBadgeMarkup(repeat) {
   return `<small class="repeat-badge">↻ ${escapeHtml(summary)}</small>`;
 }
 
-// Reads the shared repeat UI
 export function readRepeatFromModal(prefix) {
   const freq = $(`#${prefix}-repeat-freq`)?.value === 'weekly' ? 'weekly' : 'none';
   if (freq !== 'weekly') return defaultRepeat();
@@ -37,13 +32,13 @@ export function populateRepeatModal(prefix, repeat, fallbackDate) {
   $(`#${prefix}-repeat-freq`).value = value.freq;
   $(`#${prefix}-repeat-days`).hidden = value.freq !== 'weekly';
   $$(`#${prefix}-repeat-days .repeat-day-chip`).forEach((chip) => chip.classList.toggle('selected', value.days.includes(chip.dataset.day)));
-  // Wired once per app load
+
   if (populateRepeatModal.wiredPrefixes?.has(prefix)) return;
   (populateRepeatModal.wiredPrefixes ??= new Set()).add(prefix);
   $(`#${prefix}-repeat-freq`).addEventListener('change', (event) => {
     const daysRow = $(`#${prefix}-repeat-days`);
     daysRow.hidden = event.target.value !== 'weekly';
-    // A sensible default: the day of week already picked as the date
+
     if (event.target.value === 'weekly' && !$$(`#${prefix}-repeat-days .repeat-day-chip.selected`).length) {
       const dateValue = $(`#${prefix}-date`).value;
       if (dateValue) {
@@ -55,12 +50,9 @@ export function populateRepeatModal(prefix, repeat, fallbackDate) {
   $$(`#${prefix}-repeat-days .repeat-day-chip`).forEach((chip) => chip.addEventListener('click', () => chip.classList.toggle('selected')));
 }
 
-// Google Calendar events have no native "completed" state
 const DONE_PREFIX = /^✓\s*/;
 export const reminderTitle = (reminder) => `${reminder.done ? '✓ ' : ''}${reminder.text}`;
 
-// Best-effort mirroring to Google Calendar. Never blocks the Meco save/delete
-// itself: a failed calendar call only surfaces as a toast.
 export async function syncToCalendar(record, title, description) {
   if (!calendarSyncEnabled()) return;
   try {
@@ -95,8 +87,6 @@ export async function unsyncFromCalendar(record) {
   } catch {}
 }
 
-// Converts a Google event's start/end back into Meco's date/time/end-time
-// fields. All-day Google events have no time component.
 function parseGoogleEventTiming(start, end) {
   const pad = (value) => String(value).padStart(2, '0');
   const hm = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -112,7 +102,6 @@ function parseGoogleEventTiming(start, end) {
   return { date: start?.date || todayISO(), time: '', endTime: '' };
 }
 
-// The inverse of the RRULE Meco's own sync builds server-side
 function parseRecurrenceRule(recurrence) {
   const rule = (recurrence || []).find((entry) => entry.startsWith('RRULE:'));
   if (!rule) return defaultRepeat();
@@ -124,7 +113,6 @@ function parseRecurrenceRule(recurrence) {
   return defaultRepeat();
 }
 
-// One-way-back reconciliation
 export async function pullFromCalendar() {
   if (!calendarSyncEnabled()) return;
   const tracked = [...state.visits, ...state.reminders].filter((record) => record.googleEventId);
@@ -166,8 +154,7 @@ export async function pullFromCalendar() {
   }
   if (changed) {
     try { await persistState(false); } catch { return; }
-    // The pull may have rewritten visits/reminders underneath whatever is on
-    // screen; app.js re-renders the current page if it is one that shows them.
+
     requestRerender();
     toast('Updated from Google Calendar.', 'success');
   }

@@ -1,13 +1,3 @@
-/* Tests for the Cognitive Independence Engine.
-   Run: node --test test/assistance-engine.test.mjs
-
-   These matter more than typical unit tests: this module decides how much
-   help a person living with dementia is offered, and the whole design claim
-   is "the smallest assistance that lets them succeed". If the fading rule
-   silently broke, the app would quietly over-help forever and nobody would
-   see an error. So the adaptive rules, the safety clamps, and the
-   never-invent-an-intention guarantee are all pinned down here. */
-
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -28,7 +18,6 @@ import {
   independenceDashboard,
 } from '../public/assistance-engine.mjs';
 
-/* Helper: build an attempt N minutes ago. */
 const minutesAgo = (n) => new Date(Date.now() - n * 60 * 1000).toISOString();
 const attempt = (over = {}) => ({
   taskId: 'make-tea',
@@ -45,8 +34,6 @@ test('ladder is 0..6 and ordered', () => {
   assert.equal(ASSISTANCE_LADDER[0].key, 'independent');
   assert.equal(ASSISTANCE_LADDER[6].key, 'human');
 });
-
-/* ---- adaptive selection ------------------------------------------------ */
 
 test('with no history it starts mid-ladder and admits it is guessing', () => {
   const rec = recommendAssistanceLevel('make-tea', []);
@@ -92,7 +79,7 @@ test('"partial" counts as non-success for escalation', () => {
 });
 
 test('a success streak at a DIFFERENT level does not trigger fading', () => {
-  // Succeeding repeatedly with heavy help says nothing about coping with less.
+
   const history = [
     attempt({ assistanceLevel: 2, outcome: 'success', at: minutesAgo(1) }),
     attempt({ assistanceLevel: 5, outcome: 'success', at: minutesAgo(2) }),
@@ -125,8 +112,6 @@ test('recommendations are always flagged experimental', () => {
   assert.equal(recommendAssistanceLevel('make-tea', [attempt()]).experimental, true);
 });
 
-/* ---- functional model -------------------------------------------------- */
-
 test('functional summary reports counts, not a score', () => {
   const attempts = [
     attempt({ assistanceLevel: 0, outcome: 'success' }),
@@ -136,7 +121,7 @@ test('functional summary reports counts, not a score', () => {
   ];
   const s = functionalSummary('make-tea', attempts);
   assert.equal(s.observed, 4);
-  // Levels 0 and 1 count as independent; 4 does not.
+
   assert.equal(s.independentCompletionRate, 50);
   assert.equal(s.successRate, 75);
   assert.match(s.summary, /2 of 4 recorded attempts/);
@@ -156,15 +141,13 @@ test('only counts attempts for the requested task', () => {
   assert.equal(s.observed, 1);
 });
 
-/* ---- cue effectiveness ------------------------------------------------- */
-
 test('ranks cues by success rate and ignores one-off flukes', () => {
   const attempts = [
     attempt({ cueType: 'photo', outcome: 'success' }),
     attempt({ cueType: 'photo', outcome: 'success' }),
     attempt({ cueType: 'verbal', outcome: 'failure' }),
     attempt({ cueType: 'verbal', outcome: 'failure' }),
-    attempt({ cueType: 'written', outcome: 'success' }), // used once only
+    attempt({ cueType: 'written', outcome: 'success' }),
   ];
   assert.equal(mostEffectiveCue(attempts).cueType, 'photo');
   const written = cueEffectiveness(attempts).find((c) => c.cueType === 'written');
@@ -185,8 +168,6 @@ test('cue explanation refuses to guess with no data', () => {
   assert.match(explainCueChoice([]), /Not enough recorded attempts/i);
 });
 
-/* ---- baseline change --------------------------------------------------- */
-
 test('needs history before claiming anything is unusual', () => {
   const r = changeFromBaseline('make-tea', [attempt(), attempt()]);
   assert.equal(r.hasBaseline, false);
@@ -202,7 +183,7 @@ test('flags a jump in required help without naming a cause', () => {
   assert.equal(r.changed, true);
   assert.equal(r.direction, 'more-assistance');
   assert.match(r.note, /healthcare team/i, 'suggests escalation to clinicians');
-  // The critical guarantee: no diagnostic language anywhere.
+
   assert.doesNotMatch(r.note, /dementia|decline|worsen|deteriorat|progress/i);
 });
 
@@ -210,8 +191,6 @@ test('does not flag steady performance', () => {
   const history = Array.from({ length: 10 }, (_, i) => attempt({ assistanceLevel: 2, at: minutesAgo(i + 1) }));
   assert.equal(changeFromBaseline('make-tea', history).changed, false);
 });
-
-/* ---- repeated questions ------------------------------------------------ */
 
 test('recognises the same question asked differently', () => {
   const sim = questionSimilarity('When is Meena coming?', 'What time will Meena be here?');
@@ -254,8 +233,6 @@ test('repeat notes never imply progression', () => {
   assert.doesNotMatch(r.caregiverNote || '', /decline|worsen|dementia|progress/i);
 });
 
-/* ---- behaviour patterns ------------------------------------------------ */
-
 test('surfaces co-occurrence and what helped, with a disclaimer', () => {
   const events = Array.from({ length: 5 }, (_, i) => ({
     at: minutesAgo(i * 60),
@@ -270,7 +247,7 @@ test('surfaces co-occurrence and what helped, with a disclaimer', () => {
   assert.equal(pattern.commonContext.count, 4);
   assert.equal(pattern.bestIntervention.helped, 3);
   assert.match(pattern.disclaimer, /not a medical conclusion/i);
-  // Must describe co-occurrence, never assert causation.
+
   assert.doesNotMatch(pattern.statement, /because|caused|due to/i);
 });
 
@@ -278,8 +255,6 @@ test('will not claim a pattern from too few events', () => {
   const events = [{ at: minutesAgo(5), behaviour: 'Restlessness', contextTags: ['noise'] }];
   assert.equal(behaviourPatterns(events).length, 0);
 });
-
-/* ---- intention buffer -------------------------------------------------- */
 
 test('recalls a stored intention with its provenance', () => {
   const r = recallIntention([{
@@ -315,8 +290,6 @@ test('ignores completed intentions', () => {
   const done = [{ status: 'completed', goal: 'get your glasses', at: minutesAgo(2) }];
   assert.equal(recallIntention(done).found, false);
 });
-
-/* ---- handoff + dashboard ---------------------------------------------- */
 
 test('handoff rolls up today only, grouping repeated questions', () => {
   const h = dailyHandoff({

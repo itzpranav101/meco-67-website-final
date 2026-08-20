@@ -1,6 +1,3 @@
-/* Meco, Cognitive Independence Engine */
-
-/** The Meco Assistance Ladder. Ordered; index === level. */
 export const ASSISTANCE_LADDER = [
   {
     level: 0,
@@ -56,29 +53,26 @@ export const ASSISTANCE_LADDER = [
 export const MAX_LEVEL = 6;
 export const MIN_LEVEL = 0;
 
-/** Cue types whose effectiveness we track per person, per task. */
 export const CUE_TYPES = ['visual', 'verbal', 'photo', 'familiar-voice', 'written', 'contextual', 'physical', 'none'];
 
-/** Outcome of a single recorded attempt at a task. */
 export const OUTCOMES = ['success', 'partial', 'failure', 'abandoned'];
 
-/* Tunables. Exported so the caregiver UI can show the actual thresholds rather than */
 export const ENGINE_RULES = {
-  /** Consecutive successes at a level before we try offering less help. */
+
   successesBeforeFading: 3,
-  /** Consecutive non-successes at a level before we offer more help. */
+
   failuresBeforeEscalating: 2,
-  /** Attempts needed before we'll claim any pattern at all. */
+
   minAttemptsForConfidence: 4,
-  /** How many recent attempts define "usual" for baseline comparison. */
+
   baselineWindow: 10,
-  /** Attempts that must exist before baseline-change detection runs. */
+
   minAttemptsForBaseline: 6,
-  /** Level jump vs. personal baseline that counts as a notable change. */
+
   baselineDeviationLevels: 1.5,
-  /** Minutes within which two similar questions count as a repeat. */
+
   repeatQuestionWindowMinutes: 60,
-  /** Token overlap ratio at which two questions are treated as the same. */
+
   questionSimilarityThreshold: 0.5,
 };
 
@@ -88,13 +82,11 @@ const clampLevel = (level, ceiling = MAX_LEVEL, floor = MIN_LEVEL) =>
 const isSuccess = (attempt) => attempt?.outcome === 'success';
 const isNonSuccess = (attempt) => attempt && attempt.outcome !== 'success';
 
-/** Newest-first, tolerating missing/garbage timestamps. */
 const byNewest = (a, b) => new Date(b.at || 0) - new Date(a.at || 0);
 
 const sortedAttempts = (attempts = []) =>
   attempts.filter((a) => a && typeof a === 'object').slice().sort(byNewest);
 
-/* 1. FUNCTIONAL MODEL: what can this person currently do by themselves? */
 export function functionalSummary(taskId, attempts = []) {
   const relevant = sortedAttempts(attempts).filter((a) => a.taskId === taskId);
   const total = relevant.length;
@@ -113,8 +105,7 @@ export function functionalSummary(taskId, attempts = []) {
   }
 
   const successes = relevant.filter(isSuccess);
-  // "Independent" means succeeded at level 0 or 1: the person did the task,
-  // with at most a nudge. Anything from level 2 up is real assistance.
+
   const independent = successes.filter((a) => (a.assistanceLevel ?? 0) <= 1);
 
   const levels = relevant.map((a) => a.assistanceLevel ?? 0).sort((x, y) => x - y);
@@ -131,12 +122,11 @@ export function functionalSummary(taskId, attempts = []) {
     medianAssistanceLevel: median,
     meanAssistanceLevel: Math.round(mean * 10) / 10,
     mostEffectiveCue: mostEffectiveCue(relevant),
-    // Phrased as a count of observations, never as a capability verdict.
+
     summary: `${independent.length} of ${total} recorded attempts were completed with little or no assistance.`,
   };
 }
 
-/* 2. ASSISTANCE MODEL, which kind of help actually works for this person? */
 export function cueEffectiveness(attempts = []) {
   const table = {};
   for (const attempt of attempts) {
@@ -161,7 +151,6 @@ export function mostEffectiveCue(attempts = []) {
   return ranked.length ? ranked[0] : null;
 }
 
-/* 3. ADAPTIVE LEVEL SELECTION: the heart of the engine. */
 export function recommendAssistanceLevel(taskId, attempts = [], options = {}) {
   const {
     safetyCeiling = MAX_LEVEL,
@@ -187,7 +176,6 @@ export function recommendAssistanceLevel(taskId, attempts = [], options = {}) {
 
   const lastLevel = history[0].assistanceLevel ?? defaultLevel;
 
-  // Count the current streak at the level most recently used.
   let successStreak = 0;
   for (const attempt of history) {
     if ((attempt.assistanceLevel ?? -1) !== lastLevel) break;
@@ -245,7 +233,6 @@ export function recommendAssistanceLevel(taskId, attempts = [], options = {}) {
   };
 }
 
-/** Human-readable justification for a cue choice, e.g. for a "Why?" popover. */
 export function explainCueChoice(attempts = []) {
   const best = mostEffectiveCue(attempts);
   if (!best) {
@@ -254,7 +241,6 @@ export function explainCueChoice(attempts = []) {
   return `A ${best.cueType} cue was suggested because it helped in ${best.succeeded} of the last ${best.used} attempts.`;
 }
 
-/* 4. CHANGE FROM PERSONAL BASELINE */
 export function changeFromBaseline(taskId, attempts = []) {
   const history = sortedAttempts(attempts).filter((a) => a.taskId === taskId);
 
@@ -288,7 +274,7 @@ export function changeFromBaseline(taskId, attempts = []) {
     direction: delta > 0 ? 'more-assistance' : delta < 0 ? 'less-assistance' : 'same',
     recentAverageLevel: Math.round(recentAvg * 10) / 10,
     baselineAverageLevel: Math.round(baselineAvg * 10) / 10,
-    // Strictly an observation plus a care-coordination suggestion. No cause.
+
     note: changed
       ? delta > 0
         ? `Recent attempts have needed more help than usual (about level ${Math.round(recentAvg * 10) / 10} versus a usual level ${Math.round(baselineAvg * 10) / 10}). Changes like this can have many everyday or medical explanations, it may be worth mentioning to their healthcare team.`
@@ -298,7 +284,6 @@ export function changeFromBaseline(taskId, attempts = []) {
   };
 }
 
-/* 5. REPEATED QUESTION INTELLIGENCE */
 const STOP_WORDS = new Set([
   'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'am',
   'do', 'does', 'did', 'will', 'would', 'shall', 'should', 'can', 'could',
@@ -317,7 +302,6 @@ export function questionTokens(text = '') {
   )];
 }
 
-/* Overlap coefficient of content words, shared / size-of-smaller-question. */
 export function questionSimilarity(a, b) {
   const left = questionTokens(a);
   const right = questionTokens(b);
@@ -346,23 +330,20 @@ export function findRepeatedQuestion(newQuestion, history = [], now = new Date()
   return {
     isRepeat: repeatCount > 0,
     repeatCount,
-    // 1st ask: answer plainly. 2nd: answer + a visual. 3rd+: leave a
-    // persistent card up so the answer stops depending on asking again.
+
     suggestedResponseMode:
       repeatCount === 0 ? 'plain'
       : repeatCount === 1 ? 'answer-with-visual'
       : 'persistent-orientation-card',
     closestMatch: matches[0]?.entry ?? null,
     similarity: matches[0]?.similarity ?? 0,
-    // Deliberately descriptive. Repetition is a communication signal, not a
-    // progression marker, and must never be presented as one.
+
     caregiverNote: repeatCount >= 2
       ? `This question has come up ${repeatCount + 1} times in the last ${ENGINE_RULES.repeatQuestionWindowMinutes} minutes. A visible reminder may help more than answering again.`
       : null,
   };
 }
 
-/* 6. BEHAVIOUR PATTERNS (ABC-style) */
 export function behaviourPatterns(events = [], { minOccurrences = 3 } = {}) {
   const byBehaviour = {};
 
@@ -398,7 +379,7 @@ export function behaviourPatterns(events = [], { minOccurrences = 3 } = {}) {
         occurrences: row.occurrences,
         commonContext: topContext ? { tag: topContext[0], count: topContext[1] } : null,
         bestIntervention: topIntervention?.helped ? topIntervention : null,
-        // The wording here is load-bearing, not decoration.
+
         statement: topContext
           ? `${row.behaviour} was recorded ${row.occurrences} times. ${topContext[1]} of those also had "${topContext[0]}" recorded.`
           : `${row.behaviour} was recorded ${row.occurrences} times.`,
@@ -412,7 +393,6 @@ export function behaviourPatterns(events = [], { minOccurrences = 3 } = {}) {
     .sort((a, b) => b.occurrences - a.occurrences);
 }
 
-/* 7. INTENTION BUFFER */
 export function recallIntention(intentions = [], { now = new Date(), maxAgeMinutes = 120 } = {}) {
   const nowMs = new Date(now).getTime();
   const active = intentions
@@ -440,8 +420,7 @@ export function recallIntention(intentions = [], { now = new Date(), maxAgeMinut
     answer: latest.goal
       ? `You were going to ${latest.goal}${latest.destination ? `, you said you were heading to the ${latest.destination}` : ''}.`
       : 'You had something in mind, but the details were not recorded.',
-    // Shown behind a "Why Meco thinks this" control. Every reconstructed
-    // answer must be traceable to the utterance it came from.
+
     provenance: {
       recordedAt: latest.at,
       minutesAgo,
@@ -453,7 +432,6 @@ export function recallIntention(intentions = [], { now = new Date(), maxAgeMinut
   };
 }
 
-/* 8. DAILY HANDOFF */
 export function dailyHandoff({ attempts = [], questions = [], behaviours = [], medicationLogs = [] } = {}, day = new Date()) {
   const dayStart = new Date(day); dayStart.setHours(0, 0, 0, 0);
   const dayEnd = new Date(dayStart); dayEnd.setDate(dayEnd.getDate() + 1);
@@ -475,8 +453,6 @@ export function dailyHandoff({ attempts = [], questions = [], behaviours = [], m
     if (isSuccess(attempt)) byTask[attempt.taskId].completed += 1;
   }
 
-  // Questions grouped by topic so the summary reads "asked about Meena 4
-  // times" rather than listing four near-identical sentences.
   const questionTopics = {};
   for (const q of todaysQuestions) {
     const key = (q.topic || questionTokens(q.text)[0] || 'other').toLowerCase();
@@ -511,7 +487,6 @@ export function dailyHandoff({ attempts = [], questions = [], behaviours = [], m
   };
 }
 
-/* 9. INDEPENDENCE DASHBOARD ROLL-UP */
 export function independenceDashboard(attempts = [], { days = 7 } = {}, now = new Date()) {
   const cutoff = new Date(now).getTime() - days * 24 * 60 * 60 * 1000;
   const window = attempts.filter((a) => new Date(a?.at || 0).getTime() >= cutoff);
@@ -538,7 +513,7 @@ export function independenceDashboard(attempts = [], { days = 7 } = {}, now = ne
     tasksCompleted: successes.length,
     caregiverInterventions: window.filter((a) => (a.assistanceLevel ?? 0) >= 6).length,
     cueEffectiveness: cueEffectiveness(window),
-    // Guards against the single most dangerous misreading of this screen.
+
     disclaimer: 'These figures describe performance on specific recorded routines. They are not a measure of dementia severity or cognitive decline.',
   };
 }

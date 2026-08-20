@@ -9,7 +9,7 @@ import * as engine from './public/assistance-engine.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, 'public');
-// MECO_DATA_DIR so the smoke test does not wipe the real data dir
+
 const DATA_DIR = process.env.MECO_DATA_DIR || path.join(__dirname, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'meco-state.json');
 const PORT = Number(process.env.PORT || 3000);
@@ -134,10 +134,8 @@ const requireUser = async (req) => {
   }
 };
 
-// ---------- patient accounts ----------
-// Not Clerk users. Patients sign in with an id + a numeric passcode.
 const patientTokenSecret = () => env('PATIENT_TOKEN_SECRET') || env('CLERK_SECRET_KEY') || 'meco-patient-token-fallback-secret';
-const PATIENT_TOKEN_TTL_MS = 1000 * 60 * 60 * 24 * 90; // 90 days: a patient's own device stays signed in long-term
+const PATIENT_TOKEN_TTL_MS = 1000 * 60 * 60 * 24 * 90;
 
 const signPatientToken = (patientId, ownerId) => {
   const expiresAt = Date.now() + PATIENT_TOKEN_TTL_MS;
@@ -167,10 +165,9 @@ const requirePatientAuth = async (req) => {
   if (!token) throw Object.assign(new Error('Patient authentication required.'), { status: 401 });
   const verified = verifyPatientToken(token);
   if (!verified) throw Object.assign(new Error('This patient session is invalid or has expired. Please sign in again.'), { status: 401 });
-  return verified; // { patientId, ownerId }
+  return verified;
 };
 
-// For the few endpoints either role can hit (companion chat, etc).
 const requireUserOrPatient = async (req) => {
   const token = String(req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
   if (!token) throw Object.assign(new Error('Authentication required.'), { status: 401 });
@@ -180,11 +177,10 @@ const requireUserOrPatient = async (req) => {
   return { ownerId, role: 'caregiver', patientId: null };
 };
 
-const generatePatientId = () => crypto.randomBytes(4).toString('hex'); // 8 hex chars, short enough to type, unique enough to not collide
+const generatePatientId = () => crypto.randomBytes(4).toString('hex');
 const generatePasscode = () => String(crypto.randomInt(0, 1_000_000)).padStart(6, '0');
 const hashPasscode = (passcode, salt) => crypto.scryptSync(passcode, salt, 32).toString('base64url');
 
-// patientId -> owner + passcode hash. Needed before we know whose data to load.
 const PATIENT_LOOKUP_FILE = path.join(DATA_DIR, 'meco-patient-accounts.json');
 const patientLookupRowId = (patientId) => `patacct_${patientId}`;
 
@@ -205,7 +201,6 @@ const savePatientLookupFile = async (patientId, record) => {
   return patientLookupWriteQueue;
 };
 
-// Try Appwrite, fall back to the local file, same as loadState.
 const savePatientLookup = async (patientId, record) => {
   if (appwriteReady()) {
     try {
@@ -251,14 +246,12 @@ const deletePatientLookup = async (patientId) => {
   await savePatientLookupFile(patientId, null);
 };
 
-// saveState wants the whole state back, so: load, mutate, save.
 const mutateOwnerState = async (ownerId, mutator) => {
   const { state } = await loadState(ownerId);
   const next = mutator(state) || state;
   return saveState(ownerId, next);
 };
 
-// Only what a patient should see. No care notes, no settings, no other patients.
 const patientStateProjection = (state) => ({
   patientName: state.settings?.patientName || 'Meco Member',
   caregiverNote: state.settings?.caregiverNote || '',
@@ -280,7 +273,6 @@ const patientStateProjection = (state) => ({
   companionThread: (state.companionChats || []).slice(-1)[0]?.messages || [],
 });
 
-// 6 digits is about a million combos, so throttle logins properly.
 const loginAttempts = new Map();
 const LOGIN_ATTEMPT_WINDOW_MS = 5 * 60 * 1000;
 const LOGIN_ATTEMPT_MAX = 8;
@@ -317,18 +309,16 @@ const defaultState = () => ({
   patientAccounts: [],
   familyContributions: [],
 
-  // ---- Cognitive Independence Engine ----
-  // Observation records the adaptive assistance logic reads.
-  routines: [],          // { id, name, steps[], safetyLevel, safetyFloor, safetyCeiling }
-  taskAttempts: [],      // { id, taskId, at, assistanceLevel, cueType, outcome, durationMs, caregiverInvolved }
-  assistanceEvents: [],  // { id, taskId, at, level, cueType, reason, accepted }
-  intentions: [],        // { id, at, goal, destination, sourceText, status }
-  questionEvents: [],    // { id, at, text, topic, answeredWith, responseMode }
-  behaviourEvents: [],   // { id, at, behaviour, antecedent, contextTags[], intervention, outcome, notes }
-  medications: [],       // { id, name, dose, schedule[], instructions, prescriber, addedBy }
-  medicationLogs: [],    // { id, at, medicationId, name, status, confirmedBy }
-  personhood: null,      // My Story, identity, life chapters, preferences, comfort profile
-  supportProfile: 'moderate', // lower | moderate | high, configured by the care team, never inferred
+  routines: [],
+  taskAttempts: [],
+  assistanceEvents: [],
+  intentions: [],
+  questionEvents: [],
+  behaviourEvents: [],
+  medications: [],
+  medicationLogs: [],
+  personhood: null,
+  supportProfile: 'moderate',
   cognitiveAttempts: [],
   reminiscenceCollections: [],
   retrievalItems: [],
@@ -494,17 +484,17 @@ const saveState = async (ownerId, incomingValue) => {
           id: String(entry?.id || '').slice(0, 80),
           title: String(entry?.title || '').slice(0, 90),
           mood: JOURNAL_MOODS.includes(entry?.mood) ? entry.mood : 'okay',
-          // Client re-sanitizes html on render, so a tampered PUT cannot do much.
+
           html: String(entry?.html || '').slice(0, 20000),
           text: String(entry?.text || '').slice(0, 4000),
           createdAt: entry?.createdAt ? String(entry.createdAt) : new Date().toISOString(),
         }))
       : [],
-    // Memory Graph arrays. Same cap-and-coerce as everything above.
+
     memories: Array.isArray(incoming.memories) ? incoming.memories.slice(0, 500) : [],
     places: Array.isArray(incoming.places) ? incoming.places.slice(0, 100) : [],
     objects: Array.isArray(incoming.objects) ? incoming.objects.slice(0, 50) : [],
-    // Metadata only. The passcode hash lives in the patient-lookup row.
+
     patientAccounts: Array.isArray(incoming.patientAccounts)
       ? incoming.patientAccounts.slice(0, 20).map((p) => ({
           id: String(p?.id || '').slice(0, 40),
@@ -514,7 +504,6 @@ const saveState = async (ownerId, incomingValue) => {
       : [],
     familyContributions: Array.isArray(incoming.familyContributions) ? incoming.familyContributions.slice(0, 200) : [],
 
-    // Engine logs. Highest-volume arrays here, so they get bigger caps.
     routines: Array.isArray(incoming.routines) ? incoming.routines.slice(0, 60) : [],
     taskAttempts: Array.isArray(incoming.taskAttempts) ? incoming.taskAttempts.slice(0, 3000) : [],
     assistanceEvents: Array.isArray(incoming.assistanceEvents) ? incoming.assistanceEvents.slice(0, 3000) : [],
@@ -578,7 +567,6 @@ const fetchWithTimeout = async (url, options = {}, timeoutMs = 30000) => {
   finally { clearTimeout(timer); }
 };
 
-// One way, Meco -> Google. Meco stays the source of truth.
 const clerkBackendRequest = async (route, options = {}) => {
   const secretKey = env('CLERK_SECRET_KEY');
   if (!secretKey) throw Object.assign(new Error('CLERK_SECRET_KEY is not configured.'), { status: 503 });
@@ -600,13 +588,11 @@ const getGoogleAccessToken = async (userId) => {
 
 const REPEAT_DAY_CODES = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU'];
 
-// Only weekly-on-selected-days is exposed, so that is all we build.
 const buildRecurrenceRule = (repeat) => {
   const days = repeat?.freq === 'weekly' ? (repeat.days || []).filter((day) => REPEAT_DAY_CODES.includes(day)) : [];
   return days.length ? [`RRULE:FREQ=WEEKLY;BYDAY=${days.join(',')}`] : [];
 };
 
-// Google's all-day end.date is exclusive, hence start + 1 day.
 const googleCalendarEventBody = ({ title, description, date, time, endTime, timeZone, repeat }) => {
   const recurrence = buildRecurrenceRule(repeat);
   if (time) {
@@ -836,8 +822,6 @@ const generateSummary = async (payload) => {
   return { ...localSummary(payload), fallbackReason: errors.join(' | ') || 'No AI key configured.' };
 };
 
-// ---------- memory graph: extraction + recall ----------
-
 const memoryExtractSchema = {
   type: 'object',
   properties: {
@@ -939,7 +923,7 @@ const generateMemoryExtract = async (payload) => {
       console.warn(`[Meco] ${provider} memory extraction failed:`, error.message);
     }
   }
-  // Nothing safe to paraphrase without AI, so return empty instead of guessing.
+
   return { provider: 'local-fallback', model: 'none', candidates: [], fallbackReason: errors.join(' | ') || 'No AI key configured.' };
 };
 
@@ -1031,7 +1015,6 @@ const callGroqRecall = async (query, digest, validMemoryIds) => {
   return normalizeRecallResult(parseModelJson(data.choices?.[0]?.message?.content || '{}'), 'groq', model, validMemoryIds);
 };
 
-// Keyword-overlap fallback. Returns nothing rather than a bad guess.
 const localRecall = (query, memories) => {
   const words = String(query || '').toLowerCase().split(/\s+/).filter((w) => w.length > 2);
   const scored = memories.map((m) => {
@@ -1067,7 +1050,6 @@ const generateRecall = async (query, memories, digest) => {
   return { ...localRecall(query, memories), fallbackReason: errors.join(' | ') || 'No AI key configured.' };
 };
 
-// After a summary, surface up to 3 related memories already on file.
 const relatedMemoriesSchema = {
   type: 'object',
   properties: {
@@ -1142,8 +1124,6 @@ const callGroqRelated = async (summaryText, digest, validMemoryIds) => {
   return normalizeRelatedResult(parseModelJson(data.choices?.[0]?.message?.content || '{}'), 'groq', model, validMemoryIds);
 };
 
-// Local fallback: the same honest keyword-overlap approach as localRecall,
-// scored against the new summary text instead of a user query.
 const localRelated = (summaryText, memories) => {
   const words = String(summaryText || '').toLowerCase().split(/\s+/).filter((w) => w.length > 3);
   const scored = memories.map((m) => {
@@ -1169,8 +1149,6 @@ const generateRelatedMemories = async (summaryText, memories, digest) => {
   return { ...localRelated(summaryText, memories), fallbackReason: errors.join(' | ') || 'No AI key configured.' };
 };
 
-// ---------- family contributions (share-token inbox) ----------
-// Outside Clerk entirely. Auth is possession of a signed token.
 const familyShareSecret = () => env('FAMILY_SHARE_SECRET') || env('CLERK_SECRET_KEY') || 'meco-family-share-fallback-secret';
 
 const signFamilyToken = (ownerId, salt) => {
@@ -1197,7 +1175,6 @@ const verifyFamilyToken = (token, salt) => {
 
 const escapeHtmlServer = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-// Standalone page. No Clerk, no shared CSS, cannot touch the signed-in app.
 const contributePageHtml = ({ patientName, visitors, token, error }) => `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Share a memory, Meco</title>
@@ -1332,8 +1309,6 @@ const contributePageHtml = ({ patientName, visitors, token, error }) => `<!docty
 </script>
 </body></html>`;
 
-// ---------- companion chat ----------
-// Low-stakes companion for patients who are alone between visits.
 const companionSystemPrompt = (patientName, historyContext) => `You are Meco, a warm and patient companion inside a memory-care app. You are talking with ${patientName || 'a person'}, who may have memory difficulties and could be feeling lonely. Your only job is to be a good, caring listener, like a kind friend checking in.
 
 Rules:
@@ -1415,7 +1390,6 @@ const generateCompanionReply = async (patientName, messages, historyContext) => 
   return { ...localCompanionReply(), fallbackReason: errors.join(' | ') || 'No AI key configured.' };
 };
 
-// Per-conversation wellbeing signal. Explicitly not a diagnosis.
 const companionAnalysisSchema = {
   type: 'object',
   properties: {
@@ -1528,7 +1502,6 @@ const generateCompanionAnalysis = async (patientName, messages) => {
   return { ...localCompanionAnalysis(messages), fallbackReason: errors.join(' | ') || 'No AI key configured.' };
 };
 
-// Overall signal from the per-chat analyses already on file.
 const companionOverviewSchema = {
   type: 'object',
   properties: {
@@ -1635,8 +1608,6 @@ const generateCompanionOverview = async (patientName, chats) => {
   return { ...localCompanionOverview(chats), fallbackReason: errors.join(' | ') || 'No AI key configured.' };
 };
 
-// ---------- transcript tidy-up ----------
-// Live speech comes out in fragments. Group them back into turns.
 const refineSchema = {
   type: 'object',
   properties: {
@@ -1680,7 +1651,7 @@ const applyRefinedGroups = (lines, groups) => {
     if (!indexes.length) continue;
     const text = String(group.text || '').trim();
     if (!text) continue;
-    // A group may only cover fragments from one speaker.
+
     const first = lines[indexes[0]];
     const sameSpeaker = indexes.filter((index) => lines[index].speaker === first.speaker);
     if (!sameSpeaker.length) continue;
@@ -1688,7 +1659,7 @@ const applyRefinedGroups = (lines, groups) => {
     const last = lines[sameSpeaker[sameSpeaker.length - 1]];
     refined.push({ ...first, text, end: last.end ?? first.end, mergedFrom: sameSpeaker.length });
   }
-  // Anything the model dropped is kept verbatim rather than lost.
+
   lines.forEach((line, index) => { if (!used.has(index)) refined.push({ ...line, start: line.start ?? 0 }); });
   return refined.sort((a, b) => (a.start || 0) - (b.start || 0));
 };
@@ -1810,14 +1781,12 @@ const translateText = async (text, sourceLanguage, targetLanguage) => {
 
 const mimeTypes = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
-  // .mjs needs a JS mime type or strict MIME checking kills the module graph.
+
   '.mjs': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8',
 };
 
-// Marketing pages are client-rendered from the same shell, so a hard refresh
-// or a shared link on any of these paths still needs to resolve to index.html.
 const LANDING_ROUTES = ['/', '/app', '/sign-in', '/sign-up', '/product', '/recognize', '/companion', '/caregiver', '/privacy', '/pricing', '/clinicians', '/science', '/impact', '/privacy-policy', '/terms', '/cookies'];
 const serveFile = async (res, requestPath) => {
   let clean = decodeURIComponent(requestPath.split('?')[0]);
@@ -1831,8 +1800,7 @@ const serveFile = async (res, requestPath) => {
     res.writeHead(200, {
       'Content-Type': mimeTypes[ext] || 'application/octet-stream',
       'Content-Length': stat.size,
-      // App code is revalidated on every load so an updated build is never
-      // shadowed by an hour-old cached copy in the caregiver's browser.
+
       'Cache-Control': ['.html', '.js', '.mjs', '.css'].includes(ext) ? 'no-cache' : 'public, max-age=3600',
       'X-Content-Type-Options': 'nosniff',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
@@ -1894,7 +1862,6 @@ const handleApi = async (req, res, url) => {
     return true;
   }
 
-  // Mirrors one visit or reminder to Google. Does not touch our own state.
   if (url.pathname === '/api/calendar/sync' && req.method === 'POST') {
     const ownerId = await requireUser(req);
     const body = await readJson(req);
@@ -1918,7 +1885,6 @@ const handleApi = async (req, res, url) => {
     return true;
   }
 
-  // Pulls synced events back so edits made in Google reach Meco.
   if (url.pathname === '/api/calendar/pull' && req.method === 'POST') {
     const ownerId = await requireUser(req);
     const body = await readJson(req);
@@ -1948,7 +1914,6 @@ const handleApi = async (req, res, url) => {
     return true;
   }
 
-  // Deepgram key for the browser socket. Needs a Clerk session.
   if (url.pathname === '/api/live-key' && req.method === 'GET') {
     await requireUser(req);
     const key = env('DEEPGRAM_API_KEY');
@@ -2099,7 +2064,6 @@ const handleApi = async (req, res, url) => {
     return true;
   }
 
-  // No requireUser here. Auth is the signed family token, see signFamilyToken.
   if (url.pathname.startsWith('/api/contribute/') && req.method === 'POST') {
     const token = decodeURIComponent(url.pathname.slice('/api/contribute/'.length));
     const ownerId = familyTokenOwnerId(token);
@@ -2134,11 +2098,6 @@ const handleApi = async (req, res, url) => {
     return true;
   }
 
-  /* ---------- Cognitive Independence Engine ----------------------------
-     Reachable by either role: a patient's own device records attempts and
-     asks what help to offer; a caregiver reads the resulting patterns. */
-
-  // What level of help should this person get for this task, right now?
   if (url.pathname === '/api/assist/recommend' && req.method === 'POST') {
     const { ownerId } = await requireUserOrPatient(req);
     const body = await readJson(req);
@@ -2147,8 +2106,7 @@ const handleApi = async (req, res, url) => {
     const { state } = await loadState(ownerId);
     const routine = (state.routines || []).find((r) => r.id === taskId);
     const recommendation = engine.recommendAssistanceLevel(taskId, state.taskAttempts || [], {
-      // Safety-critical routines can pin a floor so the engine may never
-      // fade below caregiver supervision, however well the person is doing.
+
       safetyFloor: Number.isInteger(routine?.safetyFloor) ? routine.safetyFloor : 0,
       safetyCeiling: Number.isInteger(routine?.safetyCeiling) ? routine.safetyCeiling : 6,
     });
@@ -2160,7 +2118,6 @@ const handleApi = async (req, res, url) => {
     return true;
   }
 
-  // Record what actually happened. This is the only way the engine learns.
   if (url.pathname === '/api/assist/attempt' && req.method === 'POST') {
     const { ownerId, role } = await requireUserOrPatient(req);
     const body = await readJson(req);
@@ -2188,7 +2145,6 @@ const handleApi = async (req, res, url) => {
     return true;
   }
 
-  // Everything the caregiver Independence dashboard needs, in one read.
   if (url.pathname === '/api/assist/independence' && req.method === 'GET') {
     const ownerId = await requireUser(req);
     const { state } = await loadState(ownerId);
@@ -2208,7 +2164,6 @@ const handleApi = async (req, res, url) => {
     return true;
   }
 
-  // Intention buffer, store an explicit intention, or recover one.
   if (url.pathname === '/api/assist/intention' && req.method === 'POST') {
     const { ownerId } = await requireUserOrPatient(req);
     const body = await readJson(req);
@@ -2219,8 +2174,7 @@ const handleApi = async (req, res, url) => {
       at: new Date().toISOString(),
       goal,
       destination: String(body.destination || '').trim().slice(0, 80) || null,
-      // Kept verbatim so the recall answer can quote what was actually said
-      // rather than paraphrasing it back as if it were a fresh fact.
+
       sourceText: String(body.sourceText || '').trim().slice(0, 400) || null,
       status: 'active',
     };
@@ -2239,7 +2193,6 @@ const handleApi = async (req, res, url) => {
     return true;
   }
 
-  // Repeated-question handling: log the question, get back HOW to answer it.
   if (url.pathname === '/api/assist/question' && req.method === 'POST') {
     const { ownerId } = await requireUserOrPatient(req);
     const body = await readJson(req);
@@ -2262,7 +2215,6 @@ const handleApi = async (req, res, url) => {
     return true;
   }
 
-  // ABC-style behaviour logging + the co-occurrence patterns it produces.
   if (url.pathname === '/api/assist/behaviour' && req.method === 'POST') {
     const ownerId = await requireUser(req);
     const body = await readJson(req);
@@ -2297,7 +2249,6 @@ const handleApi = async (req, res, url) => {
     return true;
   }
 
-  // Daily handoff for the next caregiver on shift.
   if (url.pathname === '/api/assist/handoff' && req.method === 'GET') {
     const ownerId = await requireUser(req);
     const { state } = await loadState(ownerId);
@@ -2309,8 +2260,6 @@ const handleApi = async (req, res, url) => {
     }));
     return true;
   }
-
-  // ---------- patient accounts ----------
 
   if (url.pathname === '/api/patient-accounts' && req.method === 'POST') {
     const ownerId = await requireUser(req);
@@ -2333,8 +2282,7 @@ const handleApi = async (req, res, url) => {
     });
     const entry = { id: patientId, name, createdAt: new Date().toISOString() };
     await saveState(ownerId, { ...state, patientAccounts: [...(state.patientAccounts || []), entry] });
-    // passcode is returned exactly once, in plaintext, right here: the
-    // server never stores or re-displays it after this response.
+
     json(res, 200, { id: patientId, name, passcode });
     return true;
   }
@@ -2358,7 +2306,6 @@ const handleApi = async (req, res, url) => {
     return true;
   }
 
-  // No requireUser. Patients use patientId + passcode, throttled above.
   if (url.pathname === '/api/patient-auth/login' && req.method === 'POST') {
     const body = await readJson(req);
     const patientId = String(body.patientId || '').trim().toLowerCase();
@@ -2472,8 +2419,6 @@ const handleApi = async (req, res, url) => {
   return false;
 };
 
-// ---------- live transcription relay ----------
-// Browser streams PCM here, we relay to Deepgram so the key stays server-side.
 const WS_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 const WS_MAX_MESSAGE_BYTES = 4 * 1024 * 1024;
 const WS_SUBPROTOCOL = 'meco-live';
@@ -2510,8 +2455,6 @@ const wsSendClose = (socket, code = 1000, reason = '') => {
   socket.end();
 };
 
-// Minimal RFC 6455 reader: browser frames are always masked, and Meco only cares
-// about binary audio, text control messages, ping and close.
 const createWsReader = ({ onMessage, onPing, onClose }) => {
   let buffer = Buffer.alloc(0);
   let fragmentOpcode = 0;
@@ -2664,8 +2607,7 @@ const server = http.createServer(async (req, res) => {
       if (!handled) json(res, 404, { error: 'API route not found.' });
       return;
     }
-    // The family-contribution page: a standalone, unauthenticated page,
-    // never routed through the SPA's index.html or Clerk.
+
     if (url.pathname.startsWith('/contribute/') && req.method === 'GET') {
       const token = decodeURIComponent(url.pathname.slice('/contribute/'.length));
       const ownerId = familyTokenOwnerId(token);

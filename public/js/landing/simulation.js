@@ -1,5 +1,3 @@
-/* The "Watch Meco learn" homepage simulation. */
-
 import { $, escapeHtml } from '../utils.js';
 import { ASSISTANCE_LADDER, recommendAssistanceLevel, functionalSummary } from '/assistance-engine.mjs';
 
@@ -23,8 +21,6 @@ export function initAssistanceSimulation() {
 
     levelNameEl.textContent = `Level ${rec.level}, ${rec.ladder.name}`;
 
-    // Seven segments, filled up to the current level: a glance shows how
-    // much help is being given without reading anything.
     meterEl.innerHTML = ASSISTANCE_LADDER.map((rung) => `
       <span class="sim-seg${rung.level <= rec.level ? ' is-on' : ''}${rung.level === rec.level ? ' is-current' : ''}"
             title="Level ${rung.level}, ${escapeHtml(rung.name)}"></span>`).join('');
@@ -51,7 +47,7 @@ export function initAssistanceSimulation() {
   root.addEventListener('click', (event) => {
     const btn = event.target.closest('[data-sim-outcome]');
     if (btn) {
-      // Record the attempt at the level Meco is CURRENTLY offering
+
       const current = recommendAssistanceLevel(TASK, attempts);
       attempts = [{
         taskId: TASK,
