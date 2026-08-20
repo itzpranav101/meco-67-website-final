@@ -1,0 +1,7 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+flask==2.2.5
+werkzeug==2.2.3
+torch==2.5.1+cpu
+resemblyzer==0.1.4
+numpy<2
+setuptools<81

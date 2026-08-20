@@ -1,0 +1,2101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#f7f3ee" />
+  <!-- Meco is explicitly light-themed -->
+  <meta name="color-scheme" content="light" />
+  <meta name="description" content="Meco is an adaptive cognitive-support system for dementia. It learns what a person can still do, notices when they need help, and gives the smallest cue that lets them succeed on their own." />
+  <title>Meco | Adaptive Cognitive Support for Dementia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/meco-icon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+  <!-- Sets the saved theme before the page paints. -->
+  <script>
+    try {
+      var t = localStorage.getItem('meco-theme');
+      if (t && t !== 'classic') document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {}
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.js"></script>
+</head>
+<body>
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
+
+  <!-- Shared theme popover -->
+  <div id="theme-popover" class="theme-popover hidden" role="dialog" aria-label="Choose a theme">
+    <p class="theme-popover-title">Choose a theme</p>
+    <p class="theme-popover-sub">Changes color, contrast and mood everywhere: this site, sign-in, and both consoles. Two are built for low vision or light sensitivity.</p>
+    <div class="theme-grid">
+      <button type="button" class="theme-swatch" data-theme-pick="classic"><span class="theme-swatch-preview" style="background:#f8f4ef"><i style="background:#5d80e6"></i><i style="background:#11100f"></i></span><span class="theme-swatch-name">Meco Classic</span></button>
+      <button type="button" class="theme-swatch" data-theme-pick="midnight"><span class="theme-swatch-preview" style="background:#14161c"><i style="background:#7fa8ff"></i><i style="background:#ece9e2"></i></span><span class="theme-swatch-name">Midnight Calm</span></button>
+      <button type="button" class="theme-swatch" data-theme-pick="sage"><span class="theme-swatch-preview" style="background:#f2f5ee"><i style="background:#e0794f"></i><i style="background:#263820"></i></span><span class="theme-swatch-name">Sage Garden</span></button>
+      <button type="button" class="theme-swatch" data-theme-pick="golden"><span class="theme-swatch-preview" style="background:#fbf2e4"><i style="background:#d98a2b"></i><i style="background:#3a2812"></i></span><span class="theme-swatch-name">Golden Hour</span></button>
+      <button type="button" class="theme-swatch" data-theme-pick="ocean"><span class="theme-swatch-preview" style="background:#eef3f4"><i style="background:#1f8f8a"></i><i style="background:#10222b"></i></span><span class="theme-swatch-name">Ocean Mist</span></button>
+      <button type="button" class="theme-swatch" data-theme-pick="lavender-fields"><span class="theme-swatch-preview" style="background:#f5f0f7"><i style="background:#b6567f"></i><i style="background:#2c1f36"></i></span><span class="theme-swatch-name">Lavender Fields</span></button>
+      <button type="button" class="theme-swatch" data-theme-pick="contrast"><span class="theme-swatch-preview" style="background:#ffffff"><i style="background:#0b4fd6"></i><i style="background:#000000"></i></span><span class="theme-swatch-name">High Contrast <small>· low vision</small></span></button>
+      <button type="button" class="theme-swatch" data-theme-pick="sepia"><span class="theme-swatch-preview" style="background:#f2e8d5"><i style="background:#a15a2e"></i><i style="background:#3f2f1c"></i></span><span class="theme-swatch-name">Warm Sepia <small>· easy on the eyes</small></span></button>
+      <button type="button" class="theme-swatch" data-theme-pick="rose"><span class="theme-swatch-preview" style="background:#fbeef0"><i style="background:#c3536f"></i><i style="background:#3a1520"></i></span><span class="theme-swatch-name">Rose Quartz</span></button>
+    </div>
+  </div>
+
+  <main id="landing-view" class="landing-view">
+    <div class="nav-sticky-wrap">
+    <nav class="floating-nav" aria-label="Main navigation">
+      <a class="wordmark" href="/" data-landing-nav="home" aria-label="Meco home"><span>ME</span><span>CO</span></a>
+      <div class="nav-links">
+        <a href="/recognize" data-landing-nav="recognize">Recognize</a>
+        <a href="/product" data-landing-nav="product">Product</a>
+        <a href="/companion" data-landing-nav="companion">Companion</a>
+        <a href="/caregiver" data-landing-nav="caregiver">Caregiver</a>
+        <a href="/pricing" data-landing-nav="pricing">Pricing</a>
+      </div>
+      <div class="nav-actions">
+        <button class="theme-toggle" id="theme-toggle-nav" type="button" aria-label="Choose a theme" title="Choose a theme">◐</button>
+        <button class="link-button ghost-pill" data-auth="sign-in">Log in</button>
+        <button class="nav-burger" id="nav-burger-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-mobile-sheet">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="nav-mobile-sheet hidden" id="nav-mobile-sheet">
+      <a href="/recognize" data-landing-nav="recognize">Recognize</a>
+      <a href="/product" data-landing-nav="product">Product</a>
+      <a href="/companion" data-landing-nav="companion">Companion</a>
+      <a href="/caregiver" data-landing-nav="caregiver">Caregiver</a>
+      <a href="/pricing" data-landing-nav="pricing">Pricing</a>
+      <div class="nav-mobile-actions">
+        <button class="link-button ghost-pill" data-auth="sign-in">Log in</button>
+        <button class="pill-button dark wide" data-auth="sign-up">Try Meco Free</button>
+      </div>
+    </div>
+    </div>
+
+    <!-- ============ HOME ============ -->
+    <div class="landing-page" data-landing-page="home">
+      <section class="hero-shell" id="top">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">ADAPTIVE COGNITIVE SUPPORT FOR DEMENTIA</p>
+          <h1>Dementia takes<br />away context.<br />Meco rebuilds it.</h1>
+          <p class="hero-sub">Meco learns the people, routines and memories that matter to one person, then gives the <em>smallest</em> useful cue when everyday life gets difficult.</p>
+          <div class="hero-actions">
+            <button class="pill-button glass large" data-auth="sign-up">Try Meco Free</button>
+            <a class="pill-button ghost large" href="#the-ladder">See how it works</a>
+          </div>
+        </div>
+
+        <div class="hero-art" aria-hidden="true">
+          <div class="paper-strip strip-one"></div>
+          <div class="paper-strip strip-two"></div>
+          <div class="paper-mountain mountain-one"></div>
+          <div class="paper-mountain mountain-two"></div>
+          <div class="paper-mountain mountain-three"></div>
+          <div class="yellow-slope"></div>
+          <div class="cloud cloud-one"></div>
+          <div class="cloud cloud-two"></div>
+          <div class="mock-window hero-window">
+            <div class="window-bar"><span></span><span></span><span></span><div class="window-pill">Memory Space</div></div>
+            <div class="mock-app-grid">
+              <aside class="mock-sidebar">
+                <div class="mock-mini-logo">M</div>
+                <div class="mock-side-label active">Today</div>
+                <div class="mock-side-label">People</div>
+                <div class="mock-side-label">Memory book</div>
+                <div class="mock-side-label">Visits</div>
+              </aside>
+              <div class="mock-content">
+                <div class="mock-heading-row"><div><small>GOOD MORNING</small><strong>Familiar moments</strong></div><span class="mock-status">● Synced</span></div>
+                <div class="memory-cards">
+                  <article class="memory-card coral"><div class="avatar-initial">S</div><b>Sarah</b><small>Daughter</small><p>Sunday garden walks</p></article>
+                  <article class="memory-card cream"><div class="avatar-initial">J</div><b>James</b><small>Brother</small><p>Old school stories</p></article>
+                  <article class="memory-card yellow"><div class="avatar-initial">M</div><b>Mei</b><small>Friend</small><p>Tea at 4pm</p></article>
+                  <article class="memory-card mint"><div class="avatar-initial">A</div><b>Amir</b><small>Caregiver</small><p>Morning routine</p></article>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="home-evidence reveal-up">
+        <p class="section-kicker centered">WHY THIS MATTERS</p>
+        <h2 class="display-heading">Care happens at home</h2>
+        <p class="centered-copy">Not in clinics. At breakfast, during showers, on walks, in thousands of ordinary moments no appointment ever sees.</p>
+        <div data-evidence="home-strip"></div>
+        <a class="evidence-more" href="/impact" data-landing-nav="impact">See the full picture, with sources →</a>
+      </section>
+
+      <section class="ladder-section reveal-up" id="the-ladder">
+        <p class="section-kicker centered">THE CORE IDEA</p>
+        <h2 class="display-heading">The Assistance Ladder</h2>
+        <p class="centered-copy">Most tools repeat the same reminder forever. Meco asks what the <em>least</em> help is that lets someone succeed on their own, then tries to give less next time.</p>
+
+        <div class="ladder" data-ladder>
+          <div class="ladder-rungs" role="tablist" aria-label="Assistance levels"></div>
+          <div class="ladder-detail" data-ladder-detail aria-live="polite"></div>
+        </div>
+
+        <div class="ladder-adaptive">
+          <div class="ladder-adaptive-col">
+            <span class="adaptive-badge success">Succeeds 3×</span>
+            <p>Meco steps <strong>down</strong> a rung and offers less help next time.</p>
+          </div>
+          <div class="ladder-adaptive-col">
+            <span class="adaptive-badge escalate">Struggles 2×</span>
+            <p>Meco steps <strong>up</strong> a rung, never past the safety limit a caregiver set.</p>
+          </div>
+        </div>
+        <p class="ladder-caveat">Adaptive assistance is an experimental decision-support feature. It is not clinically validated, and it never diagnoses anything.</p>
+      </section>
+
+      <section class="playground-section reveal-up">
+        <p class="section-kicker centered">WHAT'S INSIDE</p>
+        <h2 class="display-heading">One shared memory,<br />carried between people</h2>
+        <p class="centered-copy">A daughter, a brother, a helper, a night carer. Each holds a different piece, and none of it is written down. This is where those pieces live.</p>
+        <div class="showcase-grid stagger-group">
+          <article class="showcase-card">
+            <div class="showcase-card-head"><span class="swatch" style="background:#ffb4a8"></span>People</div>
+            <div class="showcase-card-body">
+              <div class="showcase-row"><i class="pg-avatar coral" style="width:26px;height:26px;font-size:11px">S</i><span><b>Sarah</b> <small>· Daughter</small></span></div>
+              <div class="showcase-row"><i class="pg-avatar cream" style="width:26px;height:26px;font-size:11px">J</i><span><b>James</b> <small>· Brother</small></span></div>
+              <div class="showcase-row"><i class="pg-avatar yellow" style="width:26px;height:26px;font-size:11px">M</i><span><b>Mei</b> <small>· Friend</small></span></div>
+            </div>
+            <p class="showcase-note">Three faces, three warm hellos.</p>
+          </article>
+          <article class="showcase-card">
+            <div class="showcase-card-head"><span class="swatch" style="background:#8ea7e5"></span>Memory Book</div>
+            <div class="showcase-card-body">
+              <div class="showcase-row tinted" style="--tint:#eef1ff">▸ Family</div>
+              <div class="showcase-row tinted" style="--tint:#eef1ff">▸ Places</div>
+              <div class="showcase-row tinted" style="--tint:#eef1ff">▸ Daily routines</div>
+            </div>
+            <p class="showcase-note">“The garden bench by the roses.”</p>
+          </article>
+          <article class="showcase-card">
+            <div class="showcase-card-head"><span class="swatch" style="background:#ffe370"></span>Reminders</div>
+            <div class="showcase-card-body">
+              <div class="showcase-row"><span class="showcase-check done"></span><span>Review Sarah's visit</span></div>
+              <div class="showcase-row"><span class="showcase-check"></span><span>Print family photo</span></div>
+              <div class="showcase-row"><span class="showcase-check"></span><span>Add garden memory</span></div>
+            </div>
+            <p class="showcase-note">12:30 · Sarah visits today</p>
+          </article>
+          <article class="showcase-card">
+            <div class="showcase-card-head"><span class="swatch" style="background:#79d69b"></span>Visit Report</div>
+            <div class="showcase-card-body">
+              <div class="showcase-row"><b>31 Jul</b><small>· Sarah</small></div>
+              <div class="showcase-row"><span class="badge success">Warm</span><small>3 turns</small></div>
+            </div>
+            <p class="showcase-note">Talked about the garden and the blue photo album.</p>
+          </article>
+        </div>
+      </section>
+
+      <div class="quote-row reveal">
+        <div class="quote-row-who"><span class="quote-row-avatar" style="background:#c9efda">R</span><div class="quote-row-rule"></div><b>A daughter, on Meco</b></div>
+        <p>“It's the first thing I check before a visit, and the last thing I update after one.”</p>
+      </div>
+
+      <div class="chapter-intro" style="max-width:660px;margin:56px auto 8px">
+        <p class="section-kicker centered">HOW IT WORKS</p>
+        <h2 style="text-align:center">A loop, not a reminder</h2>
+        <p style="text-align:center">A reminder app says the same thing on Tuesday that it said on Monday. Meco runs a loop, and the point of the loop is to need less of itself.</p>
+      </div>
+
+      <section class="promo-band step-band reveal" style="background:linear-gradient(160deg,#eef1ff,#dfe6ff)">
+        <span class="step-number" aria-hidden="true">01</span>
+        <p class="promo-kicker">UNDERSTAND</p>
+        <h2>Learn the person first</h2>
+        <p>Not a patient record. The things a family already knows and no system has ever held.</p>
+              <ul class="spec-list">
+                <li><b>People</b><span>Who matters to them</span></li>
+                <li><b>Rhythm</b><span>What a normal day looks like</span></li>
+                <li><b>Stories</b><span>Which ones they light up at</span></li>
+                <li><b>Repair</b><span>What usually helps when something goes wrong</span></li>
+              </ul>
+      </section>
+
+      <section class="promo-band step-band reveal" style="background:linear-gradient(160deg,#eafbf0,#d9f3e2)">
+        <span class="step-number" aria-hidden="true">02</span>
+        <p class="promo-kicker">ASSIST</p>
+        <h2>Offer the smallest useful cue</h2>
+        <p>Meco starts low on the ladder and climbs only if that is not enough. Doing the task <em>for</em> someone is the last resort, not the default.</p>
+      </section>
+
+      <section class="promo-band step-band reveal" style="background:linear-gradient(160deg,#fff1ea,#ffe3d5)">
+        <span class="step-number" aria-hidden="true">03</span>
+        <p class="promo-kicker">LEARN</p>
+        <h2>Then try to help less</h2>
+        <p>Every attempt is recorded, then the next cue adjusts.</p>
+              <ul class="spec-list">
+                <li><b>Logged</b><span>What was offered, what happened, how long it took</span></li>
+                <li><b>3 successes</b><span>Meco steps down a rung</span></li>
+                <li><b>2 struggles</b><span>It steps back up, never past the caregiver's limit</span></li>
+              </ul>
+      </section>
+
+      <section class="sim-section reveal" aria-labelledby="sim-heading">
+        <p class="section-kicker centered">TRY IT YOURSELF</p>
+        <h2 class="display-heading" id="sim-heading">Watch Meco learn</h2>
+        <p class="centered-copy">A real simulation. Tell it how Ravi got on with his tea and the assistance level adapts, using the same engine file the product runs.</p>
+
+        <div class="sim" data-sim>
+          <div class="sim-stage">
+            <div class="sim-task">
+              <span class="sim-task-icon" aria-hidden="true"></span>
+              <div>
+                <h3>Making tea</h3>
+                <p class="sim-task-sub" data-sim-attempts>No attempts recorded yet</p>
+              </div>
+            </div>
+
+            <div class="sim-level">
+              <p class="sim-level-caption">MECO WILL OFFER</p>
+              <p class="sim-level-name" data-sim-level-name>Not started</p>
+              <div class="sim-meter" role="img" data-sim-meter aria-label="Assistance level"></div>
+              <p class="sim-reason" data-sim-reason></p>
+            </div>
+
+            <div class="sim-controls">
+              <button class="sim-btn sim-btn-success" type="button" data-sim-outcome="success">
+                <strong>Ravi managed it</strong><span>with that level of help</span>
+              </button>
+              <button class="sim-btn sim-btn-fail" type="button" data-sim-outcome="failure">
+                <strong>Ravi got stuck</strong><span>needed more than that</span>
+              </button>
+            </div>
+            <button class="sim-reset" type="button" data-sim-reset>Start over</button>
+          </div>
+
+          <aside class="sim-log">
+            <p class="sim-log-title">What Meco recorded</p>
+            <ol class="sim-log-list" data-sim-log></ol>
+            <p class="sim-log-empty" data-sim-log-empty>Nothing yet. Press a button to record Ravi's first attempt.</p>
+          </aside>
+        </div>
+
+        <p class="sim-caveat">Ravi is a fictional example. Adaptive assistance is an experimental decision-support feature. It is not clinically validated and does not diagnose anything.</p>
+      </section>
+
+      <section class="chapter-teasers reveal-up">
+        <p class="section-kicker centered">EXPLORE MECO</p>
+        <h2 class="display-heading">Five chapters,<br />one calmer visit</h2>
+        <p class="centered-copy">Each part of Meco has its own page now, read as much or as little as you need before you start.</p>
+        <div class="teaser-grid">
+          <a href="/recognize" data-landing-nav="recognize" class="teaser-card blue-tab reveal">
+            <span class="teaser-icon">◎</span>
+            <h3>Recognize</h3>
+            <p>A trusted face gets a warm, spoken hello, before a single word is exchanged.</p>
+            <span class="teaser-link">Read the chapter →</span>
+          </a>
+          <a href="/product" data-landing-nav="product" class="teaser-card green-tab reveal">
+            <span class="teaser-icon">▦</span>
+            <h3>Product</h3>
+            <p>Voices, records and reports held together in one calm, connected workspace.</p>
+            <span class="teaser-link">Read the chapter →</span>
+          </a>
+          <a href="/companion" data-landing-nav="companion" class="teaser-card coral-tab reveal">
+            <span class="teaser-icon">♥</span>
+            <h3>Companion</h3>
+            <p>A gentle AI chat and a journal for the quiet afternoons between visits.</p>
+            <span class="teaser-link">Read the chapter →</span>
+          </a>
+          <a href="/caregiver" data-landing-nav="caregiver" class="teaser-card yellow-tab reveal">
+            <span class="teaser-icon">◴</span>
+            <h3>Caregiver</h3>
+            <p>Visits, reminders and follow-ups that live next to the moment that created them.</p>
+            <span class="teaser-link">Read the chapter →</span>
+          </a>
+          <a href="/privacy" data-landing-nav="privacy" class="teaser-card dark-tab reveal">
+            <span class="teaser-icon">⌁</span>
+            <h3>Privacy</h3>
+            <p>Face matching happens on-device. Here's exactly what leaves the browser, and what doesn't.</p>
+            <span class="teaser-link">Read the chapter →</span>
+          </a>
+        </div>
+      </section>
+
+      <blockquote class="testimonial reveal"><span class="quote-avatar coral">A</span><p>“Meco gives our family one place to remember what helped, what made Mum smile, and what we should bring up next time.”</p><cite>A caregiver using Meco</cite></blockquote>
+
+      <section class="theme-showcase reveal-up">
+        <p class="section-kicker centered">MAKE IT THEIRS</p>
+        <h2 class="display-heading">Legibility isn't<br />a preference</h2>
+        <p class="centered-copy">A screen someone can't read is a screen that doesn't help. Paper tone, ink, accent and contrast shift together across every surface.</p>
+          <ul class="tag-row" style="justify-content:center">
+            <li>This site</li><li>Sign-in</li><li>Caregiver console</li><li>Patient mode</li>
+            <li class="yes">High Contrast, for low vision</li><li class="yes">Warm Sepia, for light sensitivity</li>
+          </ul>
+        <!-- A continuously auto-scrolling marquee -->
+        <div class="theme-grid-preview">
+          <div class="theme-marquee-track">
+            <div class="theme-marquee-set">
+              <button type="button" class="theme-swatch" data-theme-pick="classic"><span class="theme-swatch-preview" style="background:#f8f4ef"><i style="background:#5d80e6"></i><i style="background:#11100f"></i></span><span class="theme-swatch-name">Meco Classic</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="midnight"><span class="theme-swatch-preview" style="background:#14161c"><i style="background:#7fa8ff"></i><i style="background:#ece9e2"></i></span><span class="theme-swatch-name">Midnight Calm</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="sage"><span class="theme-swatch-preview" style="background:#f2f5ee"><i style="background:#e0794f"></i><i style="background:#263820"></i></span><span class="theme-swatch-name">Sage Garden</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="golden"><span class="theme-swatch-preview" style="background:#fbf2e4"><i style="background:#d98a2b"></i><i style="background:#3a2812"></i></span><span class="theme-swatch-name">Golden Hour</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="ocean"><span class="theme-swatch-preview" style="background:#eef3f4"><i style="background:#1f8f8a"></i><i style="background:#10222b"></i></span><span class="theme-swatch-name">Ocean Mist</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="lavender-fields"><span class="theme-swatch-preview" style="background:#f5f0f7"><i style="background:#b6567f"></i><i style="background:#2c1f36"></i></span><span class="theme-swatch-name">Lavender Fields</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="contrast"><span class="theme-swatch-preview" style="background:#ffffff"><i style="background:#0b4fd6"></i><i style="background:#000000"></i></span><span class="theme-swatch-name">High Contrast</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="sepia"><span class="theme-swatch-preview" style="background:#f2e8d5"><i style="background:#a15a2e"></i><i style="background:#3f2f1c"></i></span><span class="theme-swatch-name">Warm Sepia</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="rose"><span class="theme-swatch-preview" style="background:#fbeef0"><i style="background:#c3536f"></i><i style="background:#3a1520"></i></span><span class="theme-swatch-name">Rose Quartz</span></button>
+            </div>
+            <div class="theme-marquee-set" aria-hidden="true">
+              <button type="button" class="theme-swatch" data-theme-pick="classic" tabindex="-1"><span class="theme-swatch-preview" style="background:#f8f4ef"><i style="background:#5d80e6"></i><i style="background:#11100f"></i></span><span class="theme-swatch-name">Meco Classic</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="midnight" tabindex="-1"><span class="theme-swatch-preview" style="background:#14161c"><i style="background:#7fa8ff"></i><i style="background:#ece9e2"></i></span><span class="theme-swatch-name">Midnight Calm</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="sage" tabindex="-1"><span class="theme-swatch-preview" style="background:#f2f5ee"><i style="background:#e0794f"></i><i style="background:#263820"></i></span><span class="theme-swatch-name">Sage Garden</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="golden" tabindex="-1"><span class="theme-swatch-preview" style="background:#fbf2e4"><i style="background:#d98a2b"></i><i style="background:#3a2812"></i></span><span class="theme-swatch-name">Golden Hour</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="ocean" tabindex="-1"><span class="theme-swatch-preview" style="background:#eef3f4"><i style="background:#1f8f8a"></i><i style="background:#10222b"></i></span><span class="theme-swatch-name">Ocean Mist</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="lavender-fields" tabindex="-1"><span class="theme-swatch-preview" style="background:#f5f0f7"><i style="background:#b6567f"></i><i style="background:#2c1f36"></i></span><span class="theme-swatch-name">Lavender Fields</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="contrast" tabindex="-1"><span class="theme-swatch-preview" style="background:#ffffff"><i style="background:#0b4fd6"></i><i style="background:#000000"></i></span><span class="theme-swatch-name">High Contrast</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="sepia" tabindex="-1"><span class="theme-swatch-preview" style="background:#f2e8d5"><i style="background:#a15a2e"></i><i style="background:#3f2f1c"></i></span><span class="theme-swatch-name">Warm Sepia</span></button>
+              <button type="button" class="theme-swatch" data-theme-pick="rose" tabindex="-1"><span class="theme-swatch-preview" style="background:#fbeef0"><i style="background:#c3536f"></i><i style="background:#3a1520"></i></span><span class="theme-swatch-name">Rose Quartz</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section reveal-up">
+        <div class="chapter-intro">
+          <p class="section-kicker centered">GETTING STARTED</p>
+          <h2>Before you dive into<br />a whole chapter</h2>
+        </div>
+        <div class="deep-grid stagger-group">
+          <div class="deep-card">
+            <h3>Does someone need to be tech-savvy to run this?</h3>
+            <p>Day to day, no. A caregiver writes down what they already know (who visits, what the mornings look like, what usually helps) and Meco works from that. The first-time setup currently means pasting a few provider keys into a settings file; the <a href="/pricing" data-landing-nav="pricing" style="text-decoration:underline">Pricing chapter</a> walks through exactly what that involves.</p>
+          </div>
+          <div class="deep-card">
+            <h3>What does the person being cared for actually see?</h3>
+            <p>Their own app, on their own sign-in. Not a mode inside someone else's account.</p>
+              <ul class="spec-list">
+                <li><b>They see</b><span>Large type, today's date, who is visiting</span></li>
+                <li><b>They can</b><span>Ask for help with one button, browse their memories</span></li>
+                <li><b>They never see</b><span>Dashboards, charts, or a delete button</span></li>
+              </ul>
+              <p class="spec-more">More in <a href="/recognize" data-landing-nav="recognize" style="text-decoration:underline">Recognize</a></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="chapter-section reveal-up">
+        <div class="chapter-intro">
+          <p class="section-kicker centered">PRIVACY &amp; CONTROL</p>
+          <h2>The questions<br />that matter most</h2>
+        </div>
+        <div class="deep-grid stagger-group">
+          <div class="deep-card">
+            <h3>Is any of this sent somewhere to train an AI model?</h3>
+            <p>No. Nothing Meco holds is used to train public models.</p>
+              <ul class="spec-list">
+                <li><b>Covers</b><span>Faces, voices, routines, notes written at 2am</span></li>
+                <li><b>Matching runs</b><span>On device, or on a private server</span></li>
+                <li><b>Scope</b><span>One account, exportable and wipeable by the family</span></li>
+              </ul>
+          </div>
+          <div class="deep-card">
+            <h3>What if we stop using it?</h3>
+            <p>You take it with you. It belongs to the family who built it, not to us.</p>
+              <ul class="spec-list">
+                <li><b>Exportable</b><span>Enrolments, transcripts, routines, journal entries</span></li>
+                <li><b>Deletable</b><span>The same way each was saved</span></li>
+                <li><b>Includes</b><span>What a new caregiver would need on day one</span></li>
+              </ul>
+          </div>
+        </div>
+      </section>
+
+      <div class="pricing-teaser reveal">
+        <div><h3>Free to start, yours to own</h3><p>One full care circle, working end to end, before you connect a single paid account.</p></div>
+        <a href="/pricing" data-landing-nav="pricing" class="pill-button dark">See pricing →</a>
+      </div>
+    </div>
+
+    <!-- ============ RECOGNIZE ============ -->
+    <div class="landing-page hidden" data-landing-page="recognize">
+      <header class="chapter-header recognize-chapter reveal">
+        <div class="chapter-header-copy">
+          <p class="chapter-eyebrow">RECOGNIZE</p>
+          <h1>From a familiar face<br />to a warm hello</h1>
+          <p class="chapter-standfirst">On-device face matching, then a spoken introduction built from cues a caregiver approved, before an awkward “do you remember me?” ever happens.</p>
+          <button class="pill-button dark" data-auth="sign-up">Try Meco Free</button>
+        </div>
+        <span class="header-blob b1"></span><span class="header-blob b2"></span>
+        <div class="chapter-header-art" aria-hidden="true">
+          <div class="header-art-stack">
+            <span class="header-art-ring"></span>
+            <div class="header-art-card">
+              <div class="header-art-topbar"><span></span><span></span><span></span></div>
+              <div class="scan-art-body">
+                <div class="scan-mesh"></div>
+                <div class="scan-viewport">
+                  <span class="scan-corner tl"></span><span class="scan-corner tr"></span>
+                  <span class="scan-corner bl"></span><span class="scan-corner br"></span>
+                  <div class="scan-face"><span class="scan-mouth"></span></div>
+                  <div class="scan-sweep"></div>
+                </div>
+              </div>
+            </div>
+            <div class="header-art-chip">✓ Sarah · 92% match</div>
+          </div>
+        </div>
+      </header>
+      <div class="chapter-tabs-row"><nav class="chapter-tabs" aria-label="Jump to a section">
+        <a class="chapter-tab" href="#how-it-greets"><span class="chapter-tab-icon">✦</span>How it greets</a>
+        <a class="chapter-tab" href="#two-ways"><span class="chapter-tab-icon">◎</span>Two ways to recognize</a>
+        <a class="chapter-tab" href="#what-is-saved"><span class="chapter-tab-icon">◈</span>What's saved</a>
+        <a class="chapter-tab" href="#patient-mode"><span class="chapter-tab-icon">◉</span>Patient mode</a>
+        <a class="chapter-tab" href="#the-voice"><span class="chapter-tab-icon">≋</span>The voice</a>
+      </nav></div>
+      <div class="deckle-divider" aria-hidden="true"></div>
+      <div class="chapter-body">
+        <section id="how-it-greets" class="feature-panel blue-panel reveal">
+          <div class="feature-visual layered-visual reveal-left">
+            <div class="mock-window back-window">
+              <div class="window-bar"><span></span><span></span><span></span><div class="window-pill">Trusted people</div></div>
+              <div class="people-list-mini">
+                <div><i class="face-dot face-a"></i><strong>Sarah</strong><span>Daughter</span></div>
+                <div><i class="face-dot face-b"></i><strong>James</strong><span>Brother</span></div>
+                <div><i class="face-dot face-c"></i><strong>Mei</strong><span>Friend</span></div>
+              </div>
+            </div>
+            <div class="mock-window front-window peach-window">
+              <div class="window-bar"><span></span><span></span><span></span><div class="window-pill">Sarah is here</div></div>
+              <div class="recognition-card">
+                <div class="recognition-portrait">S</div>
+                <h3>Hi, this is Sarah.</h3>
+                <p>Your daughter. You both enjoy Sunday walks and looking through the blue photo album.</p>
+                <div class="confidence-row"><span>Face match</span><strong>92%</strong></div>
+              </div>
+            </div>
+          </div>
+          <div class="feature-copy reveal-right">
+            <p class="section-kicker">HOW IT GREETS</p>
+            <h2>One glance,<br />one gentle line</h2>
+            <p>Patient mode watches quietly for an enrolled face. The moment it's confident, it speaks a short, caregiver-written line: a name, a relationship, one reassuring detail. Nothing more.</p>
+            <div class="icon-feature-grid">
+              <div><span class="line-icon">◎</span><b>Trusted people</b></div>
+              <div><span class="line-icon">◌</span><b>Memory cues</b></div>
+              <div><span class="line-icon">✦</span><b>Voice greeting</b></div>
+              <div><span class="line-icon">⌁</span><b>Patient mode</b></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="two-ways" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Two ways to be recognized</h2>
+            <p>A visit rarely has one voice in it. Meco tells people apart by face and by voice, so transcripts read with real names.</p>
+          </div>
+          <div class="deep-grid stagger-group">
+            <div class="deep-card reveal">
+              <span class="line-icon">◎</span>
+              <h3>Enrollment takes three angles</h3>
+              <p>Three poses are enough to build a numerical descriptor of someone's face.</p>
+              <ul class="spec-list">
+                <li><b>Poses</b><span>Front, left, right</span></li>
+                <li><b>Stored</b><span>A descriptor and a small thumbnail</span></li>
+                <li><b>Never stored</b><span>A photo library or a cloud upload</span></li>
+                <li><b>Strictness</b><span>A slider the caregiver controls</span></li>
+              </ul>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">≋</span>
+              <h3>Voices get names too</h3>
+              <p>An optional voice sample names each speaker as they talk.</p>
+              <ul class="spec-list">
+                <li><b>Runs on</b><span>Meco's local recognition server</span></li>
+                <li><b>Result</b><span>A live transcript that reads &ldquo;Sarah:&rdquo;</span></li>
+              </ul>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">✦</span>
+              <h3>The greeting is caregiver-approved</h3>
+              <p>What Meco says out loud is always something a family member chose.</p>
+              <ul class="spec-list">
+                <li><b>Source</b><span>A memory cue written in advance</span></li>
+                <li><b>Never</b><span>Generated on the spot</span></li>
+              </ul>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">⌁</span>
+              <h3>Nothing is guessed</h3>
+              <p>A greeting only plays on a confident match.</p>
+              <ul class="spec-list">
+                <li><b>Plays</b><span>When a descriptor clears the threshold</span></li>
+                <li><b>Stays quiet</b><span>Empty room, stranger, or low confidence</span></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="what-is-saved" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>What actually gets saved,<br />per person</h2>
+            <p>Four small pieces of data, nothing more, for each trusted person a caregiver enrolls.</p>
+          </div>
+          <div class="showcase-grid stagger-group">
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#5d80e6"></span>Face descriptor</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><b>128 numbers</b></div>
+                <div class="showcase-row"><b>Not a photo</b></div>
+              </div>
+              <p class="showcase-note">Built by face-api.js, right in the browser.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#3f9c5e"></span>One thumbnail</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><b>Small, low-res</b></div>
+                <div class="showcase-row"><b>For the People list</b></div>
+              </div>
+              <p class="showcase-note">So a caregiver can tell faces apart at a glance.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#d9694f"></span>Voiceprint <small style="font-weight:500;color:#a49f97">(optional)</small></div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><b>One embedding</b></div>
+                <div class="showcase-row"><b>Stored locally</b></div>
+              </div>
+              <p class="showcase-note">Only if a voice sample was recorded.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#c98f12"></span>Memory cue</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><b>Caregiver-written</b></div>
+                <div class="showcase-row"><b>Plain text</b></div>
+              </div>
+              <p class="showcase-note">The one line Meco is ever allowed to say out loud.</p>
+            </article>
+          </div>
+        </section>
+
+        <div id="patient-mode" class="editorial-row reveal">
+          <div class="editorial-media blue-media">
+            <div class="visit-sheet">
+              <small>PATIENT MODE</small>
+              <h3>Ready when you are</h3>
+              <p>The camera is off until it's started on purpose. No timer, no pressure, just a quiet frame waiting for a familiar face.</p>
+              <ul><li>One escape hatch: "Return to caregiver," always visible</li><li>Elder-friendly display mode, one toggle in Settings</li><li>Silence, not a wrong guess, when no match clears the threshold</li></ul>
+            </div>
+          </div>
+          <div class="editorial-copy">
+            <h2>The screen they<br />actually see</h2>
+            <p>Everything about Patient mode was written for the person in front of the camera, not the caregiver who configured it, short, warm, and never technical.</p>
+            <ul class="clean-list"><li>Plain language, no jargon</li><li>Nothing shown that isn't needed in the moment</li></ul>
+          </div>
+        </div>
+
+        <section id="the-voice" class="promo-band reveal" style="background:linear-gradient(160deg,#eef1ff,#dfe6ff)">
+          <p class="promo-kicker">THE VOICE</p>
+          <h2>Sounds like family chose it,<br />because they did</h2>
+          <p>Tuned once in Settings, used for every greeting after that.</p>
+              <ul class="tag-row"><li>Rate</li><li>Pitch</li><li>Voice</li><li class="no">Nothing generated per visit</li></ul>
+          <div class="style-picker" role="group" aria-label="Example voice settings">
+            <button type="button" class="style-chip selected" data-mock="“Hiii… this is Saaarah… your daughter.”">Warmer &amp; slower</button>
+            <button type="button" class="style-chip" data-mock="“Hi, this is Sarah, your daughter.”">Natural pace</button>
+            <button type="button" class="style-chip" data-mock="“Hi, this is Sarah, your daughter.” (female voice)">Female voice</button>
+            <button type="button" class="style-chip" data-mock="“Hi, this is Sarah, your daughter.” (male voice)">Male voice</button>
+          </div>
+          <div class="promo-mock"><i></i>“Hiii… this is Saaarah… your daughter.”</div>
+        </section>
+
+        <blockquote class="testimonial reveal"><span class="quote-avatar mint">M</span><p>“The introduction is simple, but it changes the start of a visit. Everyone feels calmer and less rushed.”</p><cite>Family member</cite></blockquote>
+
+        <div class="chapter-cta reveal">
+          <h2>See it recognize someone in minutes</h2>
+          <p>Enroll one trusted person and try patient mode for yourself.</p>
+          <button class="pill-button glass large" data-auth="sign-up">Try Meco Free</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PRODUCT ============ -->
+    <div class="landing-page hidden" data-landing-page="product">
+      <header class="chapter-header product-chapter reveal">
+        <div class="chapter-header-copy">
+          <p class="chapter-eyebrow">PRODUCT</p>
+          <h1>Everything that matters,<br />held together by Meco</h1>
+          <p class="chapter-standfirst">One calm workspace for identity, conversations, summaries and caregiver follow-up, instead of a photo app, a notes app and a calendar that never quite agree with each other.</p>
+          <button class="pill-button dark" data-auth="sign-up">Try Meco Free</button>
+        </div>
+        <span class="header-blob b1"></span><span class="header-blob b2"></span>
+        <div class="chapter-header-art" aria-hidden="true">
+          <div class="header-art-stack">
+            <span class="header-art-ring"></span>
+            <div class="header-art-card">
+              <div class="header-art-topbar"><span></span><span></span><span></span></div>
+              <div class="voice-art-body">
+                <span class="voice-ripple"></span><span class="voice-ripple two"></span>
+                <div class="voice-bars"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                <div class="voice-art-label"><i></i>Listening, speakers separated live</div>
+              </div>
+            </div>
+            <div class="header-art-chip">Sarah: “Look who's here”</div>
+          </div>
+        </div>
+      </header>
+      <div class="chapter-tabs-row"><nav class="chapter-tabs" aria-label="Jump to a section">
+        <a class="chapter-tab" href="#how-it-works"><span class="chapter-tab-icon">⏱</span>How it works</a>
+        <a class="chapter-tab" href="#connect"><span class="chapter-tab-icon">▦</span>Connect</a>
+        <a class="chapter-tab" href="#structured"><span class="chapter-tab-icon">◎</span>Structure</a>
+        <a class="chapter-tab" href="#languages"><span class="chapter-tab-icon">≋</span>Language</a>
+        <a class="chapter-tab" href="#history"><span class="chapter-tab-icon">▤</span>Visit history</a>
+        <a class="chapter-tab" href="#capture"><span class="chapter-tab-icon">≋</span>How it captures</a>
+      </nav></div>
+      <div class="deckle-divider" aria-hidden="true"></div>
+      <div class="chapter-body">
+        <!-- HOW IT WORKS, interactive orbit -->
+        <section id="how-it-works" class="chapter-section how-it-works-section">
+          <div class="chapter-intro reveal-up">
+            <p class="section-kicker centered">HOW IT WORKS</p>
+            <h2 id="orbit-heading" class="centered" tabindex="-1">Five quiet moments,<br />one continuous circle</h2>
+            <p class="centered-copy">From the first hello to the next visit brief. This is the loop Meco runs in the background. Turn the ring, click a step, or tab through it.</p>
+          </div>
+
+          <div class="orbit reveal-scale" data-orbit aria-describedby="orbit-heading">
+            <div class="orbit-glow" aria-hidden="true"></div>
+            <svg class="orbit-track-svg" viewBox="0 0 440 440" aria-hidden="true" focusable="false">
+              <circle class="orbit-track" cx="220" cy="220" r="200" />
+            </svg>
+            <div class="orbit-hub" aria-hidden="true">
+              <span class="orbit-hub-mark">Meco</span>
+              <span class="orbit-hub-label">the loop</span>
+            </div>
+            <div class="orbit-ring" data-orbit-ring role="tablist" aria-label="Five steps of how Meco works" aria-orientation="horizontal" style="--count:5">
+              <button type="button" class="orbit-node is-active" role="tab" id="orbit-tab-1" aria-selected="true" aria-controls="orbit-panel" tabindex="0" data-orbit-node data-index="0" style="--i:0">
+                <span class="orbit-node-inner"><span class="orbit-node-icon" aria-hidden="true">◎</span><span class="orbit-node-num" aria-hidden="true">01</span></span>
+                <span class="sr-only">Step 1: Understand the person</span>
+              </button>
+              <button type="button" class="orbit-node" role="tab" id="orbit-tab-2" aria-selected="false" aria-controls="orbit-panel" tabindex="-1" data-orbit-node data-index="1" style="--i:1">
+                <span class="orbit-node-inner"><span class="orbit-node-icon" aria-hidden="true">⌁</span><span class="orbit-node-num" aria-hidden="true">02</span></span>
+                <span class="sr-only">Step 2: Notice what actually happens</span>
+              </button>
+              <button type="button" class="orbit-node" role="tab" id="orbit-tab-3" aria-selected="false" aria-controls="orbit-panel" tabindex="-1" data-orbit-node data-index="2" style="--i:2">
+                <span class="orbit-node-inner"><span class="orbit-node-icon" aria-hidden="true">≋</span><span class="orbit-node-num" aria-hidden="true">03</span></span>
+                <span class="sr-only">Step 3: Spot where it got hard</span>
+              </button>
+              <button type="button" class="orbit-node" role="tab" id="orbit-tab-4" aria-selected="false" aria-controls="orbit-panel" tabindex="-1" data-orbit-node data-index="3" style="--i:3">
+                <span class="orbit-node-inner"><span class="orbit-node-icon" aria-hidden="true">✦</span><span class="orbit-node-num" aria-hidden="true">04</span></span>
+                <span class="sr-only">Step 4: Give the smallest useful cue</span>
+              </button>
+              <button type="button" class="orbit-node" role="tab" id="orbit-tab-5" aria-selected="false" aria-controls="orbit-panel" tabindex="-1" data-orbit-node data-index="4" style="--i:4">
+                <span class="orbit-node-inner"><span class="orbit-node-icon" aria-hidden="true">⏱</span><span class="orbit-node-num" aria-hidden="true">05</span></span>
+                <span class="sr-only">Step 5: Learn, then help less</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="orbit-panel-wrap">
+            <div class="orbit-panel" id="orbit-panel" role="tabpanel" aria-labelledby="orbit-tab-1" aria-live="polite" data-orbit-panel>
+              <span class="orbit-panel-step" data-orbit-panel-step>Step 01 / 05</span>
+              <h3 class="orbit-panel-title" data-orbit-panel-title>Understand the person</h3>
+              <svg class="ink-underline" viewBox="0 0 160 12" aria-hidden="true"><path d="M2 8c30-8 100-8 156 0" /></svg>
+              <p class="orbit-panel-body" data-orbit-panel-body>Who visits, what the mornings normally look like, which stories land, and what usually helps when something goes wrong.</p>
+            </div>
+            <button type="button" class="orbit-resume" data-orbit-resume hidden>▸ Resume the orbit</button>
+          </div>
+
+          <!-- Mobile/narrow fallback -->
+          <ol class="orbit-mobile-list" data-orbit-mobile-list aria-label="Five steps of how Meco works"></ol>
+        </section>
+
+        <section id="connect" class="feature-panel green-panel reveal">
+          <div class="feature-copy left-copy reveal-left">
+            <p class="section-kicker">CONNECT</p>
+            <h2>What's holding<br />it together</h2>
+            <p>Four pieces work quietly in the background so the people using Meco never have to think about any of them.</p>
+          </div>
+          <div class="integration-board reveal-right">
+            <div class="integration-row two-col">
+              <div class="integration-card"><h3><span>✦</span> Voice intelligence</h3><div class="logo-tiles"><span class="tile assemblyai"><span class="tile-brand">AssemblyAI</span></span><span class="tile deepgram"><span class="tile-brand">Deepgram</span></span></div><small>AssemblyAI speaker diarisation, live via Deepgram</small></div>
+              <div class="integration-card"><h3><span>▦</span> Secure foundation</h3><div class="logo-tiles"><span class="tile clerk"><span class="tile-brand">Clerk</span></span><span class="tile appwrite"><span class="tile-brand">Appwrite</span></span><span class="tile shield"><span class="tile-icon">✓</span><span class="tile-label">Verified</span></span><span class="tile lock"><span class="tile-icon">⌁</span><span class="tile-label">Encrypted</span></span></div><small>Clerk identity + Appwrite records</small></div>
+            </div>
+            <div class="integration-card full-card"><h3><span>◉</span> AI visit reports</h3><div class="wide-buttons"><span>Gemini structured summary</span><span>Groq fallback</span><span>Caregiver review</span><span>Follow-up prompts</span></div></div>
+            <div class="integration-card community-card"><h3><span>♙</span> Care circle</h3><div class="community-stack"><div class="avatar-stack"><i></i><i></i><i></i><i></i><i></i></div><div><b>Patient + caregivers</b><small>One shared memory workspace</small></div></div></div>
+          </div>
+        </section>
+
+        <section id="structured" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Structured the way a family already thinks</h2>
+            <p>Three simple places to look, each one built around a question a caregiver actually asks.</p>
+          </div>
+          <div class="organize-grid stagger-group">
+            <article class="organize-card lavender reveal-left"><h3>People</h3><p>Trusted faces and relationships</p><div class="organize-mock people-mock"><div><i>S</i><b>Sarah</b><small>Daughter</small><em class="pm-memory">Sunday garden walks</em></div><div><i>J</i><b>James</b><small>Brother</small><em class="pm-memory">Old school stories</em></div></div></article>
+            <article class="organize-card sky reveal-up"><h3>Memory Book</h3><p>Stories, routines and reassuring cues</p><div class="organize-mock folders-mock"><span>▸ Family</span><span>▸ Places</span><span>▸ Daily routines</span><span>▸ Favourite music</span></div></article>
+            <article class="organize-card mint reveal-right"><h3>Visit Reports</h3><p>Structured transcripts and insights</p><div class="organize-mock table-mock"><div><b>31 Jul</b><span>Sarah</span><em>Warm</em></div><div><b>28 Jul</b><span>James</span><em>Calm</em></div><div><b>22 Jul</b><span>Mei</span><em>Joyful</em></div></div></article>
+          </div>
+        </section>
+
+        <section id="languages" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Conversations, in more than one language</h2>
+            <p>Not every visit happens in English. Meco can capture and translate a conversation in the language it's actually spoken in.</p>
+          </div>
+          <div class="deep-grid three-col stagger-group">
+            <div class="deep-card reveal">
+              <span class="line-icon">≋</span>
+              <h3>Pick a speech language</h3>
+              <p>Set the language a visit will be spoken in (English, Mandarin, Tamil or Hindi today) right from the conversation panel, before recording starts.</p>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">⇄</span>
+              <h3>Live translation alongside</h3>
+              <p>Each transcript line can show a translated line beneath it in a second language a caregiver chooses, so a family report stays readable for everyone.</p>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">⌁</span>
+              <h3>Locked in once recording starts</h3>
+              <p>Language choices lock the moment a visit begins recording, so nothing shifts mid-conversation, and unlock again the instant it stops.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="history" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Every visit,<br />still there next month</h2>
+            <p>Nothing in Meco expires or gets summarized away. A visit from three months ago reads exactly like it did the day it was saved.</p>
+          </div>
+          <div class="deep-grid three-col stagger-group">
+            <div class="deep-card reveal">
+              <span class="line-icon">▤</span>
+              <h3>The full transcript stays</h3>
+              <p>Speaker-labelled turns, not just the AI summary, so a caregiver can go back and check what was actually said, not just what Meco thought it meant.</p>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">◴</span>
+              <h3>Searchable by person or date</h3>
+              <p>Visit Reports lists every recorded visit, newest first, filterable by who was there, useful when "didn't we talk about this already?" comes up.</p>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">✓</span>
+              <h3>Deletable, the same way it was saved</h3>
+              <p>A visit transcript can be removed entirely, whenever a caregiver decides it should be, nothing lingers by default that wasn't meant to.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="capture" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Live when it can be,<br />never blocked when it can't</h2>
+            <p>Two separate paths get a visit transcribed, so one missing piece of infrastructure doesn't mean losing the conversation.</p>
+          </div>
+          <div class="deep-grid stagger-group">
+            <div class="deep-card">
+              <span class="line-icon">≋</span>
+              <h3>Live, while the visit happens</h3>
+              <p>Live, while the conversation happens.</p>
+              <ul class="spec-list">
+                <li><b>Route</b><span>Deepgram, proxied through Meco's own server</span></li>
+                <li><b>Output</b><span>Interim text, turn by turn</span></li>
+                <li><b>Naming</b><span>Each turn checked against enrolled voiceprints</span></li>
+              </ul>
+            </div>
+            <div class="deep-card">
+              <span class="line-icon">⇄</span>
+              <h3>Batch, as the fallback</h3>
+              <p>The fallback, when nothing was captured live.</p>
+              <ul class="spec-list">
+                <li><b>Route</b><span>AssemblyAI, uploaded afterwards</span></li>
+                <li><b>Model</b><span>Universal-3.5 Pro</span></li>
+                <li><b>Includes</b><span>Speaker labels</span></li>
+              </ul>
+            </div>
+            <div class="deep-card">
+              <span class="line-icon">✎</span>
+              <h3>Either way, a caregiver corrects it</h3>
+              <p>Automatic labels are a starting point, not the final word.</p>
+              <ul class="spec-list">
+                <li><b>Editable</b><span>Every speaker name</span></li>
+                <li><b>Until</b><span>A report is generated or the visit is saved</span></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <div class="quote-row reverse reveal">
+          <div class="quote-row-who"><span class="quote-row-avatar" style="background:#c7d7ff">N</span><div class="quote-row-rule"></div><b>A son, on Meco</b></div>
+          <p>“One tab for who's visiting, what we talked about, and what to bring up next time.”</p>
+        </div>
+
+        <div class="chapter-cta reveal">
+          <h2>See the whole workspace</h2>
+          <p>People, Memory Book and Visit Reports, connected from the first visit.</p>
+          <button class="pill-button glass large" data-auth="sign-up">Try Meco Free</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ COMPANION ============ -->
+    <div class="landing-page hidden" data-landing-page="companion">
+      <header class="chapter-header companion-chapter reveal">
+        <div class="chapter-header-copy">
+          <p class="chapter-eyebrow">COMPANION</p>
+          <h1>Something to talk to,<br />between visits</h1>
+          <p class="chapter-standfirst">A gentle AI companion for quiet afternoons, and a journal your Meco member can write in themselves, both built around the fact that they might not remember opening either one yesterday.</p>
+          <button class="pill-button dark" data-auth="sign-up">Try Meco Free</button>
+        </div>
+        <span class="header-blob b1"></span><span class="header-blob b2"></span>
+        <div class="chapter-header-art" aria-hidden="true">
+          <div class="header-art-stack">
+            <span class="header-art-ring"></span>
+            <div class="header-art-card">
+              <div class="header-art-topbar"><span></span><span></span><span></span></div>
+              <div class="chat-art-body">
+                <div class="companion-bubble ai">Hello! I remember you mentioning Sarah, your daughter. Would you like to tell me more about her garden?</div>
+                <div class="companion-bubble patient">She planted roses this year.</div>
+                <div class="chat-art-typing"><span></span><span></span><span></span></div>
+              </div>
+            </div>
+            <div class="header-art-chip">Wellbeing check · every conversation</div>
+          </div>
+        </div>
+      </header>
+      <div class="chapter-tabs-row"><nav class="chapter-tabs" aria-label="Jump to a section">
+        <a class="chapter-tab" href="#the-companion"><span class="chapter-tab-icon">♥</span>The companion</a>
+        <a class="chapter-tab" href="#conversation-thread"><span class="chapter-tab-icon">✎</span>A real exchange</a>
+        <a class="chapter-tab" href="#wellbeing"><span class="chapter-tab-icon">◈</span>Wellbeing signals</a>
+        <a class="chapter-tab" href="#journal-mood"><span class="chapter-tab-icon">✎</span>Journal &amp; mood</a>
+        <a class="chapter-tab" href="#legible"><span class="chapter-tab-icon">◍</span>Made to be legible</a>
+      </nav></div>
+      <div class="deckle-divider" aria-hidden="true"></div>
+      <div class="chapter-body">
+        <section id="the-companion" class="feature-panel coral-panel reveal">
+          <div class="feature-visual layered-visual reveal-left">
+            <div class="mock-window back-window">
+              <div class="window-bar"><span></span><span></span><span></span><div class="window-pill">Companion</div></div>
+              <div class="people-list-mini">
+                <div><i class="face-dot face-a"></i><strong>Reminiscence prompt</strong><span>Drawn from Sarah's memory cue</span></div>
+                <div><i class="face-dot face-b"></i><strong>Open-ended question</strong><span>Never a quiz, never a test</span></div>
+                <div><i class="face-dot face-c"></i><strong>Spoken replies</strong><span>Optional, off by default</span></div>
+              </div>
+            </div>
+            <div class="mock-window front-window peach-window">
+              <div class="window-bar"><span></span><span></span><span></span><div class="window-pill">A quiet afternoon</div></div>
+              <div class="recognition-card">
+                <div class="recognition-portrait">♥</div>
+                <h3>Not a substitute for a visit.</h3>
+                <p>It's somewhere to talk when no one else is in the room, and every conversation is there for a caregiver to read afterward, not hidden away.</p>
+                <div class="confidence-row"><span>Every reply reviewable</span><strong>Always</strong></div>
+              </div>
+            </div>
+          </div>
+          <div class="feature-copy reveal-right">
+            <p class="section-kicker">HOW IT TALKS</p>
+            <h2>Reminiscence,<br />not small talk</h2>
+            <p>Meco's companion opens with something real, a memory cue a caregiver already wrote for a trusted person, rather than a generic "how are you today?" It's a known, gentle conversation technique, not an improvised chatbot persona.</p>
+            <div class="icon-feature-grid">
+              <div><span class="line-icon">♥</span><b>Memory-led prompts</b></div>
+              <div><span class="line-icon">≋</span><b>Optional voice</b></div>
+              <div><span class="line-icon">◈</span><b>Wellbeing signal</b></div>
+              <div><span class="line-icon">✳</span><b>Caregiver review</b></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="conversation-thread" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>What a real<br />exchange looks like</h2>
+            <p>Not a script, grounded in a memory cue a caregiver already wrote, one gentle turn at a time.</p>
+          </div>
+          <div class="conversation-thread reveal-up">
+            <div class="companion-bubble ai"><p>Hello! I remember you mentioning Sarah, your daughter. Would you like to tell me more about her garden?</p></div>
+            <div class="companion-bubble patient"><p>She planted roses this year.</p></div>
+            <div class="companion-bubble ai"><p>Roses, that sounds lovely. What colour are they?</p></div>
+            <div class="companion-bubble patient"><p>Pink and yellow. She sent me a photo of them.</p></div>
+            <div class="companion-bubble ai"><p>That sounds like a memory worth keeping. Would you like to write it in your journal?</p></div>
+            <div class="companion-bubble patient"><p>Yes, I think I will.</p></div>
+          </div>
+        </section>
+
+        <section id="wellbeing" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Read by a caregiver,<br />not just logged</h2>
+            <p>Every conversation is there to look back on, with an honest label on what the AI reading of it actually is.</p>
+          </div>
+          <div class="deep-grid stagger-group">
+            <div class="deep-card reveal">
+              <span class="line-icon">◈</span>
+              <h3>A wellbeing trend, not a diagnosis</h3>
+              <p>Each conversation gets a rough, observational engagement score, charted over time. It's built to be honest about its own limits: a page in the app says so directly, in plain words, every time it's shown.</p>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">✳</span>
+              <h3>A flag when something's worth a closer look</h3>
+              <p>If a conversation shows a pattern worth attention, the caregiver dashboard surfaces it, not to alarm, but so a quiet afternoon that felt off doesn't stay invisible.</p>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">✓</span>
+              <h3>Nothing is deleted from the transcript</h3>
+              <p>What was actually said stays visible next to the AI's read of it, so a caregiver can always check the summary against the real conversation.</p>
+            </div>
+          </div>
+          <div class="mini-trend-wrap draw-in">
+            <div class="mini-trend-head"><b>Wellbeing over time</b><span>5 reviewed conversations</span></div>
+            <svg class="trend-chart" viewBox="0 0 460 120" role="img" aria-label="Illustrative wellbeing trend rising gently across five conversations">
+              <line x1="20" y1="20" x2="440" y2="20" class="trend-grid" /><line x1="20" y1="57.5" x2="440" y2="57.5" class="trend-grid" /><line x1="20" y1="95" x2="440" y2="95" class="trend-grid" />
+              <path d="M 20 95 L 135 70 L 250 80 L 365 35 L 440 45" class="trend-line" />
+              <circle class="trend-point" cx="20" cy="95" r="5"></circle>
+              <circle class="trend-point" cx="135" cy="70" r="5"></circle>
+              <circle class="trend-point" cx="250" cy="80" r="5"></circle>
+              <circle class="trend-point" cx="365" cy="35" r="5"></circle>
+              <circle class="trend-point" cx="440" cy="45" r="5"></circle>
+            </svg>
+          </div>
+
+          <div class="companion-disclaimer" style="max-width:900px;margin:24px auto 0">
+            <b>Not a clinical tool.</b>
+            <ul class="spec-list">
+              <li><b>What it is</b><span>An AI's informal read of casual conversation</span></li>
+              <li><b>Not</b><span>A diagnosis, a screening tool, or medical advice</span></li>
+              <li><b>If you are concerned</b><span>Talk to a healthcare professional, not the app</span></li>
+            </ul>
+          </div>
+        </section>
+
+        <section id="journal-mood" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>A journal in their<br />own words</h2>
+            <p>Separate from the companion chat: a simple, rich-text space a Meco member can write in themselves, whenever they want to.</p>
+          </div>
+          <div class="showcase-grid stagger-group">
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#ffe06e"></span>Mood check-in</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><b>◉ Happy</b></div>
+                <div class="showcase-row"><b>◎ Calm</b></div>
+                <div class="showcase-row"><b>◐ Okay</b></div>
+              </div>
+              <p class="showcase-note">Six moods, easy to lightest to hardest.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#c8f0d6"></span>Today's entry</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row tinted" style="--tint:#f4fbf6">Had a lovely visit from Sarah today.</div>
+                <div class="showcase-row tinted" style="--tint:#f4fbf6">We looked at old photos together.</div>
+              </div>
+              <p class="showcase-note">Their own words, not a summary.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#bec8f8"></span>Mood over time</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><span class="mood-dot" style="background:var(--yellow)"></span><span class="mood-dot" style="background:var(--mint)"></span><span class="mood-dot" style="background:var(--mint)"></span><span class="mood-dot" style="background:var(--blue)"></span><span class="mood-dot" style="background:var(--yellow)"></span></div>
+              </div>
+              <p class="showcase-note">A gentle pattern, not a score.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#ffcbb8"></span>Always private</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><b>Only this care circle</b></div>
+                <div class="showcase-row"><b>Never used to train anything</b></div>
+              </div>
+              <p class="showcase-note">Same account isolation as everything else in Meco.</p>
+            </article>
+          </div>
+        </section>
+
+        <div id="legible" class="promo-band reveal" style="background:linear-gradient(160deg,#fff1ec,#ffdccb)">
+          <p class="promo-kicker">MADE TO BE LEGIBLE</p>
+          <h2>Bigger text, bigger buttons,<br />one toggle away</h2>
+          <p>One switch in Settings scales up type and touch targets.</p>
+              <ul class="tag-row"><li>Patient mode</li><li>Companion chat</li><li>Journal</li></ul>
+          <div class="style-picker" role="group" aria-label="Example display settings">
+            <button type="button" class="style-chip" data-mock="Standard size, same as the caregiver dashboard">Standard size</button>
+            <button type="button" class="style-chip selected" data-mock="Elder mode, patient-facing screens only">Elder-friendly, larger text</button>
+          </div>
+          <div class="promo-mock"><i></i>Elder mode, patient-facing screens only</div>
+        </div>
+
+        <div class="quote-row reveal">
+          <div class="quote-row-who"><span class="quote-row-avatar" style="background:#ffcbb8">L</span><div class="quote-row-rule"></div><b>A granddaughter, on Meco</b></div>
+          <p>“Knowing there's a transcript, not just a summary, is the reason I trust it at all.”</p>
+        </div>
+
+        <div class="chapter-cta reveal">
+          <h2>Give them something to open</h2>
+          <p>A quiet chat and a journal, ready before the first visit even happens.</p>
+          <button class="pill-button glass large" data-auth="sign-up">Try Meco Free</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ CAREGIVER ============ -->
+    <div class="landing-page hidden" data-landing-page="caregiver">
+      <header class="chapter-header caregiver-chapter reveal">
+        <div class="chapter-header-copy">
+          <p class="chapter-eyebrow">CAREGIVER</p>
+          <h1>Care planning that<br />doesn't feel like admin</h1>
+          <p class="chapter-standfirst">Keep people, visits, notes and reminders close to the moments that created them, so the next visit starts with context instead of a blank page.</p>
+          <button class="pill-button dark" data-auth="sign-up">Try Meco Free</button>
+        </div>
+        <span class="header-blob b1"></span><span class="header-blob b2"></span>
+        <div class="chapter-header-art" aria-hidden="true">
+          <div class="header-art-stack">
+            <div class="header-art-card">
+              <div class="header-art-topbar"><span></span><span></span><span></span></div>
+              <div class="cal-art-body">
+                <div class="cal-grid">
+                  <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                  <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                  <span></span><span></span><span></span><span class="cal-active"></span><span></span><span></span><span></span>
+                  <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="cal-reminder"><b>12:30</b>Sarah visits</div>
+              </div>
+            </div>
+            <div class="header-art-chip">Synced to Google Calendar</div>
+          </div>
+        </div>
+      </header>
+      <div class="chapter-tabs-row"><nav class="chapter-tabs" aria-label="Jump to a section">
+        <a class="chapter-tab" href="#day-glance"><span class="chapter-tab-icon">▦</span>A day at a glance</a>
+        <a class="chapter-tab" href="#sync"><span class="chapter-tab-icon">◴</span>Calendar sync</a>
+        <a class="chapter-tab" href="#repeats"><span class="chapter-tab-icon">↻</span>Repeat visits</a>
+        <a class="chapter-tab" href="#story"><span class="chapter-tab-icon">▤</span>The story</a>
+        <a class="chapter-tab" href="#caregiver-faq"><span class="chapter-tab-icon">◌</span>Questions</a>
+      </nav></div>
+      <div class="deckle-divider" aria-hidden="true"></div>
+      <div class="chapter-body">
+        <section id="day-glance" class="feature-panel yellow-panel reveal">
+          <div class="feature-copy left-copy reveal-left">
+            <p class="section-kicker">SUPPORT</p>
+            <h2>A day, at<br />a glance</h2>
+            <p>Everything a caregiver needs before a visit starts, in one place instead of four different apps.</p>
+          </div>
+          <div class="care-grid reveal-right">
+            <article class="care-tile"><h3><span>▦</span> Visits</h3><div class="date-block"><strong>31 Jul</strong><b>Today</b><small>Friday</small></div></article>
+            <article class="care-tile"><h3><span>✓</span> Follow-ups</h3><ul class="check-list"><li class="done">Review Sarah's visit</li><li>Print family photo</li><li>Add garden memory</li></ul><button class="mini-action">＋ Add note</button></article>
+            <article class="care-tile"><h3><span>▤</span> Memory note</h3><div class="note-preview"><b>Today</b><p>Sarah mentioned the old blue album and the patient smiled when the garden was discussed.</p></div></article>
+            <article class="care-tile"><h3><span>◴</span> Reminders</h3><div class="reminders"><p><b>12:30</b> Sarah visits</p><p><b>17:10</b> Review Meco report</p></div></article>
+          </div>
+        </section>
+
+        <section id="week-view" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>A week,<br />laid out plainly</h2>
+            <p>Visits and reminders sit on the day they actually happen, nothing to mentally translate from a list into a calendar.</p>
+          </div>
+          <div class="week-planner reveal-up">
+            <div class="week-planner-day"><b>Mon</b></div>
+            <div class="week-planner-day"><b>Tue</b><span class="week-planner-chip visit">Sarah · 12:30</span></div>
+            <div class="week-planner-day today"><b>Wed</b><span class="week-planner-chip visit">James · 15:00</span><span class="week-planner-chip reminder">Review report</span></div>
+            <div class="week-planner-day"><b>Thu</b></div>
+            <div class="week-planner-day"><b>Fri</b><span class="week-planner-chip visit">Mei · 10:00</span></div>
+            <div class="week-planner-day"><b>Sat</b></div>
+            <div class="week-planner-day"><b>Sun</b><span class="week-planner-chip visit">Sarah · Lunch</span><span class="week-planner-chip reminder">Medication check</span></div>
+          </div>
+        </section>
+
+        <section id="sync" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Visits and reminders, synced</h2>
+            <p>A visit scheduled in Meco doesn't need to be typed a second time somewhere else.</p>
+          </div>
+          <div class="deep-grid stagger-group">
+            <div class="deep-card reveal">
+              <span class="line-icon">◴</span>
+              <h3>Two-way Google Calendar sync</h3>
+              <p>Connect a Google account once. After that it stays in sync on its own.</p>
+              <ul class="spec-list">
+                <li><b>Covers</b><span>Visits, reminders, weekly repeats</span></li>
+                <li><b>Direction</b><span>Both, edit in Meco or in Google Calendar</span></li>
+              </ul>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">✓</span>
+              <h3>Follow-ups that don't get lost</h3>
+              <p>A note from a visit report can become a follow-up reminder with one click, so an insight from Tuesday's transcript doesn't quietly disappear.</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="promo-band reveal" style="background:linear-gradient(160deg,#fff8e0,#ffedad)">
+          <p class="promo-kicker">CONNECTED TO YOUR CALENDAR</p>
+          <h2>Stay on schedule,<br />without a second calendar</h2>
+          <p>Meco checks Google Calendar roughly every 90 seconds in both directions, move a visit on your phone's calendar app and Meco already knows by the time you open it.</p>
+          <div class="promo-mock"><i></i>12:30 · Sarah visits, synced from Google Calendar</div>
+        </div>
+
+        <section id="repeats" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Set it once for<br />the visits that repeat</h2>
+            <p>Sunday lunch, the Tuesday carer, Friday physio, most visits aren't one-offs, so Meco doesn't make you re-enter them like they are.</p>
+          </div>
+          <div class="showcase-grid stagger-group">
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#c98f12"></span>Pick the days</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><b>Mon</b><b>Wed</b><b>Fri</b></div>
+              </div>
+              <p class="showcase-note">Any combination, not just "every day."</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#5d80e6"></span>Edit one, or all</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><b>Change a single visit</b></div>
+                <div class="showcase-row"><b>Or the whole series</b></div>
+              </div>
+              <p class="showcase-note">A single reschedule doesn't break the pattern.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#3f9c5e"></span>Reminders repeat too</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><span class="showcase-check done"></span><span>Weekly medication check</span></div>
+              </div>
+              <p class="showcase-note">The same weekly-repeat rule as visits.</p>
+            </article>
+          </div>
+        </section>
+
+        <div id="story" class="editorial-row reveal">
+          <div class="editorial-media yellow-media"><div class="visit-sheet"><small>VISIT REPORT</small><h3>Sunday with Sarah</h3><p>They spoke about the garden, family photographs and a favourite blue dress.</p><ul><li>Recognized Sarah's name</li><li>Smiled during garden memories</li><li>Asked to see the photo album</li></ul></div></div>
+          <div class="editorial-copy"><h2>Keep every visit<br />close to the story</h2><p>Speaker-labelled transcripts and reviewed summaries stay linked to the person, relationship and memories that matter.</p><ul class="clean-list"><li>Multi-speaker transcription</li><li>Structured AI summary</li></ul></div>
+        </div>
+
+        <section id="caregiver-faq" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Questions caregivers<br />actually ask</h2>
+          </div>
+          <div class="deep-grid stagger-group">
+            <div class="deep-card reveal">
+              <h3>What if a visit happens and I forget to check the app?</h3>
+              <p>It's still there. Nothing about a recorded visit expires: the transcript and report wait in Visit Reports for whenever there's time to look.</p>
+            </div>
+            <div class="deep-card reveal">
+              <h3>Can more than one family member get the reminders?</h3>
+              <p>Today, one signed-in account holds one care circle's calendar and reminders. Sharing that same view across multiple caregivers is on the roadmap.</p>
+            </div>
+            <div class="deep-card reveal">
+              <h3>What happens if I disconnect Google Calendar?</h3>
+              <p>Visits and reminders already in Meco stay exactly where they are, disconnecting just stops the two-way sync going forward.</p>
+            </div>
+            <div class="deep-card reveal">
+              <h3>Does a reminder ever get marked done automatically?</h3>
+              <p>No. A caregiver checks it off, the same way they'd cross something off a paper list. Meco never assumes a task happened.</p>
+            </div>
+          </div>
+        </section>
+
+        <blockquote class="testimonial reveal"><span class="quote-avatar coral">A</span><p>“Meco gives our family one place to remember what helped, what made Mum smile, and what we should bring up next time.”</p><cite>A caregiver using Meco</cite></blockquote>
+
+        <div class="chapter-cta reveal">
+          <h2>Plan the next visit in minutes</h2>
+          <p>Schedule it, get reminded, and walk in already knowing what matters.</p>
+          <button class="pill-button glass large" data-auth="sign-up">Try Meco Free</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PRIVACY ============ -->
+    <div class="landing-page hidden" data-landing-page="privacy">
+      <header class="chapter-header privacy-chapter reveal">
+        <div class="chapter-header-copy">
+          <p class="chapter-eyebrow">PRIVACY</p>
+          <h1>Help when you need it,<br />privacy where it matters</h1>
+          <p class="chapter-standfirst">Face matching runs in the browser. API keys stay on the server. Your account protects each sign-in and Appwrite stores its records separately. Here's exactly what that means.</p>
+          <button class="pill-button glass" data-auth="sign-up">Start with Meco</button>
+        </div>
+        <span class="header-blob b1"></span><span class="header-blob b2"></span>
+        <div class="chapter-header-art" aria-hidden="true">
+          <div class="header-art-stack">
+            <span class="header-art-ring"></span>
+            <div class="header-art-card">
+              <div class="lock-art-body">
+                <div class="lock-ring"></div>
+                <div class="lock-ring ring-two"></div>
+                <div class="lock-icon"><div class="lock-shackle"></div><div class="lock-body"></div></div>
+              </div>
+            </div>
+            <div class="header-art-chip">Encrypted connection</div>
+          </div>
+        </div>
+      </header>
+      <div class="chapter-tabs-row"><nav class="chapter-tabs" aria-label="Jump to a section">
+        <a class="chapter-tab" href="#leaves-browser"><span class="chapter-tab-icon">◎</span>What leaves the browser</a>
+        <a class="chapter-tab" href="#quick-reference"><span class="chapter-tab-icon">◈</span>At a glance</a>
+        <a class="chapter-tab" href="#in-control"><span class="chapter-tab-icon">✓</span>You're in control</a>
+        <a class="chapter-tab" href="#consent"><span class="chapter-tab-icon">◌</span>About consent</a>
+      </nav></div>
+      <div class="deckle-divider" aria-hidden="true"></div>
+      <div class="chapter-body">
+        <section id="leaves-browser" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>What actually leaves the browser</h2>
+            <p>Less than most apps like this. Here's the honest breakdown, piece by piece.</p>
+          </div>
+          <div class="deep-grid stagger-group">
+            <div class="deep-card reveal">
+              <span class="line-icon">◎</span>
+              <h3>Face matching stays on-device</h3>
+              <p>Enrolment and recognition both run in the caregiver's own browser.</p>
+              <ul class="spec-list">
+                <li><b>Engine</b><span>face-api.js, client side</span></li>
+                <li><b>Saved</b><span>A numerical descriptor and a small thumbnail</span></li>
+                <li><b>Not saved</b><span>A photo library, or any raw video</span></li>
+              </ul>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">≋</span>
+              <h3>Voice recognition runs locally too</h3>
+              <p>Speaker voiceprints are computed by a small local server on the caregiver's own machine. They never travel to a third party for identification.</p>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">⌁</span>
+              <h3>Provider keys never reach the browser</h3>
+              <p>Every provider call is proxied through Meco's own server.</p>
+              <ul class="spec-list">
+                <li><b>Covers</b><span>AssemblyAI, Deepgram, Gemini, Google Calendar</span></li>
+                <li><b>Credentials</b><span>Never present in anything the browser can see</span></li>
+              </ul>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">✓</span>
+              <h3>Each account is its own space</h3>
+              <p>Clerk verifies who's signed in on every request. Appwrite stores that account's people, visits and transcripts separately from every other account. Nothing is shared by default.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="quick-reference" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>At a glance</h2>
+          </div>
+          <div class="showcase-grid stagger-group">
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#3f9c5e"></span>Stays on-device</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><b>Face matching</b></div>
+                <div class="showcase-row"><b>Voice matching</b></div>
+              </div>
+              <p class="showcase-note">Computed locally, never uploaded to identify anyone.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#5d80e6"></span>Proxied, key hidden</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><b>AssemblyAI</b></div>
+                <div class="showcase-row"><b>Deepgram · Gemini</b></div>
+              </div>
+              <p class="showcase-note">Every provider call routes through Meco's server.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#c98f12"></span>Account-scoped</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><b>People · visits</b></div>
+                <div class="showcase-row"><b>Journal · chats</b></div>
+              </div>
+              <p class="showcase-note">Isolated per Clerk-verified account, nothing shared.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#d9694f"></span>Deletable, always</div>
+              <div class="showcase-card-body">
+                <div class="showcase-row"><b>Enrollments</b></div>
+                <div class="showcase-row"><b>Transcripts</b></div>
+              </div>
+              <p class="showcase-note">Removed the same way they were saved.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="in-control" class="chapter-section reveal-up">
+          <div class="privacy-banner">
+            <div><h2>You're in<br />control</h2><p>Everything enrolled stays under the caregiver's control.</p>
+              <ul class="spec-list">
+                <li><b>Adjust</b><span>How strict face and voice matching are</span></li>
+                <li><b>Re-enroll</b><span>A trusted person, at any time</span></li>
+                <li><b>Remove</b><span>An enrollment, or a transcript</span></li>
+              </ul></div>
+            <div class="privacy-device"><div class="privacy-screen"><small>PRIVATE CARE SPACE</small><h3>Sarah's visit</h3><div class="privacy-lines"><span></span><span></span><span></span><span></span></div><div class="privacy-badge">Encrypted connection</div></div></div>
+          </div>
+        </section>
+
+        <section id="consent" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>About consent</h2>
+            <p>Face descriptors and voiceprints are biometric data belonging to the person being enrolled, not the caregiver doing the enrolling. Meco doesn't paper over that with a checkbox.</p>
+          </div>
+          <div class="deep-grid stagger-group">
+            <div class="deep-card reveal">
+              <span class="line-icon">◌</span>
+              <h3>Ask before enrolling someone</h3>
+              <p>Capture a face or voice only with that person's knowledge, or on behalf of someone whose care you are legally responsible for. Meco cannot verify this for you.</p>
+            </div>
+            <div class="deep-card reveal">
+              <span class="line-icon">⌁</span>
+              <h3>Decide retention before you record</h3>
+              <p>Retention is a family decision, not one Meco makes for you. Everything can be removed; nothing removes itself.</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="quote-row reveal">
+          <div class="quote-row-who"><span class="quote-row-avatar" style="background:#8cdea8">P</span><div class="quote-row-rule"></div><b>A caregiver, on Meco</b></div>
+          <p>“I could actually explain to the family what leaves the house and what doesn't, that mattered more than I expected.”</p>
+        </div>
+
+        <div class="chapter-cta reveal">
+          <h2>Read the code, not just the promise</h2>
+          <p>Meco is built with no hidden npm dependencies, every integration is a plain, auditable request.</p>
+          <button class="pill-button glass large" data-auth="sign-up">Try Meco Free</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PRICING ============ -->
+    <div class="landing-page hidden" data-landing-page="pricing">
+      <header class="chapter-header pricing-chapter reveal">
+        <div class="chapter-header-copy">
+          <p class="chapter-eyebrow">PRICING</p>
+          <h1>Begin with one<br />care circle</h1>
+          <p class="chapter-standfirst">Use the full local experience, then connect your own Clerk, Appwrite, AssemblyAI and Gemini accounts when you're ready for real, ongoing use.</p>
+          <button class="pill-button dark" data-auth="sign-up">Try Meco Free</button>
+        </div>
+        <span class="header-blob b1"></span><span class="header-blob b2"></span>
+        <div class="chapter-header-art" aria-hidden="true">
+          <div class="header-art-stack">
+            <div class="header-art-card">
+              <div class="seal-art-body">
+                <span class="seal-spark s1"></span><span class="seal-spark s2"></span><span class="seal-spark s3"></span><span class="seal-spark s4"></span>
+                <div class="seal-wrap">
+                  <div class="seal-ring"></div>
+                  <div class="seal-badge"><strong>$0</strong><small>to start</small></div>
+                  <div class="seal-check">✓</div>
+                </div>
+              </div>
+            </div>
+            <div class="header-art-chip">No app fee, ever</div>
+          </div>
+        </div>
+      </header>
+      <div class="chapter-tabs-row"><nav class="chapter-tabs" aria-label="Jump to a section">
+        <a class="chapter-tab" href="#starter"><span class="chapter-tab-icon">✓</span>Starter</a>
+        <a class="chapter-tab" href="#your-own-account"><span class="chapter-tab-icon">▦</span>What you connect</a>
+        <a class="chapter-tab" href="#why-free"><span class="chapter-tab-icon">✓</span>Why free</a>
+        <a class="chapter-tab" href="#estimate"><span class="chapter-tab-icon">▦</span>A rough estimate</a>
+        <a class="chapter-tab" href="#faq"><span class="chapter-tab-icon">◌</span>Questions</a>
+      </nav></div>
+      <div class="deckle-divider" aria-hidden="true"></div>
+      <div class="chapter-body">
+        <section id="starter" class="chapter-section reveal-up">
+          <div class="price-card" style="max-width:520px;margin:0 auto">
+            <span class="price-label">MECO STARTER</span>
+            <h3>Free to build</h3>
+            <p class="price">$0 <small>app fee</small></p>
+            <ul>
+              <li>Caregiver and patient modes</li>
+              <li>Trusted face enrollment</li>
+              <li>Speaker-labelled visits</li>
+              <li>AI caregiver reports</li>
+              <li>Visits, reminders and calendar sync</li>
+            </ul>
+            <button class="pill-button dark wide" data-auth="sign-up">Try Meco Free</button>
+            <small>Third-party API usage is billed by your providers.</small>
+          </div>
+        </section>
+
+        <section id="your-own-account" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>What needs your own account</h2>
+            <p>Meco itself has no subscription. A handful of providers do the heavy lifting behind it, and each one has a free tier that comfortably covers a single care circle.</p>
+          </div>
+          <div class="deep-grid three-col stagger-group">
+            <div class="deep-card reveal">
+              <h3>Identity &amp; storage</h3>
+              <p>Clerk (sign-in) and Appwrite (records) both offer a free tier that's built for exactly this scale, one account, one family.</p>
+            </div>
+            <div class="deep-card reveal">
+              <h3>Transcription</h3>
+              <p>AssemblyAI and Deepgram bill by the minute of audio processed. Costs only start to matter once you're recording many hours of conversation.</p>
+            </div>
+            <div class="deep-card reveal">
+              <h3>AI summaries</h3>
+              <p>Gemini and Groq both offer free-tier access generous enough for regular visit reports.</p>
+            </div>
+          </div>
+        </section>
+
+        <div id="why-free" class="promo-band reveal" style="background:linear-gradient(160deg,#eef3ff,#e2ebff)">
+          <p class="promo-kicker">WHY FREE</p>
+          <h2>Meco doesn't sell<br />what it collects</h2>
+          <p>There's no ad model here, and no plan to add one: the app itself has no subscription because the thing it's asking you to trust it with (a face, a voice, a visit) isn't something to monetize twice.</p>
+          <div class="promo-mock"><i></i>$0 app fee, no tier to upgrade to</div>
+        </div>
+
+        <section id="estimate" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>What one care circle<br />actually costs</h2>
+            <p>A rough shape, not a quote, provider pricing changes, and it depends how many visits get recorded. This is what a typical month looks like for one family.</p>
+          </div>
+          <div class="showcase-grid stagger-group">
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#3f9c5e"></span>Meco itself</div>
+              <div class="showcase-card-body"><div class="showcase-row"><b>$0</b></div></div>
+              <p class="showcase-note">No app fee, no tier, ever.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#5d80e6"></span>Clerk + Appwrite</div>
+              <div class="showcase-card-body"><div class="showcase-row"><b>$0</b></div></div>
+              <p class="showcase-note">Comfortably inside both free tiers at this scale.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#c98f12"></span>Transcription</div>
+              <div class="showcase-card-body"><div class="showcase-row"><b>A few dollars</b></div></div>
+              <p class="showcase-note">Billed per minute of audio, by AssemblyAI or Deepgram.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#d9694f"></span>AI reports</div>
+              <div class="showcase-card-body"><div class="showcase-row"><b>$0</b></div></div>
+              <p class="showcase-note">Gemini's free tier covers regular visit reports.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="faq" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Common questions</h2>
+          </div>
+          <div class="deep-grid stagger-group">
+            <div class="deep-card reveal">
+              <h3>Do I need to be technical to set this up?</h3>
+              <p>You'll need to create accounts with the providers above and paste a few keys into a settings file. There's no coding required, but it isn't yet a one-click signup.</p>
+            </div>
+            <div class="deep-card reveal">
+              <h3>Can more than one caregiver share an account?</h3>
+              <p>Today, one signed-in account holds one care circle. Sharing that same view across multiple family members is on the roadmap.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ============ CLINICIANS ============ -->
+    <div class="landing-page hidden" data-landing-page="clinicians">
+      <header class="chapter-header clinicians-chapter reveal">
+        <div class="chapter-header-copy">
+          <p class="chapter-eyebrow">FOR CLINICIANS</p>
+          <h1>A structured record<br />of psychosocial<br />engagement</h1>
+          <p class="chapter-standfirst">Design rationale, grounding in established non-pharmacological practice, and the explicit limits on what Meco's outputs may be used for.</p>
+          <ul class="tag-row"><li>Observational</li><li class="no">Not diagnostic</li><li class="no">Not validated</li><li>Caregiver-reviewed</li></ul>
+        </div>
+        <span class="header-blob b1"></span><span class="header-blob b2"></span>
+        <div class="chapter-header-art" aria-hidden="true">
+          <div class="header-art-stack">
+            <span class="header-art-ring"></span>
+            <div class="header-art-card">
+              <div class="clin-art-body">
+                <div class="clin-art-row"><span class="clin-art-dot"></span>Reminiscence-based stimulus</div>
+                <div class="clin-art-row"><span class="clin-art-dot"></span>Longitudinal visit record</div>
+                <div class="clin-art-row"><span class="clin-art-dot"></span>Non-diagnostic instrument</div>
+              </div>
+            </div>
+            <div class="header-art-chip">Observational, not diagnostic</div>
+          </div>
+        </div>
+      </header>
+      <div class="chapter-tabs-row no-print"><nav class="chapter-tabs" aria-label="Jump to a section">
+        <a class="chapter-tab" href="#clin-what"><span class="chapter-tab-icon">◎</span>Mechanism of action</a>
+        <a class="chapter-tab" href="#clin-basis"><span class="chapter-tab-icon">◈</span>Theoretical basis</a>
+        <a class="chapter-tab" href="#clin-not"><span class="chapter-tab-icon">⌁</span>Scope &amp; limitations</a>
+        <a class="chapter-tab" href="#clin-data"><span class="chapter-tab-icon">✓</span>Data governance</a>
+      </nav></div>
+      <div class="deckle-divider no-print" aria-hidden="true"></div>
+      <div class="chapter-body">
+        <section id="clin-what" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Mechanism of action</h2>
+            <p>Three discrete functions, each targeting a specific point of friction in caregiving: the moment of recognition, the documentation of a visit, and the interval between visits.</p>
+          </div>
+          <div class="deep-grid three-col stagger-group">
+            <div class="deep-card">
+              <span class="line-icon">◎</span>
+              <h3>Biometric identification with caregiver-authored disclosure</h3>
+              <p>Names a visitor before the moment of unfamiliarity becomes distressing.</p>
+              <ul class="spec-list">
+                <li><b>Method</b><span>128-point facial descriptor, matched on device</span></li>
+                <li><b>Inference</b><span>Local only, no cloud call</span></li>
+                <li><b>Output</b><span>A short spoken line the caregiver wrote</span></li>
+              </ul>
+            </div>
+            <div class="deep-card">
+              <span class="line-icon">▤</span>
+              <h3>Structured documentation of visit content</h3>
+              <p>Turns a visit into a record a caregiver or clinician can actually read back.</p>
+              <ul class="spec-list">
+                <li><b>Capture</b><span>Multi-speaker diarised transcript</span></li>
+                <li><b>Summary</b><span>Affect, engagement, themes, follow-ups</span></li>
+                <li><b>Review</b><span>Caregiver edits before it is saved</span></li>
+              </ul>
+            </div>
+            <div class="deep-card">
+              <span class="line-icon">♥</span>
+              <h3>Interstitial psychosocial engagement</h3>
+              <p>Something to do between visits, with a record the caregiver can look back on.</p>
+              <ul class="spec-list">
+                <li><b>Prompts</b><span>Drawn from caregiver-written memory cues</span></li>
+                <li><b>Journal</b><span>Self-directed, with mood tracking</span></li>
+                <li><b>Retention</b><span>Full transcript kept for review</span></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="clin-basis" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Theoretical basis</h2>
+            <p>Nothing here is a novel intervention. Each item applies an established non-pharmacological approach, named plainly rather than rebranded.</p>
+          </div>
+          <div class="deep-grid stagger-group">
+            <div class="deep-card">
+              <h3>Reminiscence therapy &amp; person-centered care</h3>
+              <ul class="spec-list">
+                <li><b>Approach</b><span>Reminiscence therapy, person-centred care</span></li>
+                <li><b>Source</b><span>Autobiographical cues the caregiver wrote</span></li>
+                <li><b>Avoids</b><span>Open-ended or test-like questioning</span></li>
+              </ul>
+            </div>
+            <div class="deep-card">
+              <h3>Reality orientation</h3>
+              <ul class="spec-list">
+                <li><b>Approach</b><span>Reality orientation therapy (ROT)</span></li>
+                <li><b>Shows</b><span>Date, greeting, next scheduled visit</span></li>
+                <li><b>Form</b><span>One screen, not a wall board</span></li>
+              </ul>
+            </div>
+            <div class="deep-card">
+              <h3>Music-based recall stimulus</h3>
+              <ul class="spec-list">
+                <li><b>Approach</b><span>Music &amp; Memory model</span></li>
+                <li><b>Input</b><span>A recording tied to one person</span></li>
+                <li><b>Purpose</b><span>Low-risk stimulus for mood and recall</span></li>
+              </ul>
+            </div>
+            <div class="deep-card">
+              <h3>Caregiver-mediated oversight</h3>
+              <ul class="spec-list">
+                <li><b>Editable</b><span>Greetings, summaries, replies</span></li>
+                <li><b>Autonomy</b><span>None, nothing acts on its own</span></li>
+                <li><b>Review</b><span>Structural, not an optional setting</span></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <div id="clin-not" class="promo-band dark reveal">
+          <p class="promo-kicker">SCOPE &amp; LIMITATIONS</p>
+          <h2>Not a diagnostic instrument.<br />Not a substitute for clinical judgment.</h2>
+          <p>The wellbeing signal is a model-generated pattern for a caregiver to notice. It is not a score, and not a measure.</p>
+          <ul class="spec-list">
+            <li><b>Validated against</b><span>Nothing. Not GDS, NPI or MMSE</span></li>
+            <li><b>Screening tool</b><span>No</span></li>
+            <li><b>Medical advice</b><span>No</span></li>
+            <li><b>On every report</b><span>This disclosure, verbatim</span></li>
+            <li><b>If concern is raised</b><span>Meco points to a clinician, not to more Meco</span></li>
+          </ul>
+          <div class="promo-mock"><i></i>Presented unedited on every AI-generated report</div>
+        </div>
+
+        <section id="clin-data" class="chapter-section reveal-up">
+          <div class="chapter-intro">
+            <h2>Data governance &amp; informed consent</h2>
+            <p>Abbreviated for this overview: the complete technical disclosure is available in the <a href="/privacy" data-landing-nav="privacy" style="text-decoration:underline">Privacy chapter</a>.</p>
+          </div>
+          <div class="showcase-grid stagger-group">
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#2f6f6a"></span>Informed consent, procedurally enforced</div>
+              <div class="showcase-card-body"><div class="showcase-row"><b>Not a footnote disclosure</b></div></div>
+              <p class="showcase-note">Biometric enrollment is gated behind a mandatory consent interstitial that names the specific data captured, presented at the point of capture.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#3f9c5e"></span>On-device biometric inference</div>
+              <div class="showcase-card-body"><div class="showcase-row"><b>Local computation only</b></div></div>
+              <p class="showcase-note">Facial and voice descriptors are computed client-side; raw biometric data is not transmitted to a third party for identification.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#c98f12"></span>Right of erasure</div>
+              <div class="showcase-card-body"><div class="showcase-row"><b>Deletion parity with capture</b></div></div>
+              <p class="showcase-note">Any enrolled record (biometric descriptor, transcript, or journal entry) is deletable on request; no indefinite retention by default.</p>
+            </article>
+            <article class="showcase-card">
+              <div class="showcase-card-head"><span class="swatch" style="background:#d9694f"></span>No secondary data use</div>
+              <div class="showcase-card-body"><div class="showcase-row"><b>No advertising, no model training</b></div></div>
+              <p class="showcase-note">Revenue is not derived from data generated by a clinically vulnerable population.</p>
+            </article>
+          </div>
+        </section>
+
+        <div class="chapter-cta reveal no-print">
+          <h2>Questions best directed to us</h2>
+          <p>We would rather answer these directly than leave them implicit.</p>
+          <ul class="tag-row"><li>Data retention schedules</li><li>Consent where capacity is lacking</li><li>Pilot deployment</li></ul>
+          <button class="pill-button glass large" data-auth="sign-up">Try Meco Free</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PRIVACY POLICY ============ -->
+    <div class="landing-page hidden" data-landing-page="impact">
+      <header class="chapter-header reveal">
+        <div class="chapter-header-copy">
+          <p class="chapter-eyebrow">THE PROBLEM</p>
+          <h1>Dementia care<br />happens at home.</h1>
+          <p class="chapter-standfirst">Not in clinics. At breakfast, during showers, on walks, while taking medication, and in thousands of ordinary moments that no appointment ever sees. These are the numbers that shape what Meco is for.</p>
+        </div>
+        <span class="header-blob b1"></span><span class="header-blob b2"></span>
+      </header>
+
+      <section class="evidence-section reveal-up">
+        <p class="section-kicker">SINGAPORE</p>
+        <h2 class="display-heading">A doubling, within the decade</h2>
+        <div data-evidence="impact-singapore"></div>
+        <p class="evidence-note">Every figure on this page links to its source. Meco does not publish numbers it cannot trace.</p>
+      </section>
+
+      <section class="evidence-section reveal-up">
+        <p class="section-kicker">WHAT CARE ACTUALLY COSTS</p>
+        <h2 class="display-heading">217 hours a month</h2>
+        <p class="centered-copy">Roughly seven hours every day, on top of paid work, and everything else a family carries.</p>
+        <div data-evidence="care-load"></div>
+      </section>
+
+      <section class="evidence-section reveal-up">
+        <p class="section-kicker">WHAT MECO DOES ABOUT IT</p>
+        <h2 class="display-heading">Problem, then response</h2>
+        <div class="evidence-grid" data-evidence="problem-response"></div>
+      </section>
+
+      <section class="evidence-section reveal-up">
+        <p class="section-kicker">GLOBALLY</p>
+        <h2 class="display-heading">The wider picture</h2>
+        <div data-evidence="impact-global"></div>
+      </section>
+    </div>
+
+    <div class="landing-page hidden" data-landing-page="science">
+      <header class="chapter-header reveal">
+        <div class="chapter-header-copy">
+          <p class="chapter-eyebrow">THE EVIDENCE</p>
+          <h1>What we build on,<br />and what we<br />haven't proven.</h1>
+          <p class="chapter-standfirst">Meco is designed around established, evidence-informed approaches to dementia support. It has not itself been clinically tested. This page is where that distinction is made plainly rather than blurred.</p>
+        </div>
+        <span class="header-blob b1"></span><span class="header-blob b2"></span>
+      </header>
+
+      <section class="evidence-section reveal-up">
+        <p class="section-kicker">EVIDENCE-INFORMED</p>
+        <h2 class="display-heading">Cognitive rehabilitation</h2>
+        <p class="centered-copy">A 2023 Cochrane systematic review examined cognitive rehabilitation for people with mild-to-moderate dementia: an approach built around personally meaningful everyday goals rather than abstract brain training.</p>
+        <div data-evidence="cochrane"></div>
+        <div class="evidence-callout">
+          <h3>What this does and does not mean</h3>
+          <p><strong>It means:</strong> the review found cognitive rehabilitation helped people improve at the everyday activities the intervention specifically targeted. That finding shapes Meco's entire design philosophy, support real, personally chosen goals, and preserve independence wherever possible.</p>
+          <p><strong>It does not mean:</strong> that Meco improves independence. Meco is not the intervention that was studied, and has not been trialled. Any claim otherwise would be unearned.</p>
+        </div>
+      </section>
+
+      <section class="evidence-section reveal-up">
+        <p class="section-kicker">HONESTY</p>
+        <h2 class="display-heading">Evidence-informed vs experimental</h2>
+        <div class="split-evidence">
+          <div class="split-col">
+            <h3>Evidence-informed</h3>
+            <p class="split-sub">Design shaped by established practice.</p>
+            <ul>
+              <li>Personalised cognitive rehabilitation</li>
+              <li>Cognitive stimulation</li>
+              <li>Reminiscence</li>
+              <li>Person-centred care</li>
+              <li>Structured routines</li>
+              <li>Dementia-friendly communication</li>
+            </ul>
+          </div>
+          <div class="split-col split-experimental">
+            <h3>Experimental</h3>
+            <p class="split-sub">Our own additions. Unvalidated. Labelled as such in the product.</p>
+            <ul>
+              <li>Adaptive cue selection</li>
+              <li>AI context reconstruction</li>
+              <li>Behavioural pattern discovery</li>
+              <li>Assistance prediction</li>
+              <li>Personalised functional modelling</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="evidence-section reveal-up">
+        <p class="section-kicker">RESEARCH-READY</p>
+        <h2 class="display-heading">What Meco will measure</h2>
+        <p class="centered-copy">We have no outcome data, so we publish none. Instead, here is exactly what we would measure in a real evaluation.</p>
+        <div class="measure-list" data-evidence="will-measure"></div>
+      </section>
+
+      <section class="evidence-section reveal-up">
+        <p class="section-kicker">BOUNDARIES</p>
+        <h2 class="display-heading">What Meco is not</h2>
+        <div class="evidence-callout boundary-callout">
+          <p>Meco is an assistive and caregiving support platform. It does <strong>not</strong>:</p>
+          <ul class="tag-row">
+            <li class="no">Diagnose dementia</li>
+            <li class="no">Stage dementia</li>
+            <li class="no">Prescribe or alter treatment</li>
+            <li class="no">Replace a doctor</li>
+            <li class="no">Read a sudden change as a diagnosis</li>
+            <li class="no">Claim to slow, stop or cure dementia</li>
+          </ul>
+          <p>Meco records observations and may cautiously surface patterns in them. A change from someone's usual pattern is a reason to speak to their healthcare team, never a conclusion about why it happened.</p>
+        </div>
+      </section>
+
+      <section class="evidence-section reveal-up">
+        <p class="section-kicker">SOURCES</p>
+        <h2 class="display-heading">References</h2>
+        <div data-evidence="citations"></div>
+      </section>
+    </div>
+
+    <div class="landing-page hidden" data-landing-page="privacy-policy">
+      <div class="legal-page">
+        <div class="legal-head reveal">
+          <p class="chapter-eyebrow">LEGAL</p>
+          <h1>Privacy Policy</h1>
+          <p class="legal-updated">Last updated August 2026</p>
+          <p class="legal-standfirst">This describes what Meco collects, why, and where it goes. It's written to match what the <a href="/privacy" data-landing-nav="privacy">Privacy chapter</a> already explains in plainer language. This is the same set of facts in the form a policy needs to take.</p>
+        </div>
+        <div class="legal-body">
+          <section class="reveal">
+            <h2>1. Who this applies to</h2>
+            <p>This policy covers anyone with a Meco account (a "caregiver") and, by extension, the people a caregiver enrolls as trusted visitors or as the person Meco is set up to recognize (a "patient" or "Meco member"). A patient doesn't typically create their own account: the caregiver who enrolls them is responsible for having their consent, or the legal authority to act on their behalf. See §6.</p>
+          </section>
+          <section class="reveal">
+            <h2>2. What we collect</h2>
+            <p>An account holder's name and email, handled by our authentication provider, Clerk. For each trusted person a caregiver enrolls: a name, relationship, a short memory cue, a face descriptor (a numerical representation of facial geometry, not a photograph) and a small thumbnail, and optionally a voiceprint. For each recorded visit: an audio-derived transcript, speaker labels, and an AI-generated summary. Journal entries and care notes a caregiver or patient chooses to write. Settings such as speech language and calendar-sync preferences.</p>
+          </section>
+          <section class="reveal">
+            <h2>3. Where processing actually happens</h2>
+            <p>Face matching, both enrollment and recognition, runs in the caregiver's own browser via face-api.js; only the resulting descriptor and thumbnail are saved, never a raw video stream. Voice matching runs on a small local server, not a third party. Everything else that needs an external provider (AssemblyAI or Deepgram for transcription, Google Gemini for summaries, Google Calendar for optional sync) is proxied through Meco's own server, provider credentials never reach the browser, and the browser never talks to those providers directly.</p>
+          </section>
+          <section class="reveal">
+            <h2>4. How we use it</h2>
+            <p>Solely to run the features you're using: recognizing an enrolled person, transcribing and summarizing a visit, keeping a journal, syncing a calendar if you've turned that on. We don't use this data for advertising, we don't sell it, and we don't use it to train models outside of the third-party processors' own standard processing of a given request (see §5).</p>
+          </section>
+          <section class="reveal">
+            <h2>5. Third-party processors</h2>
+            <p>Clerk (authentication), Appwrite (account-scoped data storage), AssemblyAI and Deepgram (speech-to-text), Google Gemini (visit summaries), and Google Calendar (optional). Each processes only what a given feature requires, under their own respective privacy terms, and only when you're actively using the feature that needs them.</p>
+          </section>
+          <section class="reveal">
+            <h2>6. Consent for enrolled people</h2>
+            <p>A face descriptor and a voiceprint are biometric data belonging to the person enrolled, not the caregiver doing the enrolling. Meco does not verify consent for you; it's the caregiver's responsibility to have a real conversation with that person first, or to be acting within their legal authority as a caregiver, before enrollment.</p>
+          </section>
+          <section class="reveal">
+            <h2>7. Retention &amp; deletion</h2>
+            <p>Nothing is kept indefinitely by default, and nothing removes itself automatically, that's a decision left to the account holder. Any enrolled person, transcript, journal entry, or care note can be deleted the same way it was created, at any time, from within the app. Deleting your account removes the data associated with it.</p>
+          </section>
+          <section class="reveal">
+            <h2>8. Your rights</h2>
+            <p>You can access, export, or delete your data at any time through the app itself, without needing to submit a request. If you'd rather reach us directly, see §11.</p>
+          </section>
+          <section class="reveal">
+            <h2>9. Security</h2>
+            <p>Data in transit is encrypted (HTTPS). Authentication and storage rely on Clerk's and Appwrite's own security practices. No system is perfectly secure, and we can't guarantee absolute security, only that we haven't cut corners we could reasonably avoid.</p>
+          </section>
+          <section class="reveal">
+            <h2>10. Changes to this policy</h2>
+            <p>If this policy changes in a way that meaningfully affects what we collect or how we use it, we'll update the date above and, where practical, note it in the app.</p>
+          </section>
+          <section class="reveal">
+            <h2>11. Contact</h2>
+            <p>Questions about this policy can be sent to <a href="mailto:privacy@meco.app">privacy@meco.app</a>.</p>
+          </section>
+        </div>
+        <div class="legal-footer-nav reveal">
+          <a href="/terms" data-landing-nav="terms">Terms of Service <span>→</span></a>
+          <a href="/cookies" data-landing-nav="cookies">Cookie Policy <span>→</span></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ TERMS OF SERVICE ============ -->
+    <div class="landing-page hidden" data-landing-page="terms">
+      <div class="legal-page">
+        <div class="legal-head reveal">
+          <p class="chapter-eyebrow">LEGAL</p>
+          <h1>Terms of Service</h1>
+          <p class="legal-updated">Last updated August 2026</p>
+          <p class="legal-standfirst">The practical terms of using Meco, written as plainly as a terms page can be.</p>
+        </div>
+        <div class="legal-body">
+          <section class="reveal">
+            <h2>1. Acceptance</h2>
+            <p>By creating a Meco account or using Meco in any form, you agree to these terms. If you're setting up Meco on behalf of someone else (a parent, a patient, someone in your care) you're agreeing on their behalf as well as your own, and confirming you have the standing to do so.</p>
+          </section>
+          <section class="reveal">
+            <h2>2. What Meco is, and isn't</h2>
+            <p>Meco is a memory-companion tool: it recognizes enrolled trusted people, records and summarizes visits, and keeps a journal. <strong>Meco is not a medical device, does not diagnose or treat any condition, and is not a substitute for professional medical, psychiatric, or caregiving advice.</strong> AI-generated summaries and engagement scores are observational aids meant for a caregiver's own review, not clinical findings, and not something to act on without a caregiver reading the underlying transcript themselves.</p>
+          </section>
+          <section class="reveal">
+            <h2>3. Accounts &amp; eligibility</h2>
+            <p>You must be at least 18 years old to create an account. You're responsible for keeping your login credentials secure, for the accuracy of what you enter, and for every person you choose to enroll.</p>
+          </section>
+          <section class="reveal">
+            <h2>4. Acceptable use</h2>
+            <p>Don't enroll someone's face or voice without their knowledge, or without the legal authority to act on their behalf. Don't use Meco for anything illegal, or in a way that could reasonably harm the person it's meant to help. We can suspend or terminate accounts that violate this.</p>
+          </section>
+          <section class="reveal">
+            <h2>5. Your data, our license to use it</h2>
+            <p>You own what you put into Meco, enrollments, transcripts, journal entries, notes. We're granted only the license needed to process it in order to provide the service back to you: running recognition, generating a transcript, producing a summary. Nothing more.</p>
+          </section>
+          <section class="reveal">
+            <h2>6. Third-party services</h2>
+            <p>Meco depends on Clerk, Appwrite, AssemblyAI, Deepgram, Google Gemini, and (optionally) Google Calendar to function. We don't control their uptime, and an outage on their end can affect Meco's availability.</p>
+          </section>
+          <section class="reveal">
+            <h2>7. Disclaimers &amp; limitation of liability</h2>
+            <p>Meco is provided "as is," without warranties of any kind, express or implied. To the fullest extent the law allows, Meco and its operators aren't liable for indirect, incidental, or consequential damages arising from its use. This doesn't limit any liability that can't legally be limited.</p>
+          </section>
+          <section class="reveal">
+            <h2>8. Termination</h2>
+            <p>You can delete your account at any time, which removes the data tied to it. We can suspend or terminate an account for violating these terms, with notice where practical.</p>
+          </section>
+          <section class="reveal">
+            <h2>9. Changes to these terms</h2>
+            <p>We'll update the date above when these terms change in a way that matters, and note it in the app where practical.</p>
+          </section>
+          <section class="reveal">
+            <h2>10. Contact</h2>
+            <p>Questions about these terms can be sent to <a href="mailto:hello@meco.app">hello@meco.app</a>.</p>
+          </section>
+        </div>
+        <div class="legal-footer-nav reveal">
+          <a href="/privacy-policy" data-landing-nav="privacy-policy">Privacy Policy <span>→</span></a>
+          <a href="/cookies" data-landing-nav="cookies">Cookie Policy <span>→</span></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ COOKIE POLICY ============ -->
+    <div class="landing-page hidden" data-landing-page="cookies">
+      <div class="legal-page">
+        <div class="legal-head reveal">
+          <p class="chapter-eyebrow">LEGAL</p>
+          <h1>Cookie Policy</h1>
+          <p class="legal-updated">Last updated August 2026</p>
+          <p class="legal-standfirst">Short, because there isn't much to say, Meco doesn't run any advertising or analytics trackers.</p>
+        </div>
+        <div class="legal-body">
+          <section class="reveal">
+            <h2>1. What Meco actually stores in your browser</h2>
+            <p>A session cookie from Clerk, our authentication provider, that keeps you signed in. One entry in your browser's local storage, <code>meco-theme</code>, that remembers which of Meco's visual themes you last picked. That's the complete list.</p>
+          </section>
+          <section class="reveal">
+            <h2>2. What we don't use</h2>
+            <p>No advertising cookies, no third-party analytics or tracking scripts, no cross-site tracking of any kind. Nothing here is sold to or shared with an ad network.</p>
+          </section>
+          <section class="reveal">
+            <h2>3. Managing this</h2>
+            <p>Your browser's settings can block or clear cookies and local storage at any time. Clearing the Clerk session cookie will sign you out; clearing <code>meco-theme</code> just resets the site to its default look next visit.</p>
+          </section>
+          <section class="reveal">
+            <h2>4. Changes to this policy</h2>
+            <p>If that ever changes, if a future feature needs a new cookie, we'll update the date above and this page before it ships.</p>
+          </section>
+          <section class="reveal">
+            <h2>5. Contact</h2>
+            <p>Questions can be sent to <a href="mailto:privacy@meco.app">privacy@meco.app</a>.</p>
+          </section>
+        </div>
+        <div class="legal-footer-nav reveal">
+          <a href="/privacy-policy" data-landing-nav="privacy-policy">Privacy Policy <span>→</span></a>
+          <a href="/terms" data-landing-nav="terms">Terms of Service <span>→</span></a>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="wordmark footer-logo"><span>ME</span><span>CO</span></div>
+          <p>Adaptive cognitive support for dementia, built around what a person can still do.</p>
+          <button class="theme-toggle" id="theme-toggle-footer" type="button" aria-label="Choose a theme" title="Choose a theme">◐ Themes</button>
+        </div>
+        <nav class="footer-col" aria-label="Product">
+          <p class="footer-col-head">Product</p>
+          <a href="/recognize" data-landing-nav="recognize">Recognize</a>
+          <a href="/product" data-landing-nav="product">Product</a>
+          <a href="/companion" data-landing-nav="companion">Companion</a>
+          <a href="/caregiver" data-landing-nav="caregiver">Caregiver</a>
+        </nav>
+        <nav class="footer-col" aria-label="Company">
+          <p class="footer-col-head">Company</p>
+          <a href="/privacy" data-landing-nav="privacy">Privacy approach</a>
+          <a href="/pricing" data-landing-nav="pricing">Pricing</a>
+          <a href="/clinicians" data-landing-nav="clinicians">For Clinicians</a>
+        </nav>
+        <nav class="footer-col" aria-label="Legal">
+          <p class="footer-col-head">Legal</p>
+          <a href="/privacy-policy" data-landing-nav="privacy-policy">Privacy Policy</a>
+          <a href="/terms" data-landing-nav="terms">Terms of Service</a>
+          <a href="/cookies" data-landing-nav="cookies">Cookie Policy</a>
+        </nav>
+        <div class="footer-col footer-cta-col">
+          <p class="footer-col-head">Get started</p>
+          <button class="link-button" data-auth="sign-in">Log in</button>
+          <button class="pill-button dark" data-auth="sign-up">Try Meco Free</button>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 Meco. Not a medical device, see the <a href="/terms" data-landing-nav="terms">Terms of Service</a>.</p>
+        <div class="footer-bottom-links">
+          <a href="/privacy-policy" data-landing-nav="privacy-policy">Privacy</a>
+          <a href="/terms" data-landing-nav="terms">Terms</a>
+          <a href="/cookies" data-landing-nav="cookies">Cookies</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <main id="app-view" class="app-view hidden" aria-live="polite">
+    <header class="app-topbar">
+      <button class="wordmark app-wordmark" data-route="landing"><span>ME</span><span>CO</span></button>
+      <div class="app-top-center"><span id="backend-chip" class="status-chip"><i></i> Connecting</span><span id="face-chip" class="status-chip"><i></i> Face models</span></div>
+      <div class="app-top-actions"><button class="theme-toggle" id="theme-toggle-app" type="button" aria-label="Choose a theme" title="Choose a theme">◐</button><button class="mode-button" id="patient-mode-top">Patient mode</button><div id="clerk-user-button"></div></div>
+    </header>
+    <div class="app-layout">
+      <aside class="app-sidebar">
+        <div class="sidebar-nav-scroll">
+          <button class="side-nav active" data-page="overview"><span>⌂</span>Overview</button>
+          <p class="side-nav-group">CARE CIRCLE</p>
+          <button class="side-nav" data-page="visits"><span>▦</span>Visits</button>
+          <button class="side-nav" data-page="reminders"><span>◴</span>Reminders</button>
+          <button class="side-nav" data-page="people"><span>◎</span>People</button>
+          <button class="side-nav" data-page="memory"><span>▤</span>Memory Book</button>
+          <button class="side-nav" data-page="graph"><span>⏱</span>Memory</button>
+          <p class="side-nav-group">INSIGHTS</p>
+          <button class="side-nav" data-page="sessions"><span>≋</span>Visit Reports</button>
+          <button class="side-nav" data-page="insights"><span>◈</span>Insights</button>
+          <button class="side-nav" data-page="notes"><span>✒</span>Care Notes</button>
+          <p class="side-nav-group">COMPANION</p>
+          <button class="side-nav" data-page="companion"><span>♥</span>Companion</button>
+          <button class="side-nav" data-page="journal"><span>✎</span>Journal</button>
+          <button class="side-nav" data-page="activities"><span>✳</span>Activities</button>
+          <div class="side-nav-gap"></div>
+          <button class="side-nav" data-page="settings"><span>⚙</span>Settings</button>
+        </div>
+        <div class="care-note"><small>CAREGIVER NOTE</small><p id="sidebar-care-note">You are safe. Take your time and enjoy this visit.</p></div>
+        <button class="side-nav patient-entry" data-page="patient"><span>◉</span><span class="patient-entry-label">Open patient mode</span></button>
+      </aside>
+      <section id="app-content" class="app-content"></section>
+    </div>
+  </main>
+
+  <div id="auth-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-label="Meco authentication">
+    <div class="auth-modal-card"><button class="modal-close" data-close-modal>×</button><div class="auth-brand"><div class="wordmark"><span>ME</span><span>CO</span></div><p>Enter your private memory space.</p></div><div id="clerk-auth-mount"></div><div id="auth-loading" class="auth-loading">Loading secure sign-in…</div></div>
+  </div>
+
+  <div id="face-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-label="Enroll trusted visitor">
+    <div class="face-modal-card">
+      <button class="modal-close" data-close-face>×</button>
+      <div class="face-form-side">
+        <p class="section-kicker">TRUSTED PERSON</p><h2>Add someone familiar</h2>
+        <label>Name<input id="visitor-name" type="text" maxlength="80" placeholder="e.g. Sarah" /></label>
+        <label>Relationship<input id="visitor-relationship" type="text" maxlength="80" placeholder="e.g. Daughter" /></label>
+        <label>Memory cue<textarea id="visitor-memory" rows="4" maxlength="500" placeholder="A reassuring detail Meco can share"></textarea></label>
+        <p class="privacy-hint">Meco saves a numerical face descriptor and a small thumbnail. A real detected face is required. An optional voice sample adds a numerical voiceprint so Meco can name this person in the live conversation transcript.</p>
+      </div>
+      <div class="face-camera-side">
+        <div class="consent-gate" id="enroll-consent-gate">
+          <p class="consent-gate-title">Before you enroll someone</p>
+          <p class="consent-gate-body">This captures biometric data (a numerical face descriptor, a small thumbnail, and optionally a voice embedding) for the specific person in front of the camera. Only enroll someone with their knowledge, or on behalf of someone in your legal care.</p>
+          <label class="consent-gate-check"><input type="checkbox" id="enroll-consent-check" /><span>I have consent to enroll this person, and I understand this data can be deleted at any time from their profile.</span></label>
+        </div>
+        <div class="camera-shell"><video id="enroll-video" autoplay muted playsinline></video><div id="enroll-camera-message" class="camera-message">Start camera to enroll</div></div>
+        <div class="pose-progress"><span data-pose-status="front">Front</span><span data-pose-status="left">Left</span><span data-pose-status="right">Right</span></div>
+        <div class="camera-actions"><button id="start-enroll-camera" class="soft-button" disabled>Start camera</button><button id="capture-pose" class="pill-button dark" disabled>Capture front</button></div>
+        <div class="camera-actions"><button id="capture-voice" class="soft-button" disabled>Record voice sample (optional)</button></div>
+        <button id="save-visitor" class="pill-button dark wide" disabled>Save trusted person</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="person-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-label="Edit trusted person">
+    <div class="person-modal-card">
+      <button class="modal-close" data-close-person>×</button>
+      <div class="face-form-side">
+        <p class="section-kicker">TRUSTED PERSON</p><h2>Edit details</h2>
+        <label>Name<input id="edit-person-name" type="text" maxlength="80" placeholder="e.g. Sarah" /></label>
+        <label>Relationship<input id="edit-person-relationship" type="text" maxlength="80" placeholder="e.g. Daughter" /></label>
+        <label>Memory cue<textarea id="edit-person-memory" rows="4" maxlength="500" placeholder="A reassuring detail Meco can share"></textarea></label>
+        <div class="form-grid">
+          <div class="form-field"><label>Favorite song <small style="font-weight:500;color:#a49f97">(optional)</small></label><input id="edit-person-song-title" type="text" maxlength="120" placeholder="e.g. Fly Me to the Moon" /></div>
+          <div class="form-field"><label>YouTube link <small style="font-weight:500;color:#a49f97">(optional)</small></label><input id="edit-person-song-url" type="url" maxlength="300" placeholder="https://youtube.com/watch?v=…" /></div>
+        </div>
+        <p class="privacy-hint">A song that matters to them, played in Browse Memories, the same idea behind familiar-music approaches used in dementia care.</p>
+        <p class="privacy-hint">The enrolled face angles and voiceprint stay as they are. Re-record them from the People list when they need updating.</p>
+        <div class="action-row"><button id="save-person-details" class="pill-button dark">Save changes</button><button class="action-button" data-close-person>Cancel</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="visit-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-label="Schedule a visit">
+    <div class="person-modal-card">
+      <button class="modal-close" data-close-visit>×</button>
+      <div class="face-form-side">
+        <p class="section-kicker">VISITS</p><h2 id="visit-modal-title">Schedule a visit</h2>
+        <label>Visitor<input id="visit-name" type="text" maxlength="80" placeholder="e.g. Sarah" list="visit-visitor-options" autocomplete="off" /></label>
+        <datalist id="visit-visitor-options"></datalist>
+        <div class="form-grid">
+          <div class="form-field"><label>Date</label><input id="visit-date" type="date" /></div>
+          <div class="form-field"><label>Start time (optional)</label><input id="visit-time" type="time" /></div>
+          <div class="form-field"><label>End time (optional)</label><input id="visit-end-time" type="time" /></div>
+          <div class="form-field full"><label>Repeat</label><select id="visit-repeat-freq"><option value="none">Does not repeat</option><option value="weekly">Repeats weekly</option></select></div>
+        </div>
+        <div class="repeat-days-row" id="visit-repeat-days" hidden>
+          <button type="button" class="repeat-day-chip" data-day="MO">Mon</button>
+          <button type="button" class="repeat-day-chip" data-day="TU">Tue</button>
+          <button type="button" class="repeat-day-chip" data-day="WE">Wed</button>
+          <button type="button" class="repeat-day-chip" data-day="TH">Thu</button>
+          <button type="button" class="repeat-day-chip" data-day="FR">Fri</button>
+          <button type="button" class="repeat-day-chip" data-day="SA">Sat</button>
+          <button type="button" class="repeat-day-chip" data-day="SU">Sun</button>
+        </div>
+        <label>Note (optional)<textarea id="visit-note" rows="3" maxlength="140" placeholder="What to remember for this visit"></textarea></label>
+        <div class="action-row"><button id="save-visit" class="pill-button dark">Save visit</button><button class="action-button" data-close-visit>Cancel</button><button id="delete-visit-modal" class="action-button danger hidden">Delete visit</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="reminder-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-label="Add a reminder">
+    <div class="person-modal-card">
+      <button class="modal-close" data-close-reminder>×</button>
+      <div class="face-form-side">
+        <p class="section-kicker">REMINDERS</p><h2 id="reminder-modal-title">Add a reminder</h2>
+        <label>Reminder<input id="reminder-text" type="text" maxlength="140" placeholder="e.g. Print family photo" /></label>
+        <div class="form-grid">
+          <div class="form-field"><label>Date</label><input id="reminder-date" type="date" /></div>
+          <div class="form-field"><label>Start time (optional)</label><input id="reminder-time" type="time" /></div>
+          <div class="form-field"><label>End time (optional)</label><input id="reminder-end-time" type="time" /></div>
+          <div class="form-field full"><label>Repeat</label><select id="reminder-repeat-freq"><option value="none">Does not repeat</option><option value="weekly">Repeats weekly</option></select></div>
+          <div class="form-field"><label>Near place (optional)</label><select id="reminder-near-place"><option value="">Any place</option></select></div>
+          <div class="form-field"><label>After activity (optional)</label><input id="reminder-after-activity" type="text" maxlength="60" placeholder="e.g. breakfast" /></div>
+        </div>
+        <div class="repeat-days-row" id="reminder-repeat-days" hidden>
+          <button type="button" class="repeat-day-chip" data-day="MO">Mon</button>
+          <button type="button" class="repeat-day-chip" data-day="TU">Tue</button>
+          <button type="button" class="repeat-day-chip" data-day="WE">Wed</button>
+          <button type="button" class="repeat-day-chip" data-day="TH">Thu</button>
+          <button type="button" class="repeat-day-chip" data-day="FR">Fri</button>
+          <button type="button" class="repeat-day-chip" data-day="SA">Sat</button>
+          <button type="button" class="repeat-day-chip" data-day="SU">Sun</button>
+        </div>
+        <div class="action-row"><button id="save-reminder" class="pill-button dark">Save reminder</button><button class="action-button" data-close-reminder>Cancel</button><button id="delete-reminder-modal" class="action-button danger hidden">Delete reminder</button></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

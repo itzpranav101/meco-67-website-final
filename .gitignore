@@ -1,0 +1,8 @@
+.DS_Store
+.env
+data/*.json
+data/*.tmp
+node_modules/
+voice-id/__pycache__/
+voice-id/voiceprints.json
+.claude/

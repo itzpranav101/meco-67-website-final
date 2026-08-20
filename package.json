@@ -1,0 +1,17 @@
+{
+  "name": "meco-final",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --env-file=.env server.mjs",
+    "start": "NODE_ENV=production node server.mjs",
+    "voice:server": "python voice-id/server.py",
+    "validate": "node scripts/validate.mjs",
+    "setup:appwrite": "node --env-file=.env scripts/setup-appwrite.mjs",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
