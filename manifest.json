@@ -1,0 +1,9 @@
+{
+  "name": "Meco Memory Companion",
+  "short_name": "Meco",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f4ef",
+  "theme_color": "#9edcf2",
+  "icons": [{ "src": "/meco-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
