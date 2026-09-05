@@ -228,10 +228,10 @@ async function initClerk() {
 
       if (user && !$('#auth-modal').classList.contains('hidden')) {
         closeAuthModal();
-        if (location.pathname !== '/app') history.pushState({}, '', '/app');
+        if (routePath() !== '/app') history.pushState({}, '', routeUrl('/app'));
       }
 
-      const alreadyShowingApp = appLoaded && location.pathname === '/app' && !$('#app-view').classList.contains('hidden');
+      const alreadyShowingApp = appLoaded && routePath() === '/app' && !$('#app-view').classList.contains('hidden');
       if (!userChanged && alreadyShowingApp) return;
       await renderRoute();
     });
@@ -328,6 +328,23 @@ const landingPageTitles = {
   terms: 'Terms of Service | Meco',
   cookies: 'Cookie Policy | Meco',
 };
+const BASE = new URL('.', import.meta.url).pathname.replace(/\/$/, '');
+const routePath = () => {
+  const path = location.pathname;
+  if (BASE && path.startsWith(BASE)) return path.slice(BASE.length) || '/';
+  return path;
+};
+const routeUrl = (path) => `${BASE}${path}`;
+
+function applyRouteBase() {
+  if (!BASE) return;
+  $$('a[href^="/"]').forEach((link) => {
+    const href = link.getAttribute('href');
+    if (href.startsWith('//') || href.startsWith(BASE + '/')) return;
+    link.setAttribute('href', routeUrl(href));
+  });
+}
+
 const landingPathToPage = (pathname) => {
   const clean = pathname.replace(/^\//, '') || 'home';
   return LANDING_PAGES.includes(clean) ? clean : 'home';
@@ -335,7 +352,7 @@ const landingPathToPage = (pathname) => {
 
 async function renderRoute() {
   const signedIn = Boolean(clerk?.user && clerk?.session) || config.features.localDemo;
-  if (location.pathname === '/app') {
+  if (routePath() === '/app') {
     if (!signedIn) {
       showLanding('home');
       openAuthModal('sign-in');
@@ -343,7 +360,7 @@ async function renderRoute() {
     }
     await showApp();
   } else {
-    showLanding(landingPathToPage(location.pathname));
+    showLanding(landingPathToPage(routePath()));
   }
 }
 
@@ -937,6 +954,7 @@ function renderOverview(content) {
     ${sosAlertBannerMarkup()}
     ${flaggedChatBannerMarkup()}
     ${briefingBannerMarkup()}
+    ${onThisDayMarkup()}
     <div class="app-grid">
       <article class="app-card metric-card blue"><span>Trusted people</span><strong data-count-target="${state.visitors.length}">0</strong></article>
       <article class="app-card metric-card green"><span>Recorded visits</span><strong data-count-target="${state.sessions.length}">0</strong></article>
@@ -966,6 +984,7 @@ function renderOverview(content) {
   wireSosAlertBanner(content);
   wireBriefingBanner(content);
   wireDemoCodeStrip(content);
+  wireOnThisDay(content);
   const goInsights = () => navigateApp('insights');
   const goNotes = () => navigateApp('notes');
   $('#overview-insights-tile').onclick = goInsights;
@@ -5153,10 +5172,226 @@ function wireRerenderRequests() {
   });
 }
 
+const PALETTE_PAGE_GLYPHS = {
+  overview: '⌂', visits: '▦', reminders: '◴', people: '◎',
+  memory: '▤', graph: '⏱', sessions: '≋', insights: '◈',
+  notes: '✒', companion: '❦', journal: '✎', activities: '✳',
+  settings: '⚙', patient: '◉',
+};
+
+let paletteItems = [];
+let paletteActive = 0;
+let paletteOpen = false;
+
+function paletteIndex() {
+  const items = [];
+  $$('.side-nav[data-page]').forEach((button) => {
+    const page = button.dataset.page;
+    const label = button.textContent.trim().replace(/\s+/g, ' ');
+    if (!label) return;
+    items.push({
+      kind: 'page', glyph: PALETTE_PAGE_GLYPHS[page] || '○',
+      label, hint: 'Go to page', run: () => navigateApp(page),
+    });
+  });
+  (state.visitors || []).forEach((visitor) => {
+    items.push({
+      kind: 'person', glyph: '◎', label: visitor.name || 'Unnamed',
+      hint: visitor.relationship || 'Trusted person',
+      run: () => { navigateApp('people'); setTimeout(() => openPersonEditor(visitor.id), 60); },
+    });
+  });
+  (state.sessions || []).slice().sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt)).forEach((session) => {
+    items.push({
+      kind: 'visit', glyph: '≋', label: sessionTitle(session),
+      hint: formatDate(session.startedAt), run: () => openSessionDetail(session.id),
+    });
+  });
+  (state.memories || []).forEach((memory) => {
+    items.push({
+      kind: 'memory', glyph: '▤', label: memory.title || 'Untitled memory',
+      hint: memory.date ? formatDate(memory.date) : 'Memory capsule',
+      run: () => { navigateApp('graph'); setTimeout(() => openMemoryDetail(memory.id), 60); },
+    });
+  });
+  (state.places || []).forEach((place) => {
+    items.push({ kind: 'place', glyph: '◈', label: place.name || 'Unnamed place',
+      hint: 'Place', run: () => navigateApp('graph') });
+  });
+  return items;
+}
+
+function paletteScore(item, query) {
+  const hay = (item.label + ' ' + item.hint).toLowerCase();
+  const label = item.label.toLowerCase();
+  if (!query) return item.kind === 'page' ? 3 : 1;
+  if (label.startsWith(query)) return 100 - label.length;
+  if (label.includes(query)) return 60 - label.length;
+  if (hay.includes(query)) return 30;
+  let i = 0;
+  for (const ch of label) { if (ch === query[i]) i += 1; if (i === query.length) return 12; }
+  return 0;
+}
+
+function paletteRender(query) {
+  const list = $('#palette-results');
+  const count = $('#palette-count');
+  if (!list) return;
+  const q = query.trim().toLowerCase();
+  const ranked = paletteItems
+    .map((item) => ({ item, score: paletteScore(item, q) }))
+    .filter((row) => row.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 40)
+    .map((row) => row.item);
+  paletteItems.filtered = ranked;
+  if (paletteActive >= ranked.length) paletteActive = 0;
+  if (count) count.textContent = ranked.length ? `${ranked.length} found` : '';
+  if (!ranked.length) {
+    list.innerHTML = '<li class="palette-empty">Nothing matches that</li>';
+    return;
+  }
+  list.innerHTML = ranked.map((item, i) => `
+    <li role="option" data-palette-index="${i}" aria-selected="${i === paletteActive}">
+      <span class="palette-glyph">${item.glyph}</span>
+      <span class="palette-label"><b>${escapeHtml(item.label)}</b><small>${escapeHtml(item.hint)}</small></span>
+      <span class="palette-kind">${item.kind}</span>
+    </li>`).join('');
+  const active = list.querySelector('[aria-selected="true"]');
+  if (active) active.scrollIntoView({ block: 'nearest' });
+}
+
+function paletteRun(index) {
+  const ranked = paletteItems.filtered || [];
+  const item = ranked[index];
+  if (!item) return;
+  closePalette();
+  item.run();
+}
+
+function openPalette() {
+  const backdrop = $('#palette');
+  const input = $('#palette-input');
+  if (!backdrop || !input || appLoaded === false) return;
+  paletteItems = paletteIndex();
+  paletteActive = 0;
+  paletteOpen = true;
+  backdrop.classList.remove('hidden');
+  input.value = '';
+  paletteRender('');
+  input.focus();
+}
+
+function closePalette() {
+  const backdrop = $('#palette');
+  if (!backdrop) return;
+  paletteOpen = false;
+  backdrop.classList.add('hidden');
+}
+
+function initCommandPalette() {
+  const backdrop = $('#palette');
+  const input = $('#palette-input');
+  const list = $('#palette-results');
+  if (!backdrop || !input || !list) return;
+
+  input.addEventListener('input', () => { paletteActive = 0; paletteRender(input.value); });
+  list.addEventListener('click', (event) => {
+    const row = event.target.closest('[data-palette-index]');
+    if (row) paletteRun(Number(row.dataset.paletteIndex));
+  });
+  list.addEventListener('mousemove', (event) => {
+    const row = event.target.closest('[data-palette-index]');
+    if (!row) return;
+    const next = Number(row.dataset.paletteIndex);
+    if (next === paletteActive) return;
+    paletteActive = next;
+    list.querySelectorAll('[data-palette-index]').forEach((el) => {
+      el.setAttribute('aria-selected', String(Number(el.dataset.paletteIndex) === paletteActive));
+    });
+  });
+  backdrop.addEventListener('mousedown', (event) => { if (event.target === backdrop) closePalette(); });
+
+  document.addEventListener('keydown', (event) => {
+    const combo = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k';
+    if (combo) {
+      event.preventDefault();
+      if (paletteOpen) closePalette();
+      else if (!$('#app-view').classList.contains('hidden')) openPalette();
+      return;
+    }
+    if (!paletteOpen) return;
+    const ranked = paletteItems.filtered || [];
+    if (event.key === 'Escape') { event.preventDefault(); closePalette(); }
+    else if (event.key === 'ArrowDown') { event.preventDefault(); paletteActive = (paletteActive + 1) % Math.max(1, ranked.length); paletteRender(input.value); }
+    else if (event.key === 'ArrowUp') { event.preventDefault(); paletteActive = (paletteActive - 1 + ranked.length) % Math.max(1, ranked.length); paletteRender(input.value); }
+    else if (event.key === 'Enter') { event.preventDefault(); paletteRun(paletteActive); }
+  });
+}
+
+function onThisDayEntry() {
+  const now = new Date();
+  const today = now.getDate();
+  const thisMonth = now.getMonth();
+  const thisYear = now.getFullYear();
+  const pool = [];
+  (state.sessions || []).forEach((session) => {
+    if (session.startedAt) pool.push({ when: new Date(session.startedAt), kind: 'visit', title: sessionTitle(session),
+      body: session.summary?.summary || (session.transcript || []).map((t) => t.text).filter(Boolean).join(' '),
+      open: () => openSessionDetail(session.id) });
+  });
+  (state.journalEntries || []).forEach((entry) => {
+    if (entry.createdAt) pool.push({ when: new Date(entry.createdAt), kind: 'journal', title: 'Journal entry',
+      body: (entry.text || '').replace(/\s+/g, ' '), open: () => navigateApp('journal') });
+  });
+  (state.memories || []).forEach((memory) => {
+    const stamp = memory.date || memory.createdAt;
+    if (stamp) pool.push({ when: new Date(stamp), kind: 'memory', title: memory.title || 'A memory',
+      body: memory.summary || memory.details || '', open: () => { navigateApp('graph'); setTimeout(() => openMemoryDetail(memory.id), 60); } });
+  });
+
+  const older = pool.filter((row) => !Number.isNaN(row.when.getTime())
+    && !(row.when.getFullYear() === thisYear && row.when.getMonth() === thisMonth && row.when.getDate() === today));
+  const sameDayOtherYear = older.filter((row) => row.when.getDate() === today && row.when.getMonth() === thisMonth);
+  const sameDateOtherMonth = older.filter((row) => row.when.getDate() === today);
+  const pick = (sameDayOtherYear[0] || sameDateOtherMonth[0]);
+  if (!pick || !(pick.body || '').trim()) return null;
+
+  const months = Math.max(0, (thisYear - pick.when.getFullYear()) * 12 + (thisMonth - pick.when.getMonth()));
+  let ago = 'earlier';
+  if (months >= 12) { const y = Math.floor(months / 12); ago = `${y} year${y === 1 ? '' : 's'} ago today`; }
+  else if (months >= 1) ago = `${months} month${months === 1 ? '' : 's'} ago today`;
+  return { ...pick, ago };
+}
+
+function onThisDayMarkup() {
+  const entry = onThisDayEntry();
+  if (!entry) return '';
+  const body = entry.body.length > 190 ? `${entry.body.slice(0, 190).trim()}…` : entry.body;
+  return `<article class="onthisday" data-onthisday>
+    <div class="onthisday-head">
+      <span class="onthisday-kicker">On this day</span>
+      <span class="onthisday-when">${escapeHtml(entry.ago)} · ${escapeHtml(formatDate(entry.when.toISOString()))}</span>
+    </div>
+    <p class="onthisday-body">${escapeHtml(body)}</p>
+    <p class="onthisday-meta">${escapeHtml(entry.kind)} · ${escapeHtml(entry.title)}</p>
+    <div class="onthisday-actions"><button class="action-button" data-onthisday-open>Open it</button></div>
+  </article>`;
+}
+
+function wireOnThisDay(content) {
+  const button = content.querySelector('[data-onthisday-open]');
+  if (!button) return;
+  button.addEventListener('click', () => {
+    const entry = onThisDayEntry();
+    if (entry) entry.open();
+  });
+}
+
 function wireGlobalEvents() {
 
   $$('[data-auth]').forEach((button) => button.addEventListener('click', () => {
-    if (config.features.localDemo) { history.pushState({}, '', '/app'); renderRoute(); return; }
+    if (config.features.localDemo) { history.pushState({}, '', routeUrl('/app')); renderRoute(); return; }
     openAuthModal(button.dataset.auth);
   }));
 
@@ -5206,11 +5441,11 @@ function wireGlobalEvents() {
     else navigateApp(event.currentTarget.dataset.page);
   });
   $('#patient-mode-top').addEventListener('click', openPatientCameraMode);
-  $$('[data-route="landing"]').forEach((button) => button.addEventListener('click', () => { history.pushState({}, '', '/'); renderRoute(); }));
+  $$('[data-route="landing"]').forEach((button) => button.addEventListener('click', () => { history.pushState({}, '', routeUrl('/')); renderRoute(); }));
   $$('[data-landing-nav]').forEach((link) => link.addEventListener('click', (event) => {
     event.preventDefault();
     const path = link.dataset.landingNav === 'home' ? '/' : `/${link.dataset.landingNav}`;
-    if (location.pathname !== path) history.pushState({}, '', path);
+    if (routePath() !== path) history.pushState({}, '', routeUrl(path));
     showLanding(link.dataset.landingNav);
   }));
   window.addEventListener('popstate', renderRoute);
@@ -5308,10 +5543,14 @@ async function boot() {
   renderEvidencePages();
   initAssistanceLadder();
   initAssistanceSimulation();
+  initCommandPalette();
+  applyRouteBase();
   try {
     setConfig(await fetch('/api/config').then((response) => response.json()));
   } catch (error) {
-    toast('Meco server configuration could not be loaded.', 'error');
+    if (!$('#app-view').classList.contains('hidden')) {
+      toast('Meco server configuration could not be loaded.', 'error');
+    }
   }
   await initClerk();
   await renderRoute();

@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: meco
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install --omit=dev
+    startCommand: node server.mjs
+    healthCheckPath: /api/config
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: ALLOW_LOCAL_DEMO
+        value: "false"
+      - key: AI_PROVIDER
+        value: gemini
+      - key: APPWRITE_ENDPOINT
+        value: https://sgp.cloud.appwrite.io/v1
+      - key: APPWRITE_TABLE_ID
+        value: meco_records
+      - key: APPWRITE_TABLE_NAME
+        value: Meco records
+      - key: ASSEMBLYAI_SPEECH_MODEL
+        value: universal-3-5-pro
+      - key: DEEPGRAM_MODEL
+        value: nova-2
+      - key: PUBLIC_APP_URL
+        sync: false
+      - key: CLERK_ALLOWED_ORIGINS
+        sync: false
+      - key: CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_ISSUER
+        sync: false
+      - key: APPWRITE_PROJECT_ID
+        sync: false
+      - key: APPWRITE_DATABASE_ID
+        sync: false
+      - key: APPWRITE_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ASSEMBLYAI_API_KEY
+        sync: false
+      - key: DEEPGRAM_API_KEY
+        sync: false
+      - key: PATIENT_TOKEN_SECRET
+        sync: false

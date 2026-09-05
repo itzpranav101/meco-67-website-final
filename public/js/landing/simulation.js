@@ -1,5 +1,5 @@
 import { $, escapeHtml } from '../utils.js';
-import { ASSISTANCE_LADDER, recommendAssistanceLevel, functionalSummary } from '/assistance-engine.mjs';
+import { ASSISTANCE_LADDER, recommendAssistanceLevel, functionalSummary } from '../../assistance-engine.mjs';
 
 export function initAssistanceSimulation() {
   const root = $('[data-sim]');

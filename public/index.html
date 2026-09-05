@@ -10,10 +10,10 @@
   <title>Meco | Adaptive Cognitive Support for Dementia</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="manifest" href="/manifest.json" />
-  <link rel="icon" href="/meco-icon.svg" />
-  <link rel="stylesheet" href="/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="meco-icon.svg" />
+  <link rel="stylesheet" href="styles.css" />
 
   <script>
     try {
@@ -2083,6 +2083,22 @@
     </div>
   </div>
 
-  <script type="module" src="/app.js"></script>
+  <div id="palette" class="palette-backdrop hidden" role="dialog" aria-modal="true" aria-label="Look something up">
+    <div class="palette-card">
+      <div class="palette-input-row">
+        <span class="palette-prefix">FIND</span>
+        <input id="palette-input" type="text" autocomplete="off" spellcheck="false" placeholder="a person, a visit, a page" aria-label="Search Meco" />
+        <kbd class="palette-esc">esc</kbd>
+      </div>
+      <ul id="palette-results" class="palette-results" role="listbox" aria-label="Results"></ul>
+      <div class="palette-foot">
+        <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> move</span>
+        <span><kbd>&crarr;</kbd> open</span>
+        <span id="palette-count"></span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
 </body>
 </html>

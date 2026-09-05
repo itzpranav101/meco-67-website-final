@@ -1,7 +1,7 @@
 import { $, escapeHtml } from '../utils.js';
 import {
   Statistic, StatisticBreakdown, EvidenceCard, AllCitations, MECO_WILL_MEASURE,
-} from '/evidence.js';
+} from '../../evidence.js';
 
 export function renderEvidencePages() {
   const impact = $('[data-evidence="impact-singapore"]');
